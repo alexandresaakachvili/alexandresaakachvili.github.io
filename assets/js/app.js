@@ -508,11 +508,9 @@
       btn.addEventListener("click", function () {
         var text = btn.dataset.copy;
 
-        function done() {
-          btn.setAttribute("data-copied", "true");
-          setTimeout(function () { btn.setAttribute("data-copied", "false"); }, 1800);
-        }
-        function fallback() {
+        // Repli pour les navigateurs sans presse-papiers asynchrone, et
+        // pour les pages ouvertes hors HTTPS ou l API est refusee.
+        function repli() {
           var ta = document.createElement("textarea");
           ta.value = text;
           ta.setAttribute("readonly", "");
@@ -520,14 +518,14 @@
           ta.style.top = "-1000px";
           document.body.appendChild(ta);
           ta.select();
-          try { document.execCommand("copy"); done(); } catch (e) { /* rien */ }
+          try { document.execCommand("copy"); } catch (e) { /* rien */ }
           ta.remove();
         }
 
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(text).then(done, fallback);
+          navigator.clipboard.writeText(text)["catch"](repli);
         } else {
-          fallback();
+          repli();
         }
       });
     });

@@ -11,8 +11,6 @@
   --cream:      #F4E6D0;
   --cream-dim:  #A79E90;
   --amber:      #FCBC6D;
-  --mint:       #A9EBA2;
-  --forest:     #0A4105;
 
   --bg:   var(--ink);
   --fg:   var(--cream);
@@ -353,7 +351,11 @@ body.is-leaving{
 /* ---------- Media / figures ---------- */
 .figure > picture,.video > picture,.card__media > picture,.fav__media > picture{height:100%}
 .figure{position:relative;overflow:hidden;border-radius:var(--radius);background:var(--ink-2);margin:0}
-.figure img{width:100%;height:auto}
+.figure img,.figure video{width:100%;height:auto;display:block}
+/* Captures en boucle : elles remplacent des GIF, qui stockaient chaque
+   image entiere. Elles se comportent donc comme une image, pas comme une
+   vidéo — ni commandes, ni son, ni pointeur de lecture. */
+.loop{pointer-events:none}
 .figure--cover img{aspect-ratio:16/9;object-fit:cover}
 /* Carrousel : plusieurs visuels dans le meme cadre, une pastille par vue. */
 .carousel{position:relative}
@@ -648,8 +650,6 @@ body.is-leaving{
    leur casse et respirent moins que les libelles en capitales. */
 .footer-links button{text-transform:none;letter-spacing:.04em}
 .footer-links a:hover,.footer-links button:hover{color:var(--amber)}
-/* Accuse de reception de la copie, comme sur les tuiles de contact. */
-.footer-links button[data-copied="true"]{color:var(--mint)}
 .footer-links svg{width:15px;height:15px;flex:none}
 
 /* ---------- Contact : tuiles avec pictogrammes ---------- */
@@ -686,8 +686,6 @@ body.is-leaving{
   transition:color .35s;
 }
 .contact-tile.is-hovered .contact-tile__value{color:var(--amber)}
-.contact-tile[data-copied="true"]{border-color:var(--mint)}
-.contact-tile[data-copied="true"] .contact-tile__icon{stroke:var(--mint)}
 
 /* ---------- Page contact ----------
    Les tuiles sont centrees verticalement dans la fenetre. min-height plutot

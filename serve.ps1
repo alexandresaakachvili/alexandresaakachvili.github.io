@@ -29,6 +29,8 @@ $mime = @{
     '.jpeg' = 'image/jpeg'
     '.png'  = 'image/png'
     '.gif'  = 'image/gif'
+    '.webm' = 'video/webm'
+    '.mp4'  = 'video/mp4'
     '.pdf'  = 'application/pdf'
     '.ico'  = 'image/x-icon'
     '.txt'  = 'text/plain; charset=utf-8'

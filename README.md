@@ -115,6 +115,38 @@ Le cadre YouTube ne prend **jamais** le pointeur. Un `<iframe>` est un document 
 
 **Attention** : si tu repasses une vidéo en *privée* sur YouTube, l'embed cesse de fonctionner. *Non répertoriée* est le bon réglage — c'est déjà le cas.
 
+### Les captures en boucle
+
+Trois séquences tournent en boucle sans son, comme le faisaient des GIF : le gameplay et le marchand d'In_Machina, et le blockout de la Pyramide. Ce ne sont plus des GIF — un GIF stocke chaque image entière, sans compression d'une image à l'autre, d'où son poids. Les mêmes séquences en vidéo sont **quinze à vingt fois plus légères** :
+
+| | GIF | WebM | MP4 |
+|---|---|---|---|
+| `inmachina-gameplay` | 12 Mo | 1,3 Mo | 676 Ko |
+| `inmachina-shopkeeper` | 7,3 Mo | 364 Ko | 372 Ko |
+| `pyramid-blockout` | 712 Ko | 64 Ko | 164 Ko |
+
+```html
+<video class="loop" autoplay muted loop playsinline preload="metadata"
+       poster="../assets/img/NOM-poster.webp" aria-label="Titre du jeu">
+  <source src="../assets/img/NOM.webm" type="video/webm">
+  <source src="../assets/img/NOM.mp4" type="video/mp4">
+</video>
+```
+
+Le WebM passe en premier, le MP4 sert de repli : c'est le seul format qu'aucun navigateur ne refuse, y compris les Firefox compilés sans H.264. La classe `loop` coupe les événements de pointeur — la séquence se comporte comme une image, pas comme une vidéo : ni commandes, ni son, ni clic. Le `poster` est la première image, pour ne pas montrer un cadre noir le temps du chargement.
+
+Pour en convertir une nouvelle, il faut `ffmpeg` :
+
+```
+ffmpeg -i entree.gif -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2,format=yuv420p" \
+       -c:v libvpx-vp9 -crf 34 -b:v 0 -row-mt 1 -an sortie.webm
+ffmpeg -i entree.gif -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2,format=yuv420p" \
+       -c:v libx264 -crf 26 -preset slow -pix_fmt yuv420p -movflags +faststart -an sortie.mp4
+ffmpeg -i entree.gif -frames:v 1 -q:v 78 sortie-poster.webp
+```
+
+`format=yuv420p` aplatit le canal alpha que les GIF déclarent et que ni l'un ni l'autre encodeur ne prend ; `trunc(iw/2)*2` force des dimensions paires, exigées par le 4:2:0.
+
 ### La fiche technique d'une page projet
 
 En haut à droite de chaque page projet, en face de la phrase de présentation, une petite carte donne le rôle, le moteur, l'effectif et la durée : un pictogramme et une valeur par ligne, le moins de texte possible. Elle réagit au survol comme les cartes de l'accueil.
@@ -173,7 +205,7 @@ On referme avec la croix, la touche Échap, ou un clic n’importe où sur le vo
 
 Une seule rangée en bas de chaque page : les coordonnées à gauche, la flèche de retour en haut au milieu. La rangée compte **trois colonnes dont la dernière reste vide** — sans quoi la flèche se centrerait sur la place laissée par les liens, et non sur la page.
 
-Le mail et le téléphone sont des `<button data-copy>` : cliquer copie la valeur dans le presse-papiers et le texte passe au vert menthe pendant deux secondes. Ils gardent leur casse d'origine, contrairement aux libellés LinkedIn et CV qui sont en capitales.
+Le mail et le téléphone sont des `<button data-copy>` : cliquer copie la valeur dans le presse-papiers, sans rien afficher en retour. Ils gardent leur casse d'origine, contrairement aux libellés LinkedIn et CV qui sont en capitales.
 
 La flèche n'a ni filet ni fond : elle ne doit pas concurrencer les liens. Elle monte et redescend en continu pour attirer l'œil. Son libellé reste dans le code en `sr-only` — invisible à l'écran, mais il nomme le bouton pour les lecteurs d'écran et suit le changement de langue.
 
@@ -312,11 +344,8 @@ Le contenu visible est intégralement traduit (289 clés), titres d'onglet et m�
 - la **page 404**, qui n'a pas de sélecteur de langue ;
 - les noms propres (Panthéon → Pantheon est traduit, Tri'Nytia et Kokoro Renzu non — ce sont les titres des jeux).
 
-### Reste à faire une fois l'URL définitive connue
+### L'adresse du site
 
-Dans `index.html`, la balise `og:image` (l'image affichée quand on partage le lien sur LinkedIn, Discord, etc.) pointe pour l'instant sur un chemin relatif. La plupart des réseaux exigent une URL absolue — à remplacer par :
+**https://alexandresaakachvili.github.io/**
 
-```html
-<meta property="og:image" content="https://alexandresaakachvili.github.io/assets/img/kokoro-cover.webp">
-<meta property="og:url" content="https://alexandresaakachvili.github.io/">
-```
+Le compte GitHub a été renommé `alexandresaakachvili`, et le dépôt porte exactement ce nom suivi de `.github.io` : GitHub le sert donc à la racine du domaine. Tous les chemins du site sont relatifs, rien n'est à changer si l'adresse bouge un jour.
