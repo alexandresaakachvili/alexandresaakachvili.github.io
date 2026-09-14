@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kokoro Renzu — Alexandre Saakachvili</title>
+<meta name="description" content="Jeu d'exploration en monde ouvert et jeu de cartes sur UE5. Lead design d'un projet de diplôme à 14 personnes, finaliste des Rookie Awards.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230A0A0A'/%3E%3Ctext x='32' y='45' font-family='Arial Black,Arial' font-size='34' font-weight='900' text-anchor='middle' fill='%23FCBC6D'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/main.css">
+<script>try{var d=document.documentElement;if(sessionStorage.getItem("as-seen"))d.className+=" no-preloader";else sessionStorage.setItem("as-seen","1");if(matchMedia("(hover:hover) and (pointer:fine)").matches&&!matchMedia("(prefers-reduced-motion:reduce)").matches)d.className+=" has-custom-cursor"}catch(e){}</script>
+</head>
+<body data-en-title="Kokoro Renzu — Alexandre Saakachvili" data-en-desc="Open-world exploration and card game on UE5. Design lead of a 14-person diploma project, Rookie Awards finalist.">
+<div class="preloader" data-preloader>
+  <div class="preloader__inner">
+    <div class="preloader__name">Alexandre Saakachvili</div>
+    <div class="preloader__count"><span data-preloader-count>0</span> %</div>
+    <div class="preloader__bar"><i data-preloader-bar></i></div>
+  </div>
+</div>
+
+
+<header class="site-header" data-header>
+  <div class="shell site-header__row">
+    <a class="brand" href="../index.html" data-cursor="home">
+      <span class="brand__name">Alexandre Saakachvili</span>
+      <span class="brand__role">Game Designer</span>
+    </a>
+    <nav class="nav" aria-label="Navigation principale">
+      <div class="nav__links">
+        <a href="../index.html" data-i18n="nav.work">Projets</a>
+        <a href="../profil.html" data-i18n="nav.about">Profil</a>
+        <a href="../contact.html" data-i18n="nav.contact">Contact</a>
+      </div>
+      <div class="lang">
+        <button type="button" data-lang-btn="fr" data-cursor="swear" class="is-active">FR</button><i>/</i><button type="button" data-lang-btn="en" data-cursor="swear">EN</button>
+      </div>
+      <button type="button" class="menu-toggle" data-menu-toggle data-open="Menu" data-close="Fermer" aria-expanded="false">Menu</button>
+    </nav>
+  </div>
+</header>
+
+<div class="overlay-menu" data-menu>
+  <ul>
+    <li><a href="../index.html" data-i18n="nav.work">Projets</a></li>
+    <li><a href="../profil.html" data-i18n="nav.about">Profil</a></li>
+    <li><a href="../contact.html" data-i18n="nav.contact">Contact</a></li>
+  </ul>
+</div>
+
+<main>
+
+  <section class="work-hero shell">
+    <div class="work-hero__row">
+      <div class="work-hero__main">
+        <h1 class="work-hero__title" data-reveal>
+          <span class="line-mask"><span>Kokoro Renzu</span></span>
+          <span class="work-hero__sub">心レンズ</span>
+        </h1>
+        <p class="lede" data-reveal data-reveal-delay=".05" data-i18n="kok.lede">Kokoro Renzu mélange <strong>exploration</strong> d&rsquo;un <strong>petit monde ouvert</strong> et <strong>jeu de cartes</strong>. Pour relier ces deux aspects, une mécanique&nbsp;: la <strong>photo</strong>.</p>
+      </div>
+
+      <aside class="spec" data-tilt="soft" data-reveal data-reveal-delay=".1" aria-label="Fiche technique">
+        <span class="spec__inner">
+          <img class="spec__badge" src="../assets/img/badge-rookie-awards.webp" alt="Finaliste des Rookie Awards" loading="lazy" decoding="async">
+          <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7.5" width="18" height="12" rx="2"/><path d="M8.7 7.5V5.8A1.8 1.8 0 0 1 10.5 4h3a1.8 1.8 0 0 1 1.8 1.8v1.7"/></svg> <span data-i18n="kok.role">System Design, Level Design, UI</span></span>
+          <span class="meta-chip"><svg class="meta-chip__logo" viewBox="0 0 24 24" role="img" aria-label="Unreal Engine"><path d="M12 0a12 12 0 1012 12A12 12 0 0012 0zm0 23.52A11.52 11.52 0 1123.52 12 11.52 11.52 0 0112 23.52zm7.13-9.791c-.206.997-1.126 3.557-4.06 4.942l-1.179-1.325-1.988 2a7.338 7.338 0 01-5.804-2.978 2.859 2.859 0 00.65.123c.326.006.678-.114.678-.66v-5.394a.89.89 0 00-1.116-.89c-.92.212-1.656 2.509-1.656 2.509a7.304 7.304 0 012.528-5.597 7.408 7.408 0 013.73-1.721c-1.006.573-1.57 1.507-1.57 2.29 0 1.262.76 1.109.984.923v7.28a1.157 1.157 0 00.148.256 1.075 1.075 0 00.88.445c.76 0 1.747-.868 1.747-.868V9.172c0-.6-.452-1.324-.905-1.572 0 0 .838-.149 1.484.346a5.537 5.537 0 01.387-.425c1.508-1.48 2.929-1.902 4.112-2.112 0 0-2.151 1.69-2.151 3.96 0 1.687.043 5.801.043 5.801.799.771 1.986-.342 3.059-1.441Z"/></svg> UE5</span>
+          <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.6"/><path d="M4.8 19.5v-1a4.2 4.2 0 0 1 4.2-4.2h6a4.2 4.2 0 0 1 4.2 4.2v1"/></svg> 14</span>
+          <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.2V12l3 2"/></svg> <span data-i18n="kok.duration">9 mois</span></span>
+        </span>
+      </aside>
+    </div>
+  </section>
+
+  <section class="shell block block--flush-bottom">
+    <figure class="video-figure" data-reveal>
+      <div class="video" data-video="VooH99f8V4U" data-title="Kokoro Renzu" data-cursor="play">
+        <img class="video__poster" src="../assets/img/video/VooH99f8V4U.jpg" alt="" loading="lazy" decoding="async">
+      </div>
+    </figure>
+  </section>
+
+  <!-- Intro -->
+  <section class="shell block">
+    <div class="split">
+      <div class="prose stack" data-reveal>
+        <p class="body-lg" data-i18n="kok.p1">Vous pourrez <strong>capturer n&rsquo;importe quel objet</strong> à l&rsquo;aide de votre caméra pour le <strong>transformer en carte à jouer</strong>, à la manière d&rsquo;un polaroid. Vous pourrez aussi réutiliser les cartes acquises pour <strong>créer une copie</strong> de l&rsquo;objet capturé afin de façonner le monde qui vous entoure&nbsp;!</p>
+      </div>
+      <div class="prose stack" data-reveal data-reveal-delay=".08">
+        <p class="body-lg" data-i18n="kok.p2">Je suis le <strong>lead</strong> de ce <strong>projet de diplôme</strong> réalisé a <strong>LISAA</strong> dans le cadre de mon <strong>Bachelor Game Design</strong>.</p>
+        <p class="body-lg" data-i18n="kok.p3">Je suis chargé du <strong>System Design</strong> (exploration et jeu de carte), du <strong>Level Design</strong>, de la documentation (GC, GDD, data table...), de l&rsquo;<strong>intégration UI</strong> et du <strong>management</strong> de l&rsquo;équipe de 14 étudiants.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- L'histoire de Lyn -->
+  <section class="shell block">
+    <div class="block__head" data-reveal>
+      <h2 data-i18n="kok.story">L&rsquo;histoire de Lyn</h2>
+    </div>
+    <div class="split split--wide-media">
+      <div class="prose stack" data-reveal>
+        <p class="body-lg" data-i18n="kok.story.p1">Le joueur incarne <strong>Lyn</strong>, une jeune enfant habitant l&rsquo;île fictive <strong>japonaise</strong> de Kokoro avec son grand-père <strong>Hiwasai</strong> pendant la période <strong>Edo</strong>.</p>
+        <p class="body-lg" data-i18n="kok.story.p2">Son objectif est de <strong>battre Hiwasai au jeu de cartes</strong> qu&rsquo;il a lui-même inventé afin que ce dernier accepte de l&rsquo;emmener à la <strong>capitale</strong>, participer au <strong>festival «&nbsp;Himatsuri&nbsp;»</strong>.</p>
+        <p class="body-lg" data-i18n="kok.story.p3">Pour y arriver il faudra <strong>explorer</strong> l&rsquo;île, découvrir ses <strong>secrets</strong> et photographier ses <strong>beautés</strong>.</p>
+      </div>
+      <figure class="figure" data-reveal data-reveal-delay=".08">
+        <picture>
+          <source srcset="../assets/img/kokoro-hub.avif" type="image/avif">
+          <img src="../assets/img/kokoro-hub.webp" alt="Kokoro Renzu" loading="lazy" decoding="async">
+        </picture>
+      </figure>
+    </div>
+  </section>
+
+  <!-- L'appareil Photo -->
+  <section class="shell block">
+    <div class="block__head" data-reveal>
+      <h2 data-i18n="kok.camera">L&rsquo;appareil Photo</h2>
+    </div>
+
+    <div class="media-grid media-grid--2" data-reveal>
+      <figure class="video-figure">
+        <div class="video" data-video="lSDDQ9JoYT0" data-title="Kokoro Renzu" data-cursor="play">
+          <img class="video__poster" src="../assets/img/video/lSDDQ9JoYT0.jpg" alt="" loading="lazy" decoding="async">
+        </div>
+      </figure>
+      <figure class="video-figure">
+        <div class="video" data-video="3bM1uSj8HSA" data-title="Kokoro Renzu" data-cursor="play">
+          <img class="video__poster" src="../assets/img/video/3bM1uSj8HSA.jpg" alt="" loading="lazy" decoding="async">
+        </div>
+      </figure>
+    </div>
+    <div class="prose prose--center prose--wide stack mt-l" data-reveal>
+      <p class="body-lg" data-i18n="kok.camera.p1"><strong>Explorez</strong> l&rsquo;île de Kokoro pour <strong>prendre des photos</strong> des objets, des animaux, et des Yokais.</p>
+      <p class="body-lg" data-i18n="kok.camera.p2">Ces photos, <strong>transformées en cartes</strong>, vous permettront de vaincre des adversaires au «&nbsp;<strong>Yokai No Kake</strong>&nbsp;» et d&rsquo;explorer de nouvelles zones grâce à la mécanique du «&nbsp;<strong>Print</strong>&nbsp;» qui copie un objet déjà capturé.</p>
+      <p class="body-lg" data-i18n="kok.camera.p3">L&rsquo;île de Kokoro a été conçu pour que certaines parties ne soient accessible qu&rsquo;après avoir capturé certains objets, à la manière d&rsquo;un <strong>metroidvania</strong>.</p>
+    </div>
+
+    <div class="media-grid media-grid--2 mt-l" data-reveal>
+      <figure class="video-figure">
+        <div class="video" data-video="ySyIJ9LSdr4" data-title="Kokoro Renzu" data-cursor="play">
+          <img class="video__poster" src="../assets/img/video/ySyIJ9LSdr4.jpg" alt="" loading="lazy" decoding="async">
+        </div>
+      </figure>
+      <figure class="video-figure">
+        <div class="video" data-video="lUzUo_2FX2M" data-title="Kokoro Renzu" data-cursor="play">
+          <img class="video__poster" src="../assets/img/video/lUzUo_2FX2M.jpg" alt="" loading="lazy" decoding="async">
+        </div>
+      </figure>
+    </div>
+    <div class="prose prose--center prose--wide stack mt-l" data-reveal>
+      <p class="body-lg" data-i18n="kok.camera.p4">Des <strong>énigmes</strong> sont disséminées un petit peu partout sur l&rsquo;île. Elles peuvent être résolues avec le <strong>Print</strong> et sont <strong>optionnelles</strong>, à la manière des Korogu de Zelda BOTW.</p>
+      <p class="body-lg" data-i18n="kok.camera.p5">Les résoudre débloque une <strong>carte exclusive</strong>&nbsp;!</p>
+    </div>
+
+    <div class="media-grid media-grid--2 mt-l" data-reveal>
+      <figure class="video-figure">
+        <div class="video" data-video="-MSW4T65QFY" data-title="Kokoro Renzu" data-cursor="play">
+          <img class="video__poster" src="../assets/img/video/-MSW4T65QFY.jpg" alt="" loading="lazy" decoding="async">
+        </div>
+      </figure>
+      <figure class="video-figure">
+        <div class="video" data-video="FjficAuMNvs" data-title="Kokoro Renzu" data-cursor="play">
+          <img class="video__poster" src="../assets/img/video/FjficAuMNvs.jpg" alt="" loading="lazy" decoding="async">
+        </div>
+      </figure>
+    </div>
+    <div class="split mt-l">
+      <div class="prose stack" data-reveal>
+        <p class="body-lg" data-i18n="kok.camera.p6">Le Print sert aussi à rendre le <strong>monde vivant</strong> et à faire sentir au joueur que <strong>ses actions ont des impacts</strong>.</p>
+        <p class="body-lg" data-i18n="kok.camera.p7">Plusieurs interactions on été prévues, et d&rsquo;autres on émergé pendant les playtests&nbsp;!</p>
+      </div>
+      <div class="prose stack" data-reveal data-reveal-delay=".08">
+        <p class="body-lg" data-i18n="kok.camera.p8">Les <strong>animaux</strong> peuvent avoir 3 comportements différents&nbsp;: <strong>fuyants</strong>, <strong>agressifs</strong> et <strong>neutres</strong>.</p>
+        <p class="body-lg" data-i18n="kok.camera.p9">Certains sont plus <strong>difficiles à attraper</strong>. Le joueur doit donc l&rsquo;<strong>attirer</strong> avec de la nourriture et s&rsquo;accroupir pour être plus <strong>discret</strong>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- L'île de Kokoro -->
+  <section class="shell block">
+    <div class="block__head" data-reveal>
+      <h2 data-i18n="kok.island">L&rsquo;île de Kokoro</h2>
+    </div>
+
+    <div class="split">
+      <div class="prose stack" data-reveal>
+        <p class="body-lg" data-i18n="kok.island.p1">Pour rendre cette exploration motivante, l&rsquo;île est pensée comme un petit <strong>monde ouvert</strong> présentant <strong>plusieurs biomes</strong> plus ou moins accessibles.</p>
+        <p class="body-lg" data-i18n="kok.island.p2">Elle est construite autour de points d&rsquo;intérêt visibles de loin (<strong>landmarks</strong>) et de zones thématiquement reconnaissables (<strong>districts</strong>).</p>
+        <p class="body-lg" data-i18n="kok.island.p3">La structure <strong>open world</strong> de l&rsquo;île de Kokoro apporte une grande <strong>liberté</strong> au joueur mais rend <strong>plus difficile le contrôle de son expérience</strong>.</p>
+        <p class="body-lg" data-i18n="kok.island.p4">Après plusieurs <strong>playtests</strong> et ajustements les landmarks et la composition du level art nous ont permis de diriger les joueurs vers le <strong>critical path</strong> que nous avions prévu à l&rsquo;origine.</p>
+      </div>
+      <figure class="video-figure" data-reveal data-reveal-delay=".08">
+        <div class="video" data-video="w4KgVBWydvY" data-title="Kokoro Renzu" data-cursor="play">
+          <img class="video__poster" src="../assets/img/video/w4KgVBWydvY.jpg" alt="" loading="lazy" decoding="async">
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Le Carnet de Lyn -->
+  <section class="shell block">
+    <div class="block__head" data-reveal>
+      <h2 data-i18n="kok.notebook">Le Carnet de Lyn</h2>
+    </div>
+    <div class="split">
+      <figure class="video-figure" data-reveal>
+        <div class="video" data-video="aT21pqyK9q4" data-title="Kokoro Renzu" data-cursor="play">
+          <img class="video__poster" src="../assets/img/video/aT21pqyK9q4.jpg" alt="" loading="lazy" decoding="async">
+        </div>
+      </figure>
+      <div class="prose stack" data-reveal data-reveal-delay=".08">
+        <p class="body-lg" data-i18n="kok.notebook.p1">La grande majorité de l&rsquo;UI de Kokoro Renzu est <strong>intradigétique</strong>. Elle prend la forme d&rsquo;un carnet dans lequel Lyn va ranger ses cartes, ses photos, la carte de l&rsquo;île, les réglages...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Yokai no Kake -->
+  <section class="shell block">
+    <div class="block__head" data-reveal>
+      <h2>Yokai no Kake</h2>
+      <a class="btn" data-tilt="soft" href="../assets/files/regles-yokai-no-kake.pdf" target="_blank" rel="noopener" data-cursor="external"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16 16.5 7.5"/><path d="M9.5 7.5h7v7"/></svg><span data-i18n="kok.rules">Règles</span></a>
+    </div>
+    <div class="tech-list">
+      <article class="tech tech--media tech--flip" data-reveal>
+        <figure class="video-figure">
+          <div class="video" data-video="X0DZgZDOymw" data-title="Yokai no Kake" data-cursor="play">
+            <img class="video__poster" src="../assets/img/video/X0DZgZDOymw.jpg" alt="" loading="lazy" decoding="async">
+          </div>
+        </figure>
+        <div class="prose stack">
+          <p class="body-lg" data-i18n="kok.yokai.p1">Le Yokai no Kake <strong>mélange jeu de cartes et jeu de plateau</strong> en opposant 2 joueurs sur un échiquier de 5 cases par 5.</p>
+          <p class="body-lg" data-i18n="kok.yokai.p2">Chaque joueur va incarner un <strong>Yokai</strong>.</p>
+          <p class="body-lg" data-i18n="kok.yokai.p3">Il y a <strong>2 manières de gagner</strong> une partie&nbsp;:</p>
+          <ul class="bullets">
+            <li data-i18n="kok.yokai.w1">Faire tomber les PV du Yokai adverse à 0.</li>
+            <li data-i18n="kok.yokai.w2">Occuper la zone d&rsquo;influence adverse pendant 3 tours avec plus d&rsquo;unités.</li>
+          </ul>
+        </div>
+      </article>
+      <article class="tech tech--media" data-reveal>
+        <figure class="video-figure">
+          <div class="video" data-video="NZwhkdin_wM" data-title="Yokai no Kake" data-cursor="play">
+            <img class="video__poster" src="../assets/img/video/NZwhkdin_wM.jpg" alt="" loading="lazy" decoding="async">
+          </div>
+        </figure>
+        <div class="prose stack">
+          <p class="body-lg" data-i18n="kok.yokai.p4">Dans ce jeu, il n&rsquo;y a qu&rsquo;<strong>une seul ressource</strong>.</p>
+          <p class="body-lg" data-i18n="kok.yokai.p5">Les joueurs peuvent la dépenser pour <strong>invoquer</strong> une carte dans leur zone d&rsquo;influence, <strong>piocher</strong>, <strong>attaquer</strong> une unité adverse ou se <strong>déplacer</strong> sur le champ de bataille.</p>
+          <p class="body-lg" data-i18n="kok.yokai.p6"><strong>Les illustrations des cartes sont les photos prisent par le joueur.</strong></p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="shell footer-row" data-reveal>
+    <div class="footer-links">
+    <button type="button" data-copy="a.saakachvili@gmail.com" data-cursor="copy" aria-label="Copier l&rsquo;adresse mail">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
+      <span>a.saakachvili@gmail.com</span>
+    </button>
+    <button type="button" data-copy="06 24 56 43 31" data-cursor="copy" aria-label="Copier le numéro de téléphone">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.6 3h3.3l1.7 4.2-2.5 1.7a13.5 13.5 0 0 0 6.2 6.2l1.7-2.5 4.2 1.7v3.3a2.1 2.1 0 0 1-2.1 2.1A16.1 16.1 0 0 1 3.5 5.1 2.1 2.1 0 0 1 5.6 3z"/></svg>
+      <span>06 24 56 43 31</span>
+    </button>
+    <a href="https://www.linkedin.com/in/a-saakachvili" target="_blank" rel="noopener" data-cursor="external">LinkedIn</a>
+    <a href="../assets/files/cv-alexandre-saakachvili.pdf" target="_blank" rel="noopener" data-cursor="external">CV</a>
+    </div>
+    <button type="button" class="to-top" data-to-top data-cursor="top">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V5.4"/><path d="m6.6 10.8 5.4-5.4 5.4 5.4"/></svg>
+      <span class="sr-only" data-i18n="ui.top">Haut de page</span>
+    </button>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="../assets/js/i18n.js"></script>
+<script src="../assets/js/app.js"></script>
+</body>
+</html>

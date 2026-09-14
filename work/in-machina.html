@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>In_Machina — Alexandre Saakachvili</title>
+<meta name="description" content="Roguelite survival 2D à l'esthétique old school, développé sur Unity : game design, level design, équilibrage et programmation.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230A0A0A'/%3E%3Ctext x='32' y='45' font-family='Arial Black,Arial' font-size='34' font-weight='900' text-anchor='middle' fill='%23FCBC6D'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/main.css">
+<script>try{var d=document.documentElement;if(sessionStorage.getItem("as-seen"))d.className+=" no-preloader";else sessionStorage.setItem("as-seen","1");if(matchMedia("(hover:hover) and (pointer:fine)").matches&&!matchMedia("(prefers-reduced-motion:reduce)").matches)d.className+=" has-custom-cursor"}catch(e){}</script>
+</head>
+<body data-en-title="In_Machina — Alexandre Saakachvili" data-en-desc="2D survival roguelite with an old-school aesthetic, built on Unity: game design, level design, balancing and programming.">
+<div class="preloader" data-preloader>
+  <div class="preloader__inner">
+    <div class="preloader__name">Alexandre Saakachvili</div>
+    <div class="preloader__count"><span data-preloader-count>0</span> %</div>
+    <div class="preloader__bar"><i data-preloader-bar></i></div>
+  </div>
+</div>
+
+
+<header class="site-header" data-header>
+  <div class="shell site-header__row">
+    <a class="brand" href="../index.html" data-cursor="home">
+      <span class="brand__name">Alexandre Saakachvili</span>
+      <span class="brand__role">Game Designer</span>
+    </a>
+    <nav class="nav" aria-label="Navigation principale">
+      <div class="nav__links">
+        <a href="../index.html" data-i18n="nav.work">Projets</a>
+        <a href="../profil.html" data-i18n="nav.about">Profil</a>
+        <a href="../contact.html" data-i18n="nav.contact">Contact</a>
+      </div>
+      <div class="lang">
+        <button type="button" data-lang-btn="fr" data-cursor="swear" class="is-active">FR</button><i>/</i><button type="button" data-lang-btn="en" data-cursor="swear">EN</button>
+      </div>
+      <button type="button" class="menu-toggle" data-menu-toggle data-open="Menu" data-close="Fermer" aria-expanded="false">Menu</button>
+    </nav>
+  </div>
+</header>
+
+<div class="overlay-menu" data-menu>
+  <ul>
+    <li><a href="../index.html" data-i18n="nav.work">Projets</a></li>
+    <li><a href="../profil.html" data-i18n="nav.about">Profil</a></li>
+    <li><a href="../contact.html" data-i18n="nav.contact">Contact</a></li>
+  </ul>
+</div>
+
+<main>
+
+  <section class="work-hero shell">
+    <div class="work-hero__row">
+      <div class="work-hero__main">
+        <h1 class="work-hero__title" data-reveal>
+          <span class="line-mask"><span>In_Machina</span></span>
+        </h1>
+        <p class="lede" data-reveal data-reveal-delay=".05" data-i18n="im.lede">Les légendes racontent que quelque chose croît dans les Bois Brumeux. Une mystérieuse corruption fait des ravages dans ces terres autrefois florissantes. Saurez-vous l&rsquo;arreter&nbsp;?</p>
+      </div>
+
+      <aside class="spec" data-tilt="soft" data-reveal data-reveal-delay=".1" aria-label="Fiche technique">
+        <span class="spec__inner">
+          <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7.5" width="18" height="12" rx="2"/><path d="M8.7 7.5V5.8A1.8 1.8 0 0 1 10.5 4h3a1.8 1.8 0 0 1 1.8 1.8v1.7"/></svg> <span data-i18n="im.role">System Design, Level Design, Programmation</span></span>
+          <span class="meta-chip"><svg class="meta-chip__logo" viewBox="0 0 24 24" role="img" aria-label="Unity"><path d="m12.9288 4.2939 3.7997 2.1929c.1366.077.1415.2905 0 .3675l-4.515 2.6076a.4192.4192 0 0 1-.4246 0L7.274 6.8543c-.139-.0745-.1415-.293 0-.3675l3.7972-2.193V0L1.3758 5.5977V16.793l3.7177-2.1456v-4.3858c-.0025-.1565.1813-.2682.318-.1838l4.5148 2.6076a.4252.4252 0 0 1 .2136.3676v5.2127c.0025.1565-.1813.2682-.3179.1838l-3.7996-2.1929-3.7178 2.1457L12 24l9.6954-5.5977-3.7178-2.1457-3.7996 2.1929c-.1341.082-.3229-.0248-.3179-.1838V13.053c0-.1565.087-.2956.2136-.3676l4.5149-2.6076c.134-.082.3228.0224.3179.1838v4.3858l3.7177 2.1456V5.5977L12.9288 0Z"/></svg> Unity</span>
+          <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.6"/><path d="M4.8 19.5v-1a4.2 4.2 0 0 1 4.2-4.2h6a4.2 4.2 0 0 1 4.2 4.2v1"/></svg> 3</span>
+          <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.2V12l3 2"/></svg> <span data-i18n="im.duration">3 mois</span></span>
+          <a class="meta-chip spec__link" href="https://nitescent-studio.itch.io/in-machina" target="_blank" rel="noopener" data-cursor="external"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16 16.5 7.5"/><path d="M9.5 7.5h7v7"/></svg> <span data-i18n="im.play">itch.io</span></a>
+        </span>
+      </aside>
+    </div>
+  </section>
+
+  <section class="shell block block--flush-bottom">
+    <figure class="video-figure" data-reveal>
+      <div class="video" data-video="8vuUsuhJtGk" data-start="112" data-title="In_Machina" data-cursor="play">
+        <img class="video__poster" src="../assets/img/video/8vuUsuhJtGk.jpg" alt="" loading="lazy" decoding="async">
+      </div>
+    </figure>
+  </section>
+
+  <section class="shell block">
+    <div class="split">
+      <div class="prose stack" data-reveal>
+        <p class="body-lg" data-i18n="im.p1">In_Machina est un Roguelite 2D survival à l&rsquo;esthétique old school.</p>
+        <p class="body-lg" data-i18n="im.p2">Le projet In_Machina à été réalisé par moi, un autre Game Designer et une Game Artiste à la <strong>fin de notre première année à LISAA</strong>. J&rsquo;ai travaillé sur le <strong>Game Design</strong>, le <strong>Level Design</strong>, l&rsquo;<strong>Equilibrage</strong>, la <strong>Programmation</strong> (Unity).</p>
+      </div>
+      <div class="prose stack" data-reveal data-reveal-delay=".08">
+        <p class="body-lg" data-i18n="im.p3">Nous avons décidé de partir sur un <strong>roguelite 2D</strong> en nous inspirant de Vampire Survivors. Nous voulions donc créer un <strong>rogue-lite</strong>, <strong>fun</strong>, <strong>juicy</strong>, <strong>accessible</strong> avec une <strong>narration mystérieuse</strong>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="shell block block--flush-top">
+    <div class="media-grid media-grid--2">
+      <figure class="figure" data-reveal>
+        <img src="../assets/img/inmachina-gameplay.gif" alt="In_Machina" loading="lazy" decoding="async">
+      </figure>
+      <figure class="figure" data-reveal data-reveal-delay=".06">
+        <img src="../assets/img/inmachina-shopkeeper.gif" alt="In_Machina" loading="lazy" decoding="async">
+      </figure>
+    </div>
+
+    <div class="split mt-l">
+      <div class="prose stack" data-reveal>
+        <p class="body-lg" data-i18n="im.p4">Pour rendre le jeu <strong>fun</strong> nous avons choisi de miser sur l&rsquo;<strong>abondance de stratégies et de builds</strong> possibles, sur le <strong>nombre d&rsquo;items</strong> à acheter pour s&rsquo;améliorer, et sur le <strong>nombre de mécaniques environnementales</strong>.</p>
+        <p class="body-lg" data-i18n="im.p5">La <strong>juiciness</strong> du jeu passe par les <strong>effets visuels</strong> (shake-screen, animation, etc) mais aussi <strong>auditifs</strong> grâce au Voice Acting. En effet, le <strong>narrateur</strong> du jeu interviendra souvent pour commenter les actions du joueur.</p>
+      </div>
+      <div class="prose stack" data-reveal data-reveal-delay=".08">
+        <p class="body-lg" data-i18n="im.p6">Concernant l&rsquo;<strong>accessibilité</strong>, nous avons décidé de ne jouer qu&rsquo;avec <strong>2 boutons</strong> et le <strong>joystick</strong>.</p>
+        <p class="body-lg" data-i18n="im.p7">Le <strong>mystère</strong> est le pilier principal de notre jeu. En effet, des secrets sont dissimulés dans le Level Design, dans la Narration, dans l&rsquo;UI, et dans les systèmes de jeu.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="shell footer-row" data-reveal>
+    <div class="footer-links">
+    <button type="button" data-copy="a.saakachvili@gmail.com" data-cursor="copy" aria-label="Copier l&rsquo;adresse mail">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
+      <span>a.saakachvili@gmail.com</span>
+    </button>
+    <button type="button" data-copy="06 24 56 43 31" data-cursor="copy" aria-label="Copier le numéro de téléphone">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.6 3h3.3l1.7 4.2-2.5 1.7a13.5 13.5 0 0 0 6.2 6.2l1.7-2.5 4.2 1.7v3.3a2.1 2.1 0 0 1-2.1 2.1A16.1 16.1 0 0 1 3.5 5.1 2.1 2.1 0 0 1 5.6 3z"/></svg>
+      <span>06 24 56 43 31</span>
+    </button>
+    <a href="https://www.linkedin.com/in/a-saakachvili" target="_blank" rel="noopener" data-cursor="external">LinkedIn</a>
+    <a href="../assets/files/cv-alexandre-saakachvili.pdf" target="_blank" rel="noopener" data-cursor="external">CV</a>
+    </div>
+    <button type="button" class="to-top" data-to-top data-cursor="top">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V5.4"/><path d="m6.6 10.8 5.4-5.4 5.4 5.4"/></svg>
+      <span class="sr-only" data-i18n="ui.top">Haut de page</span>
+    </button>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="../assets/js/i18n.js"></script>
+<script src="../assets/js/app.js"></script>
+</body>
+</html>
