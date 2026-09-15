@@ -677,6 +677,7 @@ a.spec__corner:hover{color:var(--cream);transform:scale(1.12)}
   .split,.split--wide-media{grid-template-columns:1fr}
 
   .tech--media,.tech--flip{grid-template-columns:1fr;grid-template-areas:"title" "media" "text";row-gap:1rem}
+  .tech--media:not(:has(> h3)) > .prose{grid-area:text;align-self:start}
 
   .game__body{grid-template-columns:1fr;grid-template-areas:"title" "media" "text"}
   .game .video--portrait{width:min(100%,400px);margin-inline:auto}
