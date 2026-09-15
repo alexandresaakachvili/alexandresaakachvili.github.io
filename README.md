@@ -44,7 +44,8 @@ assets/
   css/main.css        Tout le style (variables CSS en haut du fichier)
   js/app.js           Scroll fluide, révélations, curseur, transitions
   js/i18n.js          Traductions anglaises uniquement
-  img/                Images (.avif + .webp pour chaque visuel, .gif pour les animations)
+  img/                Images (.avif + .webp pour chaque visuel, .webm + .mp4 pour les boucles)
+  img/favicon.png     Logo du site (onglet, favoris, ecran d accueil mobile)
   img/video/          Miniatures des vidéos YouTube (une par identifiant)
   files/              CV et règles de jeux en PDF
 ```
@@ -362,6 +363,6 @@ Chaque carte de `profil.html` qui existe sur Steam porte `data-href` (la page du
 ### Sur mobile
 
 - **Barre** : pas de menu. Les pages autres que la page courante restent dans la barre ; la langue se replie en `FR ▾`, qui se déroule vers le bas.
-- **Cartes** : elles suivent l'inclinaison du téléphone quand le gyroscope est accessible (sur iPhone, l'autorisation est demandée au premier toucher d'une carte). Sans capteur, elles oscillent seules (`html.tilt-idle`). Un doigt posé sur une carte l'incline comme la souris le ferait, sans bloquer le défilement ; un appui long n'ouvre pas le lien.
+- **Cartes** : pas de suivi du doigt ni de gyroscope — la carte s'enfonce légèrement sous le doigt (`:active`) et revient d'un ressort. C'est le seul retour tactile, volontairement.
 - **Images agrandies** : pincer ou taper l'image pour zoomer, glisser pour se déplacer, taper à côté pour fermer. Le bouton **Retour** referme l'image au lieu de quitter la page (une entrée d'historique est ajoutée à l'ouverture). À la souris : molette pour zoomer, clic sur l'image pour zoomer/dézoomer, Échap pour fermer.
-- **Ordre des blocs** : dans les techniques de LD, le titre passe au-dessus de la vidéo ; dans les jeux mobiles, la capture passe au-dessus du texte ; dans le combat d'Abandon West, chaque capture précède son explication (`.quad`).
+- **Ordre des blocs** : dans les techniques de LD comme dans les jeux mobiles (`.game__body`), le titre passe au-dessus de la vidéo et le texte en dessous ; dans le combat d'Abandon West, chaque capture précède son explication (`.quad`).

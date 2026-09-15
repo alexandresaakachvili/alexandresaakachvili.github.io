@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jeux Mobiles — Alexandre Saakachvili</title>
 <meta name="description" content="Gas Station (5M+ téléchargements), Gangsta Rage, Titan Survivors, Monster Merge Battle : system design, économie et level design sur Unity.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230A0A0A'/%3E%3Ctext x='32' y='45' font-family='Arial Black,Arial' font-size='34' font-weight='900' text-anchor='middle' fill='%23FCBC6D'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" href="../assets/img/favicon.png">
+<link rel="apple-touch-icon" href="../assets/img/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -20,7 +21,6 @@
     <div class="preloader__bar"><i data-preloader-bar></i></div>
   </div>
 </div>
-
 
 <header class="site-header" data-header>
   <div class="shell site-header__row">
@@ -44,7 +44,6 @@
     </nav>
   </div>
 </header>
-
 
 <main>
 
@@ -70,17 +69,19 @@
 
   <section class="shell block">
 
-    <!-- Gas Station -->
     <article class="game" data-reveal>
-      <div class="game__title">
-        <h2>Gas Station</h2>
-        <span class="game__badge">5 M+ <span data-i18n="mob.dl">téléchargements</span></span>
-      </div>
-      <div class="split">
+      <div class="game__body">
+        <div class="game__title">
+          <h2>Gas Station</h2>
+          <span class="game__badge">5 M+ <span data-i18n="mob.dl">téléchargements</span></span>
+        </div>
         <div class="prose stack">
           <p class="body-lg" data-i18n="mob.gas.p1">Gas Station : Junkyaed Tycoon mélange <strong>arcade-idle</strong> et <strong>Tycoon</strong>.</p>
           <p class="body-lg" data-i18n="mob.gas.p2">Propriétaire d&rsquo;une petite station-service dans le Nevada, le joueur devra <strong>construire de nouvelles structures</strong> (car wash, garage, gare routière...) et étendre son empire dans tous les États-Unis d&rsquo;Amérique. Vous devrez donc nettoyer les lieux en <strong>cassant des objets</strong> pour <strong>collecter des ressources</strong> et gagner de l&rsquo;espace.</p>
           <p class="body-lg" data-i18n="mob.gas.p3"><strong>+5M de téléchargements</strong>, en collaboration avec <strong>HOMA</strong>, j&rsquo;ai travailler sur le <strong>System Design</strong>, l&rsquo;<strong>économie</strong> et le <strong>Level Design</strong>.</p>
+          <div class="game__cta">
+            <a class="btn" data-tilt="soft" href="https://apps.apple.com/fr/app/gas-station-simulator-tycoon/id6737841009" target="_blank" rel="noopener" data-cursor="external"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16 16.5 7.5"/><path d="M9.5 7.5h7v7"/></svg><span>App Store</span></a>
+          </div>
         </div>
         <figure class="video-figure">
           <div class="video video--portrait" data-video="1O8M_00afmg" data-title="Gas Station" data-cursor="play">
@@ -88,22 +89,21 @@
           </div>
         </figure>
       </div>
-      <div class="game__cta">
-        <a class="btn" data-tilt="soft" href="https://play.google.com/store/apps/details/Gas_Station_Max_Gas?id=gas.station.idle&amp;hl=fr" target="_blank" rel="noopener" data-cursor="external"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16 16.5 7.5"/><path d="M9.5 7.5h7v7"/></svg><span>Google Play</span></a>
-      </div>
     </article>
 
-    <!-- Gangsta Rage -->
     <article class="game" data-reveal>
-      <div class="game__title">
-        <h2>Gangsta Rage</h2>
-        <span class="game__badge">500 K+ <span data-i18n="mob.dl">téléchargements</span></span>
-      </div>
-      <div class="split">
+      <div class="game__body">
+        <div class="game__title">
+          <h2>Gangsta Rage</h2>
+          <span class="game__badge">500 K+ <span data-i18n="mob.dl">téléchargements</span></span>
+        </div>
         <div class="prose stack">
           <p class="body-lg" data-i18n="mob.rage.p1">Gangsta Rage est une <strong>réinterprétation urbaine</strong> de <strong>XP Hero</strong>.</p>
           <p class="body-lg" data-i18n="mob.rage.p2">Pour conquérir tous les districts et <strong>contrôler le territoire de toutes les mafias</strong>, le joueur va devoir <strong>faire tomber leurs chefs</strong>. Il pourra compter sur son <strong>crew</strong>, ses <strong>statistiques</strong> et ses <strong>armes</strong> qu&rsquo;il améliorera avec l&rsquo;argent volé aux membres des gangs rivaux.</p>
           <p class="body-lg" data-i18n="mob.rage.p3">Construit sur <strong>Unity</strong> en <strong>2 mois</strong> avec 1 programmeurs et 2 artistes, j&rsquo;étais en charge du <strong>System Design</strong>, de l&rsquo;<strong>économie</strong>, du <strong>Level Design</strong> et de l&rsquo;<strong>intégration moteur</strong>.</p>
+          <div class="game__cta">
+            <a class="btn" data-tilt="soft" href="https://apps.apple.com/fr/app/gangsta-rage/id6746482327" target="_blank" rel="noopener" data-cursor="external"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16 16.5 7.5"/><path d="M9.5 7.5h7v7"/></svg><span>App Store</span></a>
+          </div>
         </div>
         <figure class="video-figure">
           <div class="video video--portrait" data-video="USfPP7ubTSY" data-title="Gangsta Rage" data-cursor="play">
@@ -111,18 +111,14 @@
           </div>
         </figure>
       </div>
-      <div class="game__cta">
-        <a class="btn" data-tilt="soft" href="https://play.google.com/store/apps/details?id=gangsta.rage.game&amp;hl=fr" target="_blank" rel="noopener" data-cursor="external"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16 16.5 7.5"/><path d="M9.5 7.5h7v7"/></svg><span>Google Play</span></a>
-      </div>
     </article>
 
-    <!-- Titan Survivors -->
     <article class="game" data-reveal>
-      <div class="game__title">
-        <h2>Titan Survivors</h2>
-        <span class="game__badge" data-i18n="mob.proto">Prototype</span>
-      </div>
-      <div class="split">
+      <div class="game__body">
+        <div class="game__title">
+          <h2>Titan Survivors</h2>
+          <span class="game__badge" data-i18n="mob.proto">Prototype</span>
+        </div>
         <div class="prose stack">
           <p class="body-lg" data-i18n="mob.titan.p1">Titan survivors est un <strong>survivors-like</strong> avec des méchas, des aliens et beaucoup d&rsquo;explosions. La particularité est que le joueur doit se former une <strong>squad de 3 personnages</strong> au cours de la partie. Chaque personnage ayant son propre style de combat et donc certains <strong>builds</strong> et <strong>combos</strong> spécifiques.</p>
           <p class="body-lg" data-i18n="mob.titan.p2">Prototypé sur <strong>Unity</strong> en <strong>2 mois</strong> avec 2 programmeurs et 2 artistes, j&rsquo;étais en charge du <strong>Combat Design</strong>, de l&rsquo;<strong>économie</strong>, du <strong>Level Design</strong> et de l&rsquo;<strong>intégration moteur</strong>.</p>
@@ -135,13 +131,12 @@
       </div>
     </article>
 
-    <!-- Monster Merge Battle -->
     <article class="game" data-reveal>
-      <div class="game__title">
-        <h2>Monster Merge</h2>
-        <span class="game__badge" data-i18n="mob.proto">Prototype</span>
-      </div>
-      <div class="split">
+      <div class="game__body">
+        <div class="game__title">
+          <h2>Monster Merge</h2>
+          <span class="game__badge" data-i18n="mob.proto">Prototype</span>
+        </div>
         <div class="prose stack">
           <p class="body-lg" data-i18n="mob.merge.p1">Monster Merge Battle associe <strong>merge</strong> game et <strong>slot machine</strong>.</p>
           <p class="body-lg" data-i18n="mob.merge.p2">Entre <strong>jackpot</strong>, <strong>super merge</strong> et <strong>fusion d&rsquo;unité en héros</strong>, le joueur a toujours de quoi faire. Dans un second temps, l&rsquo;expérience devient plus <strong>stratégique</strong>, notamment grâce au <strong>placement grid based des unités</strong>, au <strong>deckbuilding</strong> et aux choix de <strong>bonus post-combat</strong>.</p>

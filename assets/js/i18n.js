@@ -1,25 +1,13 @@
-/* =========================================================
-   Alexandre Saakachvili — Portfolio
-   i18n.js — version anglaise
-   Le français est dans le HTML ; ce fichier ne contient que
-   les traductions. Pour modifier un texte anglais, édite la
-   valeur ; pour le français, édite directement le HTML.
-   ========================================================= */
 window.I18N_EN = {
-
-  /* ---------- Navigation & pied de page ---------- */
   "nav.work": "Work",
   "nav.about": "Profile",
   "nav.contact": "Contact",
 
-  /* ---------- Catégories ---------- */
   "cat.ld": "Level Design",
   "cat.pc": "PC Games",
   "cat.mobile": "Mobile Games",
   "cat.board": "Board Games",
 
-  /* ---------- Métadonnées projets ---------- */
-  /* ---------- Accueil ---------- */
   "p.pyramid.name": "Pyramid&rsquo;s Shadow",
   "p.pyramid.desc": "Stealth 3D Level Design",
   "p.pyramid.time": "10 days",
@@ -36,7 +24,6 @@ window.I18N_EN = {
   "p.pantheon.desc": "Coopetition tile placement game",
   "p.pantheon.time": "2 weeks",
 
-  /* ---------- Profil ---------- */
   "about.p1": "My passion is to create games, experiences, stories.",
   "about.p2": "I enjoy imagining <strong>creations that have meaning</strong> for those who play them, that leave a mark, that change their perception of the World and of Man.",
   "about.p3": "I want to create, <strong>surrounded by people as passionate as I am</strong>, games that will leave their mark on the hearts of players and on the industry.",
@@ -59,7 +46,7 @@ window.I18N_EN = {
   "fav.outerwilds": "Progression through knowledge",
   "fav.witness": "Tutorial, biome and illusion",
   "fav.lol": "Devilishly addictive",
-  /* ---------- Pyramid&rsquo;s Shadow ---------- */
+
   "pyr.h1a": "Pyramid&rsquo;s",
   "pyr.h1b": "Shadow",
   "pyr.lede": "Mission: bring back the artifact buried in the pyramid, somewhere in the ochre desert. Rivals got there first and already hold the place. Get inside and bring the artifact back at all costs.",
@@ -102,7 +89,6 @@ window.I18N_EN = {
   "pyr.t10.h": "Show how far you&rsquo;ve come",
   "pyr.t10": "To reward the player and make them aware of how far they&rsquo;ve come, the <strong>level&rsquo;s macro circulatory</strong> system is a <strong>loop</strong> offering a <strong>view of the beginning</strong> of their adventure.",
 
-  /* ---------- Kokoro Renzu ---------- */
   "kok.lede": "Kokoro Renzu combines <strong>exploration of a small open world</strong> with a <strong>card game</strong>. These two aspects are linked by a mechanic : <strong>photography</strong>.",
   "kok.role": "System Design, Level Design, UI",
   "kok.duration": "9 months",
@@ -140,7 +126,6 @@ window.I18N_EN = {
   "kok.yokai.p6": "<strong>The illustrations on the cards are photos taken by the player.</strong>",
   "kok.rules": "Rules",
 
-  /* ---------- ABANDON WEST ---------- */
   "aw.lede": "ABANDON WEST is a <strong>2D turn-based roguelike</strong>. You <strong>play a cowboy</strong> brought back from the dead by a shady mortician. Your mission ? <strong>Find the man who shot you and pay him back</strong>.",
   "aw.role": "Programming, Combat Design",
   "aw.duration": "12 months",
@@ -195,7 +180,6 @@ window.I18N_EN = {
   "aw.builds2": "For example, if the player has a stock of <strong>yoyo bullets</strong> and a <strong>Winchester</strong> (automatic reload), he can <strong>shoot continuously as long as he doesn&rsquo;t miss his target</strong>.",
   "aw.builds3": "Finding an artifact that <strong>increases his accuracy</strong> or one that <strong>prevents the enemy from hiding</strong> would enable him to complete his build.",
 
-  /* ---------- In_Machina ---------- */
   "im.lede": "Legends tell of something growing in the Misty Woods. A mysterious corruption is wreaking havoc on these once flourishing lands. Can you stop it?",
   "im.role": "System Design, Level Design, Programming",
   "im.duration": "3 months",
@@ -207,7 +191,6 @@ window.I18N_EN = {
   "im.p6": "In terms of <strong>accessibility</strong>, we&rsquo;ve decided to play with just <strong>2 buttons</strong> and the <strong>joystick</strong>.",
   "im.p7": "<strong>Mystery</strong> is the main pillar of our game. Secrets are hidden in the level design, narrative, UI and gameplay systems.",
 
-  /* ---------- Jeux mobiles ---------- */
   "mob.h1": "Mobile Games",
   "mob.lede": "Hybrid-casual and mid-core mobile games for VOODOO and HOMA (idle arcade, survivors, auto battler).",
   "mob.role": "System Design, Economy Design, Level Design, Programming",
@@ -225,7 +208,6 @@ window.I18N_EN = {
   "mob.merge.p2": "With <strong>jackpots</strong>, <strong>super merges</strong> and <strong>hero unit fusion</strong>, there&rsquo;s always something for the player to enjoy. In a second step, the experience becomes more <strong>strategic</strong>, with <strong>grid-based unit placement</strong>, <strong>deckbuilding</strong> and <strong>post-combat bonus</strong> choices.",
   "mob.merge.p3": "Prototyped on Unity in 2 months with 2 programmers and 2 artists, I was in charge of System Design, game economy, Level Design (wave based) and engine integration.",
 
-  /* ---------- Tri&rsquo;Nytia ---------- */
   "tn.lede": "Tri&rsquo;Nytia is a strategic board game in which <strong>three factions struggle</strong> to achieve their often opposing goals.",
   "tn.duration": "5 months",
   "tn.p1": "Play as a member of the Order of Guardians, the Pact of Shadows or a Legend of the Circle. To win, you will need <strong>opportunism</strong>, <strong>ingenuity</strong> and above all <strong>team spirit</strong>. At the beginning of the game <strong>the identity of each player is secret</strong>. You will therefore have to determine who your allies and enemies are in order to set up the strategy that will make you win !",
@@ -244,7 +226,6 @@ window.I18N_EN = {
   "tn.c7": "A <strong>variety of more than 60 characters</strong> and <strong>over 400 cards</strong> — spells, equipment, familiars and so on.",
   "tn.c8": "<strong>Lore</strong>. Scattered across all the maps, it makes each game unique, as players learn a little more about the world of Tri&rsquo;Nytia.",
 
-  /* ---------- Panthéon ---------- */
   "pn.lede": "Dive into the heart of a world in the throes of creation, where the <strong>gods of Olympus</strong> clash in the shadows to impose their vision of the world !",
   "pn.duration": "2 weeks",
   "pn.p1": "In Pantheon, each <strong>player secretly embodies a God</strong> with his or her <strong>own way of winning</strong>. <strong>Create</strong> the world, <strong>populate</strong> it with inhabitants and <strong>influence</strong> their destiny with your divine powers.",
@@ -275,7 +256,6 @@ window.I18N_EN = {
   "pn.people.p7": "You can play a divine action during your turns, in addition to placing a unit on a terrain tile.",
   "pn.people.p8": "They are used to <strong>influence the destiny of peoples to your advantage</strong>.",
 
-  /* ---------- Interface ---------- */
   "ui.top": "Back to top",
   "ui.close": "Close"
 };

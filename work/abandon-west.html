@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Abandon West — Alexandre Saakachvili</title>
 <meta name="description" content="Roguelike 2D au tour par tour sur Unity : combat design, programmation et animation. Duels de cowboys rapides et mortels.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230A0A0A'/%3E%3Ctext x='32' y='45' font-family='Arial Black,Arial' font-size='34' font-weight='900' text-anchor='middle' fill='%23FCBC6D'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" href="../assets/img/favicon.png">
+<link rel="apple-touch-icon" href="../assets/img/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -20,7 +21,6 @@
     <div class="preloader__bar"><i data-preloader-bar></i></div>
   </div>
 </div>
-
 
 <header class="site-header" data-header>
   <div class="shell site-header__row">
@@ -44,7 +44,6 @@
     </nav>
   </div>
 </header>
-
 
 <main>
 
@@ -89,7 +88,6 @@
     </div>
   </section>
 
-  <!-- Roguelike Western -->
   <section class="shell block">
     <div class="block__head" data-reveal>
       <h2 data-i18n="aw.rogue">Roguelike Western</h2>
@@ -108,7 +106,6 @@
     </div>
   </section>
 
-  <!-- Combat -->
   <section class="shell block">
     <div class="block__head" data-reveal>
       <h2 data-i18n="aw.combat">Combat</h2>
@@ -131,8 +128,6 @@
       </div>
     </div>
 
-    <!-- Deux captures puis leurs explications, A et B. Sur mobile, chaque
-         capture precede le bloc qu elle illustre : 1, A, 2, B. -->
     <div class="quad mt-l">
       <figure class="figure" data-reveal>
         <picture><source srcset="../assets/img/abandon-combat-1.avif" type="image/avif"><img src="../assets/img/abandon-combat-1.webp" alt="ABANDON WEST" loading="lazy" decoding="async"></picture>
@@ -156,19 +151,22 @@
           <li><p data-i18n="aw.combat.b2">Le <strong>joueur</strong> se <strong>cache</strong> (caisse). L&rsquo;<strong>ennemi tire</strong> dans la caisse.</p></li>
           <li><p data-i18n="aw.combat.b3">Le <strong>joueur tire</strong> et touche l&rsquo;ennemi. L&rsquo;<strong>ennemi recharge</strong> et est touché. Comme le <strong>joueur et l&rsquo;ennemi n&rsquo;ont que 2 PV, i</strong>l ne lui en reste plus qu&rsquo;un.</p></li>
         </ol>
-        <h3 class="mt-l" data-i18n="aw.combat.special.h">Cas particulier&nbsp;:</h3>
-        <p class="body-lg" data-i18n="aw.combat.special">Si le <strong>joueur</strong> et l&rsquo;<strong>ennemi</strong> se cachent derrière le même objet, une <strong>bagarre</strong> se déclenche dont l&rsquo;issue est aléatoire (<strong>50/50</strong>). <strong>Le perdant subit 1 blessure</strong>.</p>
       </div>
     </div>
 
-    <figure class="video-figure mt-l" data-reveal>
-      <div class="video" data-video="9i04A-dKDMk" data-title="ABANDON WEST" data-cursor="play">
-        <img class="video__poster" src="../assets/img/video/9i04A-dKDMk.jpg" alt="" loading="lazy" decoding="async">
+    <div class="split split--media-right mt-l" data-reveal>
+      <figure class="video-figure">
+        <div class="video" data-video="9i04A-dKDMk" data-title="ABANDON WEST" data-cursor="play">
+          <img class="video__poster" src="../assets/img/video/9i04A-dKDMk.jpg" alt="" loading="lazy" decoding="async">
+        </div>
+      </figure>
+      <div class="prose stack">
+        <h3 data-i18n="aw.combat.special.h">Cas particulier&nbsp;:</h3>
+        <p class="body-lg" data-i18n="aw.combat.special">Si le <strong>joueur</strong> et l&rsquo;<strong>ennemi</strong> se cachent derrière le même objet, une <strong>bagarre</strong> se déclenche dont l&rsquo;issue est aléatoire (<strong>50/50</strong>). <strong>Le perdant subit 1 blessure</strong>.</p>
       </div>
-    </figure>
+    </div>
   </section>
 
-  <!-- Armes -->
   <section class="shell block">
     <div class="block__head" data-reveal>
       <h2 data-i18n="aw.weapons">Armes</h2>
@@ -208,7 +206,6 @@
     </div>
   </section>
 
-  <!-- Balles et Artefacts -->
   <section class="shell block">
     <div class="block__head" data-reveal>
       <h2 data-i18n="aw.items">Balles et Artefacts</h2>
