@@ -40,21 +40,17 @@
         <a href="profil.html" data-i18n="nav.about">Profil</a>
         <a href="contact.html" data-i18n="nav.contact">Contact</a>
       </div>
-      <div class="lang">
-        <button type="button" data-lang-btn="fr" data-cursor="swear" class="is-active">FR</button><i>/</i><button type="button" data-lang-btn="en" data-cursor="swear">EN</button>
+      <div class="lang" data-lang>
+        <button type="button" class="lang__current" data-lang-current aria-expanded="false" aria-label="Langue"><span data-lang-label>FR</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"/></svg></button>
+        <div class="lang__menu">
+          <button type="button" data-lang-btn="fr" data-cursor="swear" class="is-active">FR</button><i>/</i><button type="button" data-lang-btn="en" data-cursor="swear">EN</button>
+        </div>
       </div>
-      <button type="button" class="menu-toggle" data-menu-toggle data-open="Menu" data-close="Fermer" aria-expanded="false">Menu</button>
+
     </nav>
   </div>
 </header>
 
-<div class="overlay-menu" data-menu>
-  <ul>
-    <li><a href="index.html" data-i18n="nav.work">Projets</a></li>
-    <li><a href="profil.html" data-i18n="nav.about">Profil</a></li>
-    <li><a href="contact.html" data-i18n="nav.contact">Contact</a></li>
-  </ul>
-</div>
 
 <main class="shell page-top page-bottom">
 
@@ -95,7 +91,7 @@
             <span class="card__desc" data-i18n="p.abandon.desc">Roguelike 2D turn based</span>
             <span class="card__meta">
               <span class="meta-chip"><svg class="meta-chip__logo" viewBox="0 0 24 24" role="img" aria-label="Unity"><path d="m12.9288 4.2939 3.7997 2.1929c.1366.077.1415.2905 0 .3675l-4.515 2.6076a.4192.4192 0 0 1-.4246 0L7.274 6.8543c-.139-.0745-.1415-.293 0-.3675l3.7972-2.193V0L1.3758 5.5977V16.793l3.7177-2.1456v-4.3858c-.0025-.1565.1813-.2682.318-.1838l4.5148 2.6076a.4252.4252 0 0 1 .2136.3676v5.2127c.0025.1565-.1813.2682-.3179.1838l-3.7996-2.1929-3.7178 2.1457L12 24l9.6954-5.5977-3.7178-2.1457-3.7996 2.1929c-.1341.082-.3229-.0248-.3179-.1838V13.053c0-.1565.087-.2956.2136-.3676l4.5149-2.6076c.134-.082.3228.0224.3179.1838v4.3858l3.7177 2.1456V5.5977L12.9288 0Z"/></svg> Unity</span>
-              <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.6"/><path d="M4.8 19.5v-1a4.2 4.2 0 0 1 4.2-4.2h6a4.2 4.2 0 0 1 4.2 4.2v1"/></svg> 6</span>
+              <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.6"/><path d="M4.8 19.5v-1a4.2 4.2 0 0 1 4.2-4.2h6a4.2 4.2 0 0 1 4.2 4.2v1"/></svg> 5</span>
               <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.2V12l3 2"/></svg> <span data-i18n="p.abandon.time">12 mois</span></span>
             </span>
           </span>

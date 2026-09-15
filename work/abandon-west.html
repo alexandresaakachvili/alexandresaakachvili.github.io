@@ -34,21 +34,17 @@
         <a href="../profil.html" data-i18n="nav.about">Profil</a>
         <a href="../contact.html" data-i18n="nav.contact">Contact</a>
       </div>
-      <div class="lang">
-        <button type="button" data-lang-btn="fr" data-cursor="swear" class="is-active">FR</button><i>/</i><button type="button" data-lang-btn="en" data-cursor="swear">EN</button>
+      <div class="lang" data-lang>
+        <button type="button" class="lang__current" data-lang-current aria-expanded="false" aria-label="Langue"><span data-lang-label>FR</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"/></svg></button>
+        <div class="lang__menu">
+          <button type="button" data-lang-btn="fr" data-cursor="swear" class="is-active">FR</button><i>/</i><button type="button" data-lang-btn="en" data-cursor="swear">EN</button>
+        </div>
       </div>
-      <button type="button" class="menu-toggle" data-menu-toggle data-open="Menu" data-close="Fermer" aria-expanded="false">Menu</button>
+
     </nav>
   </div>
 </header>
 
-<div class="overlay-menu" data-menu>
-  <ul>
-    <li><a href="../index.html" data-i18n="nav.work">Projets</a></li>
-    <li><a href="../profil.html" data-i18n="nav.about">Profil</a></li>
-    <li><a href="../contact.html" data-i18n="nav.contact">Contact</a></li>
-  </ul>
-</div>
 
 <main>
 
@@ -61,12 +57,13 @@
         <p class="lede" data-reveal data-reveal-delay=".05" data-i18n="aw.lede">ABANDON WEST est un <strong>Roguelike 2D turn based</strong>. Vous y incarnez un <strong>cowboy</strong> ramené d&rsquo;entre les morts par un croque-mort véreux. Votre mission&nbsp;? <strong>Retrouver l&rsquo;homme qui vous a tué</strong> et lui rendre la monnaie de sa pièce.</p>
       </div>
 
-      <aside class="spec" data-tilt="soft" data-reveal data-reveal-delay=".1" aria-label="Fiche technique">
+      <aside class="spec" data-tilt="soft" data-reveal data-reveal-delay=".1" aria-label="Fiche technique" data-href="https://store.steampowered.com/app/4537180/Abandon_West/" data-cursor="external">
         <span class="spec__inner">
           <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7.5" width="18" height="12" rx="2"/><path d="M8.7 7.5V5.8A1.8 1.8 0 0 1 10.5 4h3a1.8 1.8 0 0 1 1.8 1.8v1.7"/></svg> <span data-i18n="aw.role">Programmation, Combat Design</span></span>
           <span class="meta-chip"><svg class="meta-chip__logo" viewBox="0 0 24 24" role="img" aria-label="Unity"><path d="m12.9288 4.2939 3.7997 2.1929c.1366.077.1415.2905 0 .3675l-4.515 2.6076a.4192.4192 0 0 1-.4246 0L7.274 6.8543c-.139-.0745-.1415-.293 0-.3675l3.7972-2.193V0L1.3758 5.5977V16.793l3.7177-2.1456v-4.3858c-.0025-.1565.1813-.2682.318-.1838l4.5148 2.6076a.4252.4252 0 0 1 .2136.3676v5.2127c.0025.1565-.1813.2682-.3179.1838l-3.7996-2.1929-3.7178 2.1457L12 24l9.6954-5.5977-3.7178-2.1457-3.7996 2.1929c-.1341.082-.3229-.0248-.3179-.1838V13.053c0-.1565.087-.2956.2136-.3676l4.5149-2.6076c.134-.082.3228.0224.3179.1838v4.3858l3.7177 2.1456V5.5977L12.9288 0Z"/></svg> Unity</span>
-          <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.6"/><path d="M4.8 19.5v-1a4.2 4.2 0 0 1 4.2-4.2h6a4.2 4.2 0 0 1 4.2 4.2v1"/></svg> 6</span>
+          <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.6"/><path d="M4.8 19.5v-1a4.2 4.2 0 0 1 4.2-4.2h6a4.2 4.2 0 0 1 4.2 4.2v1"/></svg> 5</span>
           <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.2V12l3 2"/></svg> <span data-i18n="aw.duration">12 mois</span></span>
+          <a class="spec__corner" href="https://store.steampowered.com/app/4537180/Abandon_West/" target="_blank" rel="noopener" aria-label="Abandon West sur Steam" data-cursor="external"><svg class="spec__corner-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></svg></a>
         </span>
       </aside>
     </div>
@@ -134,16 +131,15 @@
       </div>
     </div>
 
-    <div class="media-grid media-grid--2 mt-l">
+    <!-- Deux captures puis leurs explications, A et B. Sur mobile, chaque
+         capture precede le bloc qu elle illustre : 1, A, 2, B. -->
+    <div class="quad mt-l">
       <figure class="figure" data-reveal>
         <picture><source srcset="../assets/img/abandon-combat-1.avif" type="image/avif"><img src="../assets/img/abandon-combat-1.webp" alt="ABANDON WEST" loading="lazy" decoding="async"></picture>
       </figure>
       <figure class="figure" data-reveal data-reveal-delay=".06">
         <picture><source srcset="../assets/img/abandon-combat-2.avif" type="image/avif"><img src="../assets/img/abandon-combat-2.webp" alt="ABANDON WEST" loading="lazy" decoding="async"></picture>
       </figure>
-    </div>
-
-    <div class="split split--top mt-l">
       <div data-reveal>
         <h3 data-i18n="aw.combat.a">A) Choix des actions joueurs</h3>
         <ol class="steps">

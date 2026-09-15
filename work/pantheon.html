@@ -34,21 +34,17 @@
         <a href="../profil.html" data-i18n="nav.about">Profil</a>
         <a href="../contact.html" data-i18n="nav.contact">Contact</a>
       </div>
-      <div class="lang">
-        <button type="button" data-lang-btn="fr" data-cursor="swear" class="is-active">FR</button><i>/</i><button type="button" data-lang-btn="en" data-cursor="swear">EN</button>
+      <div class="lang" data-lang>
+        <button type="button" class="lang__current" data-lang-current aria-expanded="false" aria-label="Langue"><span data-lang-label>FR</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"/></svg></button>
+        <div class="lang__menu">
+          <button type="button" data-lang-btn="fr" data-cursor="swear" class="is-active">FR</button><i>/</i><button type="button" data-lang-btn="en" data-cursor="swear">EN</button>
+        </div>
       </div>
-      <button type="button" class="menu-toggle" data-menu-toggle data-open="Menu" data-close="Fermer" aria-expanded="false">Menu</button>
+
     </nav>
   </div>
 </header>
 
-<div class="overlay-menu" data-menu>
-  <ul>
-    <li><a href="../index.html" data-i18n="nav.work">Projets</a></li>
-    <li><a href="../profil.html" data-i18n="nav.about">Profil</a></li>
-    <li><a href="../contact.html" data-i18n="nav.contact">Contact</a></li>
-  </ul>
-</div>
 
 <main>
 
@@ -61,12 +57,12 @@
         <p class="lede" data-reveal data-reveal-delay=".05" data-i18n="pn.lede">Plongez au cœur d&rsquo;un monde en pleine création, où les <strong>Dieux de l&rsquo;Olympe</strong> s&rsquo;affrontent dans l&rsquo;ombre pour imposer leur vision du monde&nbsp;!</p>
       </div>
 
-      <aside class="spec" data-tilt="soft" data-reveal data-reveal-delay=".1" aria-label="Fiche technique">
+      <aside class="spec" data-tilt="soft" data-reveal data-reveal-delay=".1" aria-label="Fiche technique" data-href="../assets/files/regles-pantheon.pdf" data-cursor="external">
         <span class="spec__inner">
           <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8.5 4.6L12 12.2 3.5 7.6z"/><path d="m3.5 12.2 8.5 4.6 8.5-4.6"/><path d="m3.5 16.5 8.5 4.6 8.5-4.6"/></svg> Photoshop</span>
           <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.6"/><path d="M4.8 19.5v-1a4.2 4.2 0 0 1 4.2-4.2h6a4.2 4.2 0 0 1 4.2 4.2v1"/></svg> 1</span>
           <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.2V12l3 2"/></svg> <span data-i18n="pn.duration">2 semaines</span></span>
-          <a class="meta-chip spec__link" href="../assets/files/regles-pantheon.pdf" target="_blank" rel="noopener" data-cursor="external"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16 16.5 7.5"/><path d="M9.5 7.5h7v7"/></svg> <span data-i18n="pn.rules">Règles</span></a>
+          <a class="spec__corner" href="../assets/files/regles-pantheon.pdf" target="_blank" rel="noopener" aria-label="Règles de Panthéon (PDF)" data-cursor="external"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3h7.2L19 8.3V19.5a1.5 1.5 0 0 1-1.5 1.5H6.5A1.5 1.5 0 0 1 5 19.5v-15A1.5 1.5 0 0 1 6.5 3z"/><path d="M13.5 3v5.5H19"/><path d="M8.5 13h7"/><path d="M8.5 16.5h7"/></svg></a>
         </span>
       </aside>
     </div>

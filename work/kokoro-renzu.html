@@ -34,21 +34,17 @@
         <a href="../profil.html" data-i18n="nav.about">Profil</a>
         <a href="../contact.html" data-i18n="nav.contact">Contact</a>
       </div>
-      <div class="lang">
-        <button type="button" data-lang-btn="fr" data-cursor="swear" class="is-active">FR</button><i>/</i><button type="button" data-lang-btn="en" data-cursor="swear">EN</button>
+      <div class="lang" data-lang>
+        <button type="button" class="lang__current" data-lang-current aria-expanded="false" aria-label="Langue"><span data-lang-label>FR</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"/></svg></button>
+        <div class="lang__menu">
+          <button type="button" data-lang-btn="fr" data-cursor="swear" class="is-active">FR</button><i>/</i><button type="button" data-lang-btn="en" data-cursor="swear">EN</button>
+        </div>
       </div>
-      <button type="button" class="menu-toggle" data-menu-toggle data-open="Menu" data-close="Fermer" aria-expanded="false">Menu</button>
+
     </nav>
   </div>
 </header>
 
-<div class="overlay-menu" data-menu>
-  <ul>
-    <li><a href="../index.html" data-i18n="nav.work">Projets</a></li>
-    <li><a href="../profil.html" data-i18n="nav.about">Profil</a></li>
-    <li><a href="../contact.html" data-i18n="nav.contact">Contact</a></li>
-  </ul>
-</div>
 
 <main>
 
@@ -64,11 +60,11 @@
 
       <aside class="spec" data-tilt="soft" data-reveal data-reveal-delay=".1" aria-label="Fiche technique">
         <span class="spec__inner">
-          <img class="spec__badge" src="../assets/img/badge-rookie-awards.webp" alt="Finaliste des Rookie Awards" loading="lazy" decoding="async">
           <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7.5" width="18" height="12" rx="2"/><path d="M8.7 7.5V5.8A1.8 1.8 0 0 1 10.5 4h3a1.8 1.8 0 0 1 1.8 1.8v1.7"/></svg> <span data-i18n="kok.role">System Design, Level Design, UI</span></span>
           <span class="meta-chip"><svg class="meta-chip__logo" viewBox="0 0 24 24" role="img" aria-label="Unreal Engine"><path d="M12 0a12 12 0 1012 12A12 12 0 0012 0zm0 23.52A11.52 11.52 0 1123.52 12 11.52 11.52 0 0112 23.52zm7.13-9.791c-.206.997-1.126 3.557-4.06 4.942l-1.179-1.325-1.988 2a7.338 7.338 0 01-5.804-2.978 2.859 2.859 0 00.65.123c.326.006.678-.114.678-.66v-5.394a.89.89 0 00-1.116-.89c-.92.212-1.656 2.509-1.656 2.509a7.304 7.304 0 012.528-5.597 7.408 7.408 0 013.73-1.721c-1.006.573-1.57 1.507-1.57 2.29 0 1.262.76 1.109.984.923v7.28a1.157 1.157 0 00.148.256 1.075 1.075 0 00.88.445c.76 0 1.747-.868 1.747-.868V9.172c0-.6-.452-1.324-.905-1.572 0 0 .838-.149 1.484.346a5.537 5.537 0 01.387-.425c1.508-1.48 2.929-1.902 4.112-2.112 0 0-2.151 1.69-2.151 3.96 0 1.687.043 5.801.043 5.801.799.771 1.986-.342 3.059-1.441Z"/></svg> UE5</span>
           <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.6"/><path d="M4.8 19.5v-1a4.2 4.2 0 0 1 4.2-4.2h6a4.2 4.2 0 0 1 4.2 4.2v1"/></svg> 14</span>
           <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.2V12l3 2"/></svg> <span data-i18n="kok.duration">9 mois</span></span>
+          <span class="spec__corner spec__corner--badge"><img src="../assets/img/badge-rookie-awards.webp" alt="Finaliste des Rookie Awards" loading="lazy" decoding="async"></span>
         </span>
       </aside>
     </div>

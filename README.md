@@ -151,10 +151,12 @@ ffmpeg -i entree.gif -frames:v 1 -q:v 78 sortie-poster.webp
 
 En haut à droite de chaque page projet, en face de la phrase de présentation, une petite carte donne le rôle, le moteur, l'effectif et la durée : un pictogramme et une valeur par ligne, le moins de texte possible. Elle réagit au survol comme les cartes de l'accueil.
 
+Son **coin bas droit** porte ce qui prolonge le projet : la page Steam ou itch.io, les règles en PDF, ou le badge des Rookie Awards. Un logo, rien d'autre. Sur ordinateur, un clic **n'importe où sur la fiche** ouvre ce lien (`data-href` sur l'`<aside>`) ; sur mobile, seul le logo l'ouvre, le doigt posé sur la fiche servant à l'incliner.
+
 ```html
-<aside class="spec" data-tilt="soft" data-reveal data-reveal-delay=".1" aria-label="Fiche technique">
+<aside class="spec" data-tilt="soft" data-reveal data-reveal-delay=".1" aria-label="Fiche technique"
+       data-href="https://store.steampowered.com/app/…" data-cursor="external">  <!-- data-href : facultatif -->
   <span class="spec__inner">
-    <img class="spec__badge" src="../assets/img/badge-rookie-awards.webp" alt="…">  <!-- facultatif -->
     <span class="meta-chip"><svg …>mallette</svg> <span data-i18n="xx.role">Game Design</span></span>
     <span class="meta-chip"><svg class="meta-chip__logo" …>logo moteur</svg> Unity</span>
     <span class="meta-chip"><svg …>silhouettes</svg> 6</span>
@@ -163,13 +165,16 @@ En haut à droite de chaque page projet, en face de la phrase de présentation, 
 </aside>
 ```
 
-La dernière ligne peut être un **lien** — les règles en PDF, la page itch.io, la fiche boutique :
+Le coin bas droit est un `spec__corner`, placé en dernier dans `spec__inner`. Lien (Steam, itch.io, PDF) ou simple badge :
 
 ```html
-<a class="meta-chip spec__link" href="../assets/files/regles-xxx.pdf" target="_blank" rel="noopener" data-cursor="external">
-  <svg …>flèche du lien sortant</svg> <span data-i18n="xx.rules">Règles</span>
+<a class="spec__corner" href="../assets/files/regles-xxx.pdf" target="_blank" rel="noopener" aria-label="Règles (PDF)" data-cursor="external">
+  <svg …>icône document</svg>          <!-- ou <svg class="spec__corner-logo">logo Steam / itch.io</svg> -->
 </a>
+<span class="spec__corner spec__corner--badge"><img src="../assets/img/badge-rookie-awards.webp" alt="…"></span>
 ```
+
+Les logos Steam et itch.io viennent de Simple Icons ; ils se recopient depuis `work/abandon-west.html` et `work/in-machina.html`.
 
 Les pictogrammes se recopient d'une page à l'autre. Les logos de marque (Unity, Unreal) portent la classe `meta-chip__logo` : ce sont des aplats, pas des dessins au trait.
 
@@ -349,3 +354,14 @@ Le contenu visible est intégralement traduit (289 clés), titres d'onglet et m�
 **https://alexandresaakachvili.github.io/**
 
 Le compte GitHub a été renommé `alexandresaakachvili`, et le dépôt porte exactement ce nom suivi de `.github.io` : GitHub le sert donc à la racine du domaine. Tous les chemins du site sont relatifs, rien n'est à changer si l'adresse bouge un jour.
+
+### Les jeux préférés
+
+Chaque carte de `profil.html` qui existe sur Steam porte `data-href` (la page du jeu) et un logo Steam en bas à droite (`fav__store`). Même règle que la fiche technique : sur ordinateur toute la carte est cliquable, sur mobile seul le logo. Les jeux absents de Steam (Magic, Shadow of the Colossus, League of Legends) n'ont ni l'un ni l'autre.
+
+### Sur mobile
+
+- **Barre** : pas de menu. Les pages autres que la page courante restent dans la barre ; la langue se replie en `FR ▾`, qui se déroule vers le bas.
+- **Cartes** : elles suivent l'inclinaison du téléphone quand le gyroscope est accessible (sur iPhone, l'autorisation est demandée au premier toucher d'une carte). Sans capteur, elles oscillent seules (`html.tilt-idle`). Un doigt posé sur une carte l'incline comme la souris le ferait, sans bloquer le défilement ; un appui long n'ouvre pas le lien.
+- **Images agrandies** : pincer ou taper l'image pour zoomer, glisser pour se déplacer, taper à côté pour fermer. Le bouton **Retour** referme l'image au lieu de quitter la page (une entrée d'historique est ajoutée à l'ouverture). À la souris : molette pour zoomer, clic sur l'image pour zoomer/dézoomer, Échap pour fermer.
+- **Ordre des blocs** : dans les techniques de LD, le titre passe au-dessus de la vidéo ; dans les jeux mobiles, la capture passe au-dessus du texte ; dans le combat d'Abandon West, chaque capture précède son explication (`.quad`).

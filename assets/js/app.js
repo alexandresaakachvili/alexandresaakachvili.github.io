@@ -204,19 +204,30 @@
      4 bis. Signature du header : chaque lettre grossit a son tour
      ------------------------------------------------------ */
   function initBrand() {
-    if (reduced) return;
+    // Sur tactile il n y a pas de survol, et le nom doit pouvoir se replier
+    // sur deux lignes dans la barre : on ne le decoupe pas.
+    if (reduced || coarse) return;
     document.querySelectorAll(".brand__name").forEach(function (el) {
       var text = el.textContent;
       if (!text) return;
       el.textContent = "";
-      for (var i = 0; i < text.length; i++) {
-        var s = document.createElement("span");
-        // Espace insecable : un span contenant un espace simple serait
-        // reduit a zero par le rendu, et le nom se collerait.
-        s.textContent = text.charAt(i) === " " ? "\u00A0" : text.charAt(i);
-        s.style.setProperty("--i", i);
-        el.appendChild(s);
-      }
+      // Les lettres sont regroupees par mot : des lettres en inline-block
+      // laissees libres se replieraient n importe ou quand la barre se
+      // resserre. Le mot est insecable, l espace entre deux mots reste un
+      // vrai espace, qui peut se replier.
+      var i = 0;
+      text.split(" ").forEach(function (word, w) {
+        if (w) { el.appendChild(document.createTextNode(" ")); i++; }
+        var box = document.createElement("span");
+        box.className = "brand__word";
+        for (var c = 0; c < word.length; c++, i++) {
+          var s = document.createElement("span");
+          s.textContent = word.charAt(c);
+          s.style.setProperty("--i", i);
+          box.appendChild(s);
+        }
+        el.appendChild(box);
+      });
     });
   }
 
@@ -420,9 +431,14 @@
      7. Cartes qui suivent le curseur
      ------------------------------------------------------ */
   function initTilt() {
-    if (coarse || reduced) return;
-    document.querySelectorAll("[data-tilt]").forEach(function (card) {
+    if (reduced) return;
+    var cards = document.querySelectorAll("[data-tilt]");
+    if (!cards.length) return;
+
+    cards.forEach(function (card, index) {
       var inner = card.querySelector(".fav__inner, .card__inner, .spec__inner");
+      // Dephasage du balancement de secours sur tactile (voir le CSS).
+      card.style.setProperty("--i", index);
       // Sans conteneur interne (les tuiles de contact), on incline la carte
       // elle-meme. perspective() ecrit DANS la transform donne a chaque
       // element son propre point de fuite, centre sur lui : c'est ce qui
@@ -461,10 +477,6 @@
         });
       };
 
-      card.addEventListener("mousemove", function (e) {
-        card.__tiltApply(e.clientX, e.clientY);
-      });
-
       // Expose la remise a plat : la synchronisation ci-dessous doit
       // pouvoir l appeler sans passer par un evenement de souris.
       card.__tiltReset = function () {
@@ -472,8 +484,19 @@
         inner.style.transform = ""; // retour élastique géré par --ease-snap
       };
 
+      // Ce que le gyroscope a besoin de savoir de la carte.
+      card.__tiltInner = inner;
+      card.__tiltSelf = selfTilt;
+      card.__tiltSoft = soft;
+
+      if (coarse) return;
+      card.addEventListener("mousemove", function (e) {
+        card.__tiltApply(e.clientX, e.clientY);
+      });
       card.addEventListener("mouseleave", card.__tiltReset);
     });
+
+    if (coarse) { initTouchTilt(cards); return; }
 
     /* ----------------------------------------------------
        Le defilement ne declenche aucun evenement de souris : ni mouseleave,
@@ -498,6 +521,128 @@
         if (card.__tiltApply) card.__tiltApply(Cursor.x, Cursor.y);
       }
     });
+  }
+
+  /* ------------------------------------------------------
+     7 bis. Tactile : pas de survol. Un doigt pose sur une carte la
+        manipule comme la souris le ferait, sans bloquer le defilement.
+        Le reste du temps, les cartes suivent l inclinaison du telephone
+        quand le gyroscope est disponible ; sinon elles oscillent seules
+        (classe tilt-idle, animee par le CSS).
+     ------------------------------------------------------ */
+  function initTouchTilt(cards) {
+    var touched = null;
+
+    /* --- Le doigt --- */
+    cards.forEach(function (card) {
+      var since = 0, scrollAt = 0, held = false;
+
+      function release() {
+        if (touched !== card) return;
+        held = Date.now() - since > 300;
+        touched = null;
+        card.classList.remove("is-hovered", "is-touched");
+        card.__tiltReset();
+      }
+
+      card.addEventListener("touchstart", function (e) {
+        if (e.touches.length !== 1) return;
+        var t = e.touches[0];
+        touched = card; since = Date.now(); scrollAt = window.scrollY; held = false;
+        card.classList.add("is-hovered", "is-touched");
+        card.__tiltApply(t.clientX, t.clientY);
+      }, { passive: true });
+
+      card.addEventListener("touchmove", function (e) {
+        if (touched !== card || e.touches.length !== 1) return;
+        // La page a bouge : c est un defilement, pas une manipulation.
+        if (Math.abs(window.scrollY - scrollAt) > 6) { release(); return; }
+        var t = e.touches[0];
+        card.__tiltApply(t.clientX, t.clientY);
+      }, { passive: true });
+
+      card.addEventListener("touchend", release, { passive: true });
+      card.addEventListener("touchcancel", release, { passive: true });
+
+      // Un appui long sert a manipuler la carte, pas a suivre le lien :
+      // le clic qui le conclut est absorbe. Le menu contextuel du
+      // navigateur, lui, couperait la manipulation.
+      card.addEventListener("click", function (e) {
+        if (held) { held = false; e.preventDefault(); e.stopPropagation(); }
+      }, true);
+      card.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+    });
+
+    /* --- Le gyroscope --- */
+    var root = document.documentElement;
+    var gyro = { on: false, bg: 0, bb: 0, gx: 0, gy: 0, raf: null };
+    var subjects = [];
+    cards.forEach(function (card) { if (!card.__tiltSelf) subjects.push(card); });
+    if (!subjects.length) return;
+
+    // Seules les cartes a l ecran sont mises a jour.
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { en.target.__tiltSeen = en.isIntersecting; });
+    }, { rootMargin: "10% 0px" });
+    subjects.forEach(function (card) { io.observe(card); });
+
+    function render() {
+      gyro.raf = null;
+      subjects.forEach(function (card) {
+        if (!card.__tiltSeen || card === touched) return;
+        var rot = card.__tiltSoft ? 3 : 5;
+        // Les voisines de la carte tenue reculent, comme au survol.
+        var dim = touched && touched.parentElement === card.parentElement;
+        card.__tiltInner.style.transform =
+          "rotateY(" + (-gyro.gx * rot).toFixed(2) + "deg) " +
+          "rotateX(" + (gyro.gy * rot).toFixed(2) + "deg)" +
+          (dim ? " scale(.96)" : "");
+      });
+    }
+
+    function onOrient(e) {
+      if (e.gamma === null || e.beta === null) return;
+      var g = e.gamma, b = e.beta, t;
+      // En paysage, les axes s echangent.
+      var angle = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
+      if (angle === 90) { t = g; g = -b; b = t; }
+      else if (angle === -90 || angle === 270) { t = g; g = b; b = -t; }
+
+      if (!gyro.on) {
+        gyro.on = true; gyro.bg = g; gyro.bb = b;
+        root.classList.remove("tilt-idle");
+      }
+      // La reference suit lentement la prise en main : une inclinaison
+      // penche les cartes, qui se redressent d elles-memes si on garde la
+      // position. Rien n est donc jamais bloque de travers.
+      gyro.bg += (g - gyro.bg) * 0.006;
+      gyro.bb += (b - gyro.bb) * 0.006;
+      var dx = Math.max(-1, Math.min(1, (g - gyro.bg) / 20));
+      var dy = Math.max(-1, Math.min(1, (b - gyro.bb) / 20));
+      gyro.gx += (dx - gyro.gx) * 0.15;
+      gyro.gy += (dy - gyro.gy) * 0.15;
+      if (!gyro.raf) gyro.raf = requestAnimationFrame(render);
+    }
+
+    function listen() { window.addEventListener("deviceorientation", onOrient); }
+    function fallback() { if (!gyro.on) root.classList.add("tilt-idle"); }
+
+    var DOE = window.DeviceOrientationEvent;
+    if (!DOE) { fallback(); return; }
+    if (typeof DOE.requestPermission === "function") {
+      // iOS : l acces au capteur se demande au premier geste sur une carte.
+      // En attendant, et si c est refuse, le balancement prend le relais.
+      fallback();
+      var ask = function () {
+        cards.forEach(function (card) { card.removeEventListener("touchend", ask); });
+        DOE.requestPermission().then(function (s) { if (s === "granted") listen(); })["catch"](function () {});
+      };
+      cards.forEach(function (card) { card.addEventListener("touchend", ask, { passive: true }); });
+    } else {
+      listen();
+      // Aucune lecture apres 1,5 s : pas de capteur.
+      setTimeout(fallback, 1500);
+    }
   }
 
   /* ------------------------------------------------------
@@ -546,24 +691,27 @@
       }, { passive: true });
     }
 
-    var toggle = document.querySelector("[data-menu-toggle]");
-    var overlay = document.querySelector("[data-menu]");
-    if (!toggle || !overlay) return;
+    // Langue : sur mobile, le choix courant se deroule vers le bas. Sur
+    // grand ecran le bouton est masque par le CSS et les deux choix sont
+    // toujours visibles ; ce code n y change rien.
+    var lang = document.querySelector("[data-lang]");
+    var current = lang ? lang.querySelector("[data-lang-current]") : null;
+    if (!lang || !current) return;
     var open = false;
-    function setMenu(state) {
+    function setOpen(state) {
       open = state;
-      overlay.classList.toggle("is-open", open);
-      toggle.textContent = open ? (toggle.dataset.close || "Fermer") : (toggle.dataset.open || "Menu");
-      toggle.setAttribute("aria-expanded", open ? "true" : "false");
-      if (lenis) { if (open) { lenis.stop(); } else { lenis.start(); } }
-      document.documentElement.classList.toggle("lenis-stopped", open);
+      lang.classList.toggle("is-open", open);
+      current.setAttribute("aria-expanded", open ? "true" : "false");
     }
-    toggle.addEventListener("click", function () { setMenu(!open); });
-    overlay.querySelectorAll("a").forEach(function (a) {
-      a.addEventListener("click", function () { setMenu(false); });
+    current.addEventListener("click", function () { setOpen(!open); });
+    lang.querySelectorAll("[data-lang-btn]").forEach(function (b) {
+      b.addEventListener("click", function () { setOpen(false); });
+    });
+    document.addEventListener("click", function (e) {
+      if (open && !lang.contains(e.target)) setOpen(false);
     });
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && open) setMenu(false);
+      if (e.key === "Escape" && open) setOpen(false);
     });
   }
 
@@ -699,12 +847,64 @@
     document.documentElement.appendChild(boite);
 
     var ouverte = false;
+    // Le curseur annonce le zoom sur l image elle-meme.
+    vue.dataset.cursor = "view";
+
+    /* ---- Zoom : une echelle et un decalage, appliques a l image ---- */
+    var MAX = 4;
+    var z = { s: 1, x: 0, y: 0 };
+
+    function boxOf() {
+      // Dimensions de mise en page de l image, insensibles a la transform,
+      // et centre de la boite, que rien ne deplace.
+      var r = boite.getBoundingClientRect();
+      var W = vue.offsetWidth, H = vue.offsetHeight;
+      // Taille reellement dessinee : object-fit:contain laisse des marges
+      // d un cote ou de l autre, dans lesquelles on n a pas a se deplacer.
+      var nw = vue.naturalWidth || W, nh = vue.naturalHeight || H;
+      var dw = W, dh = H;
+      if (W / H > nw / nh) { dh = H; dw = H * nw / nh; } else { dw = W; dh = W * nh / nw; }
+      return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, W: W, H: H, dw: dw, dh: dh };
+    }
+
+    function clamp(v, lim) { return Math.max(-lim, Math.min(lim, v)); }
+
+    function apply() {
+      var b = boxOf();
+      z.x = clamp(z.x, Math.max(0, (b.dw * z.s - b.W) / 2));
+      z.y = clamp(z.y, Math.max(0, (b.dh * z.s - b.H) / 2));
+      vue.style.transform = z.s === 1
+        ? ""
+        : "translate3d(" + z.x.toFixed(1) + "px," + z.y.toFixed(1) + "px,0) scale(" + z.s.toFixed(3) + ")";
+      boite.classList.toggle("is-zoomed", z.s > 1);
+    }
+
+    // Change d echelle en gardant fixe le point (px, py) de l ecran.
+    function zoomAt(s, px, py) {
+      s = Math.max(1, Math.min(MAX, s));
+      var b = boxOf();
+      var k = s / z.s;
+      var fx = px - b.cx, fy = py - b.cy;
+      z.x = fx - (fx - z.x) * k;
+      z.y = fy - (fy - z.y) * k;
+      z.s = s;
+      if (s === 1) { z.x = 0; z.y = 0; }
+      apply();
+    }
+
+    function resetZoom() { z.s = 1; z.x = 0; z.y = 0; vue.style.transform = ""; boite.classList.remove("is-zoomed", "is-dragging"); }
+
+    /* ---- Ouverture / fermeture ----
+       L ouverture pousse une entree dans l historique : sur mobile, le
+       bouton Retour referme alors l image au lieu de quitter la page. */
+    var pushed = false, closing = false;
 
     function ouvrir(img) {
       // currentSrc : le fichier que le navigateur a reellement choisi dans
       // le <picture>, donc deja en cache. Rien de plus a telecharger.
       vue.src = img.currentSrc || img.src;
       vue.alt = img.alt || "";
+      resetZoom();
       fermer.setAttribute("aria-label", I18N.t("ui.close", "Fermer"));
       boite.hidden = false;
       void boite.offsetWidth;          // force le point de depart de la transition
@@ -713,17 +913,34 @@
       if (lenis) lenis.stop();
       document.documentElement.classList.add("lenis-stopped");
       fermer.focus();
+      try { history.pushState({ lightbox: true }, ""); pushed = true; } catch (e) { pushed = false; }
     }
 
-    function refermer() {
+    function fermerVraiment() {
       if (!ouverte) return;
-      ouverte = false;
+      ouverte = false; pushed = false; closing = false;
       boite.classList.remove("is-open");
       if (lenis) lenis.start();
       document.documentElement.classList.remove("lenis-stopped");
       // On attend la fin du fondu pour retirer l image de l affichage.
-      setTimeout(function () { if (!ouverte) { boite.hidden = true; vue.src = ""; } }, 400);
+      setTimeout(function () { if (!ouverte) { boite.hidden = true; vue.src = ""; resetZoom(); } }, 400);
     }
+
+    function refermer() {
+      if (!ouverte) return;
+      if (pushed) {
+        // On retire l entree ajoutee : popstate fait le reste. Un seul
+        // retour, meme si Echap est presse deux fois.
+        if (closing) return;
+        closing = true;
+        history.back();
+        setTimeout(function () { if (ouverte) fermerVraiment(); }, 400);
+        return;
+      }
+      fermerVraiment();
+    }
+
+    window.addEventListener("popstate", function () { if (ouverte) fermerVraiment(); });
 
     main.addEventListener("click", function (e) {
       var img = zoomable(e.target);
@@ -732,9 +949,117 @@
       ouvrir(img);
     });
 
-    boite.addEventListener("click", refermer);
+    fermer.addEventListener("click", function (e) { e.stopPropagation(); refermer(); });
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") refermer();
+    });
+
+    /* ---- Gestes ----
+       Un doigt : glisser deplace l image agrandie. Deux doigts : pincer
+       change l echelle. Un tap sur l image l agrandit sur ce point, ou la
+       ramene a sa taille ; un tap a cote la referme. A la souris : la
+       molette zoome sous le pointeur, le clic fait comme le tap. */
+    var pointers = {};
+    var count = 0;
+    var start = null;   // etat au debut du geste courant
+
+    function pts() {
+      var a = [];
+      for (var id in pointers) a.push(pointers[id]);
+      return a;
+    }
+
+    boite.addEventListener("pointerdown", function (e) {
+      if (e.target === fermer || fermer.contains(e.target)) return;
+      pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+      count++;
+      try { boite.setPointerCapture(e.pointerId); } catch (err) { /* noop */ }
+      var p = pts();
+      start = {
+        s: z.s, x: z.x, y: z.y,
+        moved: false, target: e.target,
+        px: e.clientX, py: e.clientY,
+        dist: p.length === 2 ? Math.hypot(p[1].x - p[0].x, p[1].y - p[0].y) : 0,
+        mx: p.length === 2 ? (p[0].x + p[1].x) / 2 : e.clientX,
+        my: p.length === 2 ? (p[0].y + p[1].y) / 2 : e.clientY
+      };
+      boite.classList.add("is-dragging");
+    });
+
+    boite.addEventListener("pointermove", function (e) {
+      if (!pointers[e.pointerId] || !start) return;
+      pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+      var p = pts();
+      if (p.length >= 2) {
+        // Pincement : l echelle suit l ecart des doigts, le point entre
+        // eux reste sous eux.
+        var d = Math.hypot(p[1].x - p[0].x, p[1].y - p[0].y);
+        var mx = (p[0].x + p[1].x) / 2, my = (p[0].y + p[1].y) / 2;
+        var s = Math.max(1, Math.min(MAX, start.s * (d / (start.dist || d))));
+        var b = boxOf();
+        var k = s / start.s;
+        z.x = (mx - b.cx) - ((start.mx - b.cx) - start.x) * k;
+        z.y = (my - b.cy) - ((start.my - b.cy) - start.y) * k;
+        z.s = s;
+        start.moved = true;
+        apply();
+      } else if (z.s > 1) {
+        var dx = e.clientX - start.px, dy = e.clientY - start.py;
+        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) start.moved = true;
+        z.x = start.x + dx; z.y = start.y + dy;
+        apply();
+      }
+    });
+
+    function up(e) {
+      if (!pointers[e.pointerId]) return;
+      delete pointers[e.pointerId];
+      count--;
+      if (count > 0) {
+        // Un doigt reste : on repart de la position actuelle, sans saut.
+        var p = pts();
+        start = { s: z.s, x: z.x, y: z.y, moved: true, target: null, px: p[0].x, py: p[0].y, dist: 0, mx: p[0].x, my: p[0].y };
+        return;
+      }
+      boite.classList.remove("is-dragging");
+      var g = start; start = null;
+      if (!g || g.moved) { if (z.s === 1) apply(); return; }
+      // Tap ou clic sans mouvement.
+      if (g.target === vue) {
+        if (z.s > 1) zoomAt(1, e.clientX, e.clientY);
+        else zoomAt(2.5, e.clientX, e.clientY);
+      } else {
+        refermer();
+      }
+    }
+    boite.addEventListener("pointerup", up);
+    boite.addEventListener("pointercancel", up);
+
+    // La molette enchaine les crans : pas de transition entre deux, sinon
+    // l image traine derriere le pointeur.
+    var wheelTimer = null;
+    boite.addEventListener("wheel", function (e) {
+      e.preventDefault();
+      boite.classList.add("is-dragging");
+      zoomAt(z.s * Math.exp(-e.deltaY * 0.0018), e.clientX, e.clientY);
+      clearTimeout(wheelTimer);
+      wheelTimer = setTimeout(function () { if (!start) boite.classList.remove("is-dragging"); }, 150);
+    }, { passive: false });
+  }
+
+  /* ------------------------------------------------------
+     12 bis. Cartes qui menent quelque part : la fiche technique, les jeux
+        preferes. Le logo dans le coin est un vrai lien ; a la souris, un
+        clic n importe ou sur la carte l ouvre aussi. Sur tactile, seul le
+        logo ouvre : le doigt pose sur la carte sert a la manipuler.
+     ------------------------------------------------------ */
+  function initCardLinks() {
+    if (coarse) return;
+    document.querySelectorAll("[data-href]").forEach(function (card) {
+      card.addEventListener("click", function (e) {
+        if (e.button !== 0 || e.target.closest("a, button")) return;
+        window.open(card.dataset.href, "_blank", "noopener");
+      });
     });
   }
 
@@ -840,16 +1165,7 @@
         desc.setAttribute("content", (toEN && body.dataset.enDesc) ? body.dataset.enDesc : body.dataset.frDesc);
       }
 
-      var mt = document.querySelector("[data-menu-toggle]");
-      if (mt) {
-        if (!mt.dataset.frOpen) {
-          mt.dataset.frOpen = mt.dataset.open;
-          mt.dataset.frClose = mt.dataset.close;
-        }
-        mt.dataset.open = (toEN && dict["menu.open"]) ? dict["menu.open"] : mt.dataset.frOpen;
-        mt.dataset.close = (toEN && dict["menu.close"]) ? dict["menu.close"] : mt.dataset.frClose;
-        if (mt.getAttribute("aria-expanded") !== "true") mt.textContent = mt.dataset.open;
-      }
+      document.querySelectorAll("[data-lang-label]").forEach(function (el) { el.textContent = lang.toUpperCase(); });
 
       document.querySelectorAll("[data-lang-btn]").forEach(function (b) {
         b.classList.toggle("is-active", b.dataset.langBtn === lang);
@@ -881,6 +1197,7 @@
     initCarousels();
     initToTop();
     initLightbox();
+    initCardLinks();
     initVideos();
     initTilt();
     initCopy();

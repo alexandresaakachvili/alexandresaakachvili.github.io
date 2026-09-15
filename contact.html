@@ -34,21 +34,17 @@
         <a href="profil.html" data-i18n="nav.about">Profil</a>
         <a href="contact.html" aria-current="page" data-i18n="nav.contact">Contact</a>
       </div>
-      <div class="lang">
-        <button type="button" data-lang-btn="fr" data-cursor="swear" class="is-active">FR</button><i>/</i><button type="button" data-lang-btn="en" data-cursor="swear">EN</button>
+      <div class="lang" data-lang>
+        <button type="button" class="lang__current" data-lang-current aria-expanded="false" aria-label="Langue"><span data-lang-label>FR</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"/></svg></button>
+        <div class="lang__menu">
+          <button type="button" data-lang-btn="fr" data-cursor="swear" class="is-active">FR</button><i>/</i><button type="button" data-lang-btn="en" data-cursor="swear">EN</button>
+        </div>
       </div>
-      <button type="button" class="menu-toggle" data-menu-toggle data-open="Menu" data-close="Fermer" aria-expanded="false">Menu</button>
+
     </nav>
   </div>
 </header>
 
-<div class="overlay-menu" data-menu>
-  <ul>
-    <li><a href="index.html" data-i18n="nav.work">Projets</a></li>
-    <li><a href="profil.html" data-i18n="nav.about">Profil</a></li>
-    <li><a href="contact.html" data-i18n="nav.contact">Contact</a></li>
-  </ul>
-</div>
 
 <main>
 

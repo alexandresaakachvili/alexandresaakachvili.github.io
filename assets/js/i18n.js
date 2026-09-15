@@ -11,8 +11,6 @@ window.I18N_EN = {
   "nav.work": "Work",
   "nav.about": "Profile",
   "nav.contact": "Contact",
-  "menu.open": "Menu",
-  "menu.close": "Close",
 
   /* ---------- Catégories ---------- */
   "cat.ld": "Level Design",
@@ -208,7 +206,6 @@ window.I18N_EN = {
   "im.p5": "The <strong>juiciness</strong> of the game is enhanced by <strong>visual effects</strong> (shake-screen, animation, etc.) as well as <strong>auditory effects</strong> thanks to Voice Acting. Indeed, the game&rsquo;s <strong>narrator</strong> will often intervene to comment on the player&rsquo;s actions.",
   "im.p6": "In terms of <strong>accessibility</strong>, we&rsquo;ve decided to play with just <strong>2 buttons</strong> and the <strong>joystick</strong>.",
   "im.p7": "<strong>Mystery</strong> is the main pillar of our game. Secrets are hidden in the level design, narrative, UI and gameplay systems.",
-  "im.play": "itch.io",
 
   /* ---------- Jeux mobiles ---------- */
   "mob.h1": "Mobile Games",
@@ -231,7 +228,6 @@ window.I18N_EN = {
   /* ---------- Tri&rsquo;Nytia ---------- */
   "tn.lede": "Tri&rsquo;Nytia is a strategic board game in which <strong>three factions struggle</strong> to achieve their often opposing goals.",
   "tn.duration": "5 months",
-  "tn.rules": "Rules",
   "tn.p1": "Play as a member of the Order of Guardians, the Pact of Shadows or a Legend of the Circle. To win, you will need <strong>opportunism</strong>, <strong>ingenuity</strong> and above all <strong>team spirit</strong>. At the beginning of the game <strong>the identity of each player is secret</strong>. You will therefore have to determine who your allies and enemies are in order to set up the strategy that will make you win !",
   "tn.p2": "To sum up, to make Tri&rsquo;Nytia alone, I worked on the <strong>Game Design</strong>, the <strong>Balancing</strong>, the <strong>Making</strong> of the cards, the box, the board (Photoshop, Printing, Laminating) and the <strong>World Building</strong>",
   "tn.board": "The Board",
@@ -251,7 +247,6 @@ window.I18N_EN = {
   /* ---------- Panthéon ---------- */
   "pn.lede": "Dive into the heart of a world in the throes of creation, where the <strong>gods of Olympus</strong> clash in the shadows to impose their vision of the world !",
   "pn.duration": "2 weeks",
-  "pn.rules": "Rules",
   "pn.p1": "In Pantheon, each <strong>player secretly embodies a God</strong> with his or her <strong>own way of winning</strong>. <strong>Create</strong> the world, <strong>populate</strong> it with inhabitants and <strong>influence</strong> their destiny with your divine powers.",
   "pn.p2": "Between <strong>strategy</strong> and <strong>bluffing</strong>, will you be the supreme God of this new world ?",
   "pn.gods": "Gods of Olympus",
