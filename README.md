@@ -366,3 +366,15 @@ Chaque carte de `profil.html` qui existe sur Steam porte `data-href` (la page du
 - **Cartes** : pas de suivi du doigt ni de gyroscope — la carte s'enfonce légèrement sous le doigt (`:active`) et revient d'un ressort. C'est le seul retour tactile, volontairement.
 - **Images agrandies** : pincer ou taper l'image pour zoomer, glisser pour se déplacer, taper à côté pour fermer. Le bouton **Retour** referme l'image au lieu de quitter la page (une entrée d'historique est ajoutée à l'ouverture). À la souris : molette pour zoomer, clic sur l'image pour zoomer/dézoomer, Échap pour fermer.
 - **Ordre des blocs** : dans les techniques de LD comme dans les jeux mobiles (`.game__body`), le titre passe au-dessus de la vidéo et le texte en dessous ; dans le combat d'Abandon West, chaque capture précède son explication (`.quad`).
+
+### Le niveau du curseur (ordinateur seulement)
+
+Le curseur dessiné porte un **niveau**, affiché au coin de l'anneau (`LV 7`), mémorisé dans le navigateur (`localStorage`, clé `as-level`) et plafonné à **100 = MAX**.
+
+- **Clic** : +1, éclat de particules, le chiffre rebondit.
+- **Paliers 30 et 100** : triple onde, rafale, petite secousse, et le curseur change d'allure (classes `cursor-tier-1` / `cursor-tier-2` sur `<html>`). À 30 : le point **bat** comme un cœur en lâchant une onde fine à chaque battement, et laisse une **traînée** de losanges quand la souris va vite. À 100 : trait plein qui tourne vite autour du point + **halo doré** pulsé ; le point garde un battement doux et la traînée reste. Au survol d'un lien, l'anneau reprend le style du palier (battement, ou halo + trait tournant). Pendant la charge, le rythme et la rotation s'accélèrent avec `--charge`.
+- **Maintien** : après 0,26 s, charge de 0,9 s (le point grossit et tourne de plus en plus vite, l'anneau se contracte, des particules convergent — `--charge` de 0 à 1, classes `is-charging` puis `is-charged`). **Relâcher** : grosse rafale, deux ondes, secousse d'écran, +5 niveaux, et les cartes visibles sont repoussées en vague depuis le curseur (`is-shocked`) avant de revenir par ressort.
+
+Tout vit dans `initLevel()` (`app.js`) et le bloc `.cursor-level` / `.fx` du CSS. Rien de tout cela n'existe sur tactile ni en mouvement réduit : la mécanique est attachée au curseur dessiné, qui n'y est pas.
+
+> **À retirer avant publication** : la touche **R** remet le niveau à 0 (fonction `debugResetLevel` à la fin de `initLevel()`, deux lignes à supprimer : la fonction et son `addEventListener`).

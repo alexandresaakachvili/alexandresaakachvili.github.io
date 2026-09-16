@@ -299,6 +299,224 @@
     })();
   }
 
+  function initLevel() {
+    if (!Cursor.enabled) return;
+    var root = document.documentElement;
+    var MAX = 100;
+    var level = 0;
+    try { level = Math.min(MAX, parseInt(localStorage.getItem("as-level"), 10) || 0); } catch (e) { level = 0; }
+
+    var fx = document.createElement("div");
+    fx.className = "fx";
+    root.appendChild(fx);
+    var label = document.createElement("span");
+    label.className = "cursor-level";
+    Cursor.ring.appendChild(label);
+
+    function tierOf(l) { return l >= MAX ? 2 : l >= 30 ? 1 : 0; }
+
+    function render() {
+      label.textContent = level >= MAX ? "MAX" : "LV " + level;
+      root.classList.toggle("has-level", level > 0);
+      for (var t = 1; t <= 2; t++) root.classList.toggle("cursor-tier-" + t, tierOf(level) === t);
+    }
+    render();
+
+    function spawn(cls, x, y) {
+      var p = document.createElement("i");
+      if (cls) p.className = cls;
+      p.style.left = x + "px";
+      p.style.top = y + "px";
+      fx.appendChild(p);
+      return p;
+    }
+
+    function remove() { this.effect.target.remove(); }
+
+    function burst(x, y, n, spread, size, duration, mix) {
+      for (var i = 0; i < n; i++) {
+        var a = (i / n) * Math.PI * 2 + (Math.random() - .5) * .7;
+        var d = spread * (.5 + Math.random() * .8);
+        var s = size * (.6 + Math.random() * .8);
+        var p = spawn(mix && i % 3 === 1 ? "is-cream" : "", x, y);
+        p.style.width = p.style.height = s.toFixed(1) + "px";
+        p.animate([
+          { transform: "translate(-50%,-50%) rotate(45deg) scale(1)", opacity: 1 },
+          { transform: "translate(calc(-50% + " + (Math.cos(a) * d).toFixed(1) + "px),calc(-50% + " + (Math.sin(a) * d).toFixed(1) + "px)) rotate(" + (45 + (Math.random() - .5) * 240).toFixed(0) + "deg) scale(.15)", opacity: 0 }
+        ], { duration: duration * (.7 + Math.random() * .5), easing: "cubic-bezier(.2,.8,.3,1)", fill: "forwards" }).onfinish = remove;
+      }
+    }
+
+    function wave(x, y, size, duration, delay) {
+      var w = spawn("fx__wave", x, y);
+      w.style.width = w.style.height = size + "px";
+      w.animate([
+        { transform: "translate(-50%,-50%) scale(.05)", opacity: .9, borderWidth: "3px" },
+        { transform: "translate(-50%,-50%) scale(1)", opacity: 0, borderWidth: "1px" }
+      ], { duration: duration, delay: delay || 0, easing: "cubic-bezier(.1,.7,.3,1)", fill: "both" }).onfinish = remove;
+    }
+
+    function converge(x, y) {
+      var a = Math.random() * Math.PI * 2;
+      var d = 55 + Math.random() * 45;
+      var p = spawn(Math.random() < .3 ? "is-cream" : "", x + Math.cos(a) * d, y + Math.sin(a) * d);
+      p.animate([
+        { transform: "translate(-50%,-50%) rotate(45deg) scale(.3)", opacity: 0 },
+        { opacity: 1, offset: .3 },
+        { transform: "translate(calc(-50% - " + (Math.cos(a) * d).toFixed(1) + "px),calc(-50% - " + (Math.sin(a) * d).toFixed(1) + "px)) rotate(225deg) scale(1)", opacity: 0 }
+      ], { duration: 420, easing: "cubic-bezier(.6,0,.9,.4)", fill: "forwards" }).onfinish = remove;
+    }
+
+    function pop(k) {
+      label.animate([
+        { transform: "scale(1)" },
+        { transform: "scale(" + k + ")", color: "#fff", offset: .3 },
+        { transform: "scale(1)" }
+      ], { duration: 480, easing: "cubic-bezier(.2,1.4,.35,1)" });
+    }
+
+    function shake(amp, dur) {
+      var els = [document.querySelector("main"), document.querySelector(".site-footer")];
+      var header = document.querySelector(".site-header");
+      if (header && !header.classList.contains("is-hidden")) els.push(header);
+      els = els.filter(Boolean);
+      root.classList.add("is-shaking");
+      var t0 = performance.now();
+      (function frame(now) {
+        var k = 1 - (now - t0) / dur;
+        if (k <= 0) {
+          els.forEach(function (el) { el.style.transform = ""; });
+          root.classList.remove("is-shaking");
+          return;
+        }
+        var a = amp * k * k;
+        var x = (Math.random() * 2 - 1) * a, y = (Math.random() * 2 - 1) * a, r = (Math.random() * 2 - 1) * a * .06;
+        els.forEach(function (el) {
+          el.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) rotate(" + r.toFixed(2) + "deg)";
+        });
+        requestAnimationFrame(frame);
+      })(t0);
+    }
+
+    function shockwave(x, y, k) {
+      document.querySelectorAll("[data-tilt]").forEach(function (card) {
+        var r = card.getBoundingClientRect();
+        if (r.bottom < -120 || r.top > window.innerHeight + 120) return;
+        var dx = r.left + r.width / 2 - x, dy = r.top + r.height / 2 - y;
+        var d = Math.hypot(dx, dy) || 1;
+        var force = Math.max(0, 1 - d / (900 + 300 * k));
+        if (!force) return;
+        var el = card.__tiltInner || card;
+        var push = (12 + 34 * force) * k;
+        setTimeout(function () {
+          el.classList.add("is-shocked");
+          el.style.transform = "translate3d(" + (dx / d * push).toFixed(1) + "px," + (dy / d * push).toFixed(1) + "px,0) rotate(" + (dx / d * 5 * force).toFixed(2) + "deg) scale(" + (1 + .05 * force).toFixed(3) + ")";
+          setTimeout(function () { el.classList.remove("is-shocked"); el.style.transform = ""; }, 150);
+        }, d * .5);
+      });
+    }
+
+    function gain(n, x, y) {
+      var before = level;
+      level = Math.min(MAX, level + n);
+      try { localStorage.setItem("as-level", String(level)); } catch (e) { level = level; }
+      render();
+      var tier = tierOf(level);
+      if (tier > tierOf(before)) {
+        burst(x, y, 26 + tier * 10, 170, 8, 800, true);
+        for (var i = 0; i < 3; i++) wave(x, y, 240 + i * 140, 650, i * 110);
+        shake(5, 380);
+        pop(2.3);
+        return;
+      }
+      burst(x, y, [6, 10, 16][tier], 55 + tier * 25, 6, 520, tier > 0);
+      if (tier === 2) wave(x, y, 120, 450);
+      pop(level >= MAX ? 1.25 : 1.6);
+    }
+
+    var RELEASE = [
+      { n: 12, spread: 90, size: 6, waves: [220], shake: 4, push: .4 },
+      { n: 20, spread: 140, size: 8, waves: [440], shake: 7, push: .7 },
+      { n: 48, spread: 260, size: 11, waves: [420, 900, 1500], shake: 16, push: 1.5 }
+    ];
+
+    function release(x, y) {
+      var r = RELEASE[tierOf(level)];
+      burst(x, y, r.n, r.spread, r.size, 700 + r.n * 4, true);
+      r.waves.forEach(function (w, i) { wave(x, y, w, 550 + i * 150, i * 70); });
+      shake(r.shake, 380 + r.shake * 8);
+      shockwave(x, y, r.push);
+      gain(5, x, y);
+    }
+
+    var down = null, charge = 0, raf = null, lastSpawn = 0;
+
+    function setCharge(p) {
+      charge = p;
+      root.style.setProperty("--charge", p.toFixed(3));
+      root.classList.toggle("is-charging", p > 0);
+      root.classList.toggle("is-charged", p >= 1);
+    }
+
+    function tick(now) {
+      if (!down) return;
+      var p = Math.max(0, Math.min(1, (now - down - 260) / 900));
+      if (p !== charge) setCharge(p);
+      if (p > 0 && now - lastSpawn > (p >= 1 ? 110 : 55)) { lastSpawn = now; converge(Cursor.x, Cursor.y); }
+      raf = requestAnimationFrame(tick);
+    }
+
+    function reset() {
+      if (raf) cancelAnimationFrame(raf);
+      raf = null;
+      down = null;
+      setCharge(0);
+    }
+
+    document.addEventListener("pointerdown", function (e) {
+      if (e.button !== 0 || e.pointerType === "touch") return;
+      down = performance.now();
+      lastSpawn = 0;
+      raf = requestAnimationFrame(tick);
+    });
+
+    document.addEventListener("pointerup", function (e) {
+      if (!down || e.button !== 0) return;
+      var charged = charge >= 1;
+      reset();
+      if (charged) release(e.clientX, e.clientY);
+      else gain(1, e.clientX, e.clientY);
+    });
+
+    document.addEventListener("pointercancel", reset);
+    window.addEventListener("blur", reset);
+
+    var lastX = Cursor.x, lastY = Cursor.y, lastT = 0, lastTrail = 0;
+    window.addEventListener("mousemove", function (e) {
+      var now = performance.now();
+      var speed = Math.hypot(e.clientX - lastX, e.clientY - lastY) / Math.max(1, now - lastT);
+      lastX = e.clientX; lastY = e.clientY; lastT = now;
+      if (!tierOf(level) || speed < .6 || now - lastTrail < 28) return;
+      lastTrail = now;
+      var dot = Cursor.dot.getBoundingClientRect();
+      var p = spawn(Math.random() < .25 ? "is-cream" : "", dot.left + dot.width / 2, dot.top + dot.height / 2);
+      p.style.width = p.style.height = (4 + Math.random() * 4).toFixed(1) + "px";
+      p.animate([
+        { transform: "translate(-50%,-50%) rotate(45deg) scale(1)", opacity: .9 },
+        { transform: "translate(-50%,-50%) rotate(45deg) scale(.1)", opacity: 0 }
+      ], { duration: 380, easing: "cubic-bezier(.2,.6,.3,1)", fill: "forwards" }).onfinish = remove;
+    }, { passive: true });
+
+    function debugResetLevel(e) {
+      if (e.key !== "r" && e.key !== "R") return;
+      level = 0;
+      try { localStorage.removeItem("as-level"); } catch (err) { level = 0; }
+      render();
+      burst(Cursor.x, Cursor.y, 10, 70, 5, 450, true);
+    }
+    document.addEventListener("keydown", debugResetLevel);
+  }
+
   function initVideos() {
     var boxes = document.querySelectorAll("[data-video]");
     if (!boxes.length) return;
@@ -362,6 +580,7 @@
 
       var selfTilt = !inner;
       if (selfTilt) inner = card;
+      card.__tiltInner = inner;
       var prefix = selfTilt ? "perspective(900px) " : "";
 
       var soft = card.dataset.tilt === "soft";
@@ -800,7 +1019,10 @@
 
   function initPageTransition() {
     var main = document.querySelector("main");
-    if (main && !reduced) main.classList.add("page-in");
+    if (main && !reduced) {
+      main.classList.add("page-in");
+      main.addEventListener("animationend", function () { main.classList.remove("page-in"); }, { once: true });
+    }
 
     document.addEventListener("click", function (e) {
       var a = e.target.closest("a");
@@ -891,6 +1113,7 @@
     initSmoothScroll();
     initHeader();
     initCursor();
+    initLevel();
     initBrand();
     initPageTransition();
     I18N.init();
