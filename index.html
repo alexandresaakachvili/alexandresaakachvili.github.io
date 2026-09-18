@@ -17,10 +17,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/main.css">
-<script>try{var d=document.documentElement;if(sessionStorage.getItem("as-seen"))d.className+=" no-preloader";else sessionStorage.setItem("as-seen","1");if(matchMedia("(hover:hover) and (pointer:fine)").matches&&!matchMedia("(prefers-reduced-motion:reduce)").matches)d.className+=" has-custom-cursor"}catch(e){}</script>
+<script>try{var d=document.documentElement;if(sessionStorage.getItem("as-seen"))d.className+=" no-preloader";else sessionStorage.setItem("as-seen","1");if(matchMedia("(hover:hover) and (pointer:fine)").matches&&!matchMedia("(prefers-reduced-motion:reduce)").matches)d.className+=" has-custom-cursor";var st=JSON.parse(localStorage.getItem("as-ach")||"{}");if(st.theme&&st.theme!=="vanilla")d.setAttribute("data-theme",st.theme);if(st.cursor==="tri")d.setAttribute("data-cursor-shape","round")}catch(e){}</script>
 </head>
 <body data-en-title="Alexandre Saakachvili — Game Designer" data-en-desc="Portfolio of Alexandre Saakachvili, game designer. Level design, system design, combat design — UE5, Unity, board games.">
-
 <div class="preloader" data-preloader>
   <div class="preloader__inner">
     <div class="preloader__name">Alexandre Saakachvili</div>
@@ -47,7 +46,6 @@
           <button type="button" data-lang-btn="fr" data-cursor="swear" class="is-active">FR</button><i>/</i><button type="button" data-lang-btn="en" data-cursor="swear">EN</button>
         </div>
       </div>
-
     </nav>
   </div>
 </header>
@@ -143,7 +141,7 @@
 
   <section class="cat" id="jeux-mobiles">
     <div class="cat__head" data-reveal>
-      <h2 data-i18n="cat.mobile">Jeux Mobiles</h2>
+      <h2 data-i18n="cat.mobile">Jeux Mobile et Web</h2>
     </div>
     <div class="cards" data-stagger=".07">
       <a class="card" href="work/mobile-games.html" data-cursor="view" data-tilt data-reveal>
@@ -156,11 +154,27 @@
             <span class="card__desc" data-i18n="p.mobile.desc">Idle-arcade, tycoon, merge, survivor</span>
             <span class="card__meta">
               <span class="meta-chip"><svg class="meta-chip__logo" viewBox="0 0 24 24" role="img" aria-label="Unity"><path d="m12.9288 4.2939 3.7997 2.1929c.1366.077.1415.2905 0 .3675l-4.515 2.6076a.4192.4192 0 0 1-.4246 0L7.274 6.8543c-.139-.0745-.1415-.293 0-.3675l3.7972-2.193V0L1.3758 5.5977V16.793l3.7177-2.1456v-4.3858c-.0025-.1565.1813-.2682.318-.1838l4.5148 2.6076a.4252.4252 0 0 1 .2136.3676v5.2127c.0025.1565-.1813.2682-.3179.1838l-3.7996-2.1929-3.7178 2.1457L12 24l9.6954-5.5977-3.7178-2.1457-3.7996 2.1929c-.1341.082-.3229-.0248-.3179-.1838V13.053c0-.1565.087-.2956.2136-.3676l4.5149-2.6076c.134-.082.3228.0224.3179.1838v4.3858l3.7177 2.1456V5.5977L12.9288 0Z"/></svg> Unity</span>
-              <span class="meta-chip meta-chip--accent"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v10"/><path d="m8 9.8 4 4 4-4"/><path d="M4.5 19.5h15"/></svg> 5 M+</span>
             </span>
           </span>
         </span>
       </a>
+
+      <div class="card card--locked" data-cursor="lock" data-tilt data-reveal>
+        <span class="card__inner">
+          <span class="card__media card__media--lock">
+            <svg class="card__lock" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.3" r="1.2"/><path d="M12 16.5v1.6"/></svg>
+            <span class="card__poster" aria-hidden="true"></span>
+          </span>
+          <span class="card__body">
+            <span class="card__name" data-glitch data-i18n="p.lock.name">Ne pas ouvrir</span>
+            <span class="card__desc card__timer" data-active-timer>00:00:00</span>
+            <span class="card__meta">
+              <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.6"/><path d="M4.8 19.5v-1a4.2 4.2 0 0 1 4.2-4.2h6a4.2 4.2 0 0 1 4.2 4.2v1"/></svg> 1</span>
+              <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.2V12l3 2"/></svg> <span data-i18n="p.lock.time">2 jours</span></span>
+            </span>
+          </span>
+        </span>
+      </div>
     </div>
   </section>
 
@@ -229,7 +243,6 @@
     </button>
   </div>
 </footer>
-
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>

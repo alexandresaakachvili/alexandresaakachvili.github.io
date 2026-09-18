@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/main.css">
-<script>try{var d=document.documentElement;if(sessionStorage.getItem("as-seen"))d.className+=" no-preloader";else sessionStorage.setItem("as-seen","1");if(matchMedia("(hover:hover) and (pointer:fine)").matches&&!matchMedia("(prefers-reduced-motion:reduce)").matches)d.className+=" has-custom-cursor"}catch(e){}</script>
+<script>try{var d=document.documentElement;if(sessionStorage.getItem("as-seen"))d.className+=" no-preloader";else sessionStorage.setItem("as-seen","1");if(matchMedia("(hover:hover) and (pointer:fine)").matches&&!matchMedia("(prefers-reduced-motion:reduce)").matches)d.className+=" has-custom-cursor";var st=JSON.parse(localStorage.getItem("as-ach")||"{}");if(st.theme&&st.theme!=="vanilla")d.setAttribute("data-theme",st.theme);if(st.cursor==="tri")d.setAttribute("data-cursor-shape","round")}catch(e){}</script>
 </head>
 <body data-en-title="Kokoro Renzu — Alexandre Saakachvili" data-en-desc="Open-world exploration and card game on UE5. Design lead of a 14-person diploma project, Rookie Awards finalist.">
 <div class="preloader" data-preloader>
@@ -40,7 +40,6 @@
           <button type="button" data-lang-btn="fr" data-cursor="swear" class="is-active">FR</button><i>/</i><button type="button" data-lang-btn="en" data-cursor="swear">EN</button>
         </div>
       </div>
-
     </nav>
   </div>
 </header>

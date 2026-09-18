@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/main.css">
-<script>try{var d=document.documentElement;if(sessionStorage.getItem("as-seen"))d.className+=" no-preloader";else sessionStorage.setItem("as-seen","1");if(matchMedia("(hover:hover) and (pointer:fine)").matches&&!matchMedia("(prefers-reduced-motion:reduce)").matches)d.className+=" has-custom-cursor"}catch(e){}</script>
+<script>try{var d=document.documentElement;if(sessionStorage.getItem("as-seen"))d.className+=" no-preloader";else sessionStorage.setItem("as-seen","1");if(matchMedia("(hover:hover) and (pointer:fine)").matches&&!matchMedia("(prefers-reduced-motion:reduce)").matches)d.className+=" has-custom-cursor";var st=JSON.parse(localStorage.getItem("as-ach")||"{}");if(st.theme&&st.theme!=="vanilla")d.setAttribute("data-theme",st.theme);if(st.cursor==="tri")d.setAttribute("data-cursor-shape","round")}catch(e){}</script>
 </head>
 <body data-en-title="Profile — Alexandre Saakachvili" data-en-desc="Game designer. Creating games, experiences and stories that leave a mark.">
 <div class="preloader" data-preloader>
@@ -40,7 +40,6 @@
           <button type="button" data-lang-btn="fr" data-cursor="swear" class="is-active">FR</button><i>/</i><button type="button" data-lang-btn="en" data-cursor="swear">EN</button>
         </div>
       </div>
-
     </nav>
   </div>
 </header>
@@ -57,9 +56,9 @@
            alt="Alexandre Saakachvili" loading="eager" decoding="async">
     </div>
     <div class="prose stack" data-reveal data-reveal-delay=".08">
-      <p class="body-lg" data-i18n="about.p1">Ma passion est de créer des jeux, des expériences, des histoires.</p>
-      <p class="body-lg" data-i18n="about.p2">Je m&rsquo;amuse à imaginer <strong>des œuvres qui ont du sens</strong> pour ceux qui y voyagent, qui laissent une marque, qui changent leur perception du Monde et de l&rsquo;Homme.</p>
-      <p class="body-lg" data-i18n="about.p3">Je désire créer, <strong>entouré de gens aussi passionnés que moi</strong>, des œuvres ludiques qui laisseront leurs empreintes dans le cœur des joueurs et dans celui de l&rsquo;industrie.</p>
+      <p class="body-lg" data-i18n="about.p1"><strong>Ancien banquier</strong> devenu game designer, ma <strong>passion</strong> est de créer des expériences, des univers, des histoires.</p>
+      <p class="body-lg" data-i18n="about.p2">Je m&rsquo;amuse à imaginer <strong>des œuvres qui ont du sens</strong> pour ceux qui y voyagent, qui marquent par leur <strong>design élégant</strong>, leurs <strong>univers uniques</strong> et leurs <strong><a href="index.html#jeux-mobiles" data-cursor="secret">secrets</a> envoûtants</strong>.</p>
+      <p class="body-lg" data-i18n="about.p3">Je désire créer, <strong>entouré de gens aussi passionnés que moi</strong>, des jeux qui laisseront leurs empreintes dans le cœur des joueurs et dans celui de l&rsquo;industrie.</p>
       <div>
         <a class="btn" data-tilt="soft" href="assets/files/cv-alexandre-saakachvili.pdf" target="_blank" rel="noopener" data-cursor="external"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16 16.5 7.5"/><path d="M9.5 7.5h7v7"/></svg><span data-i18n="about.cv">CV</span></a>
       </div>
@@ -116,7 +115,6 @@
     </button>
   </div>
 </footer>
-
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
