@@ -392,7 +392,7 @@ Les succès marqués `pc: true` (niveau, clics) n'apparaissent pas sur tactile, 
 
 ### Les pièces et la boutique
 
-Chaque succès débloqué rapporte **une pièce**, mais il faut la **réclamer** : dans la liste, un succès non réclamé montre une pièce qui pulse ; un clic sur la ligne la fait voler jusqu'au compteur en haut à droite du panneau. Le panneau a trois onglets, **Succès**, **Boutique** et **Scores** (le troisième apparaît après le premier lancement du mini-jeu). La pièce est un `.coin` (contour et « A » à deux barres façon ¥ en ambre, reflet holographique, rotation continue).
+Chaque succès débloqué rapporte **une pièce**, mais il faut la **réclamer** : dans la liste, un succès non réclamé montre une pièce qui pulse ; un clic sur la ligne la fait voler jusqu'au compteur en haut à droite du panneau. Le panneau a trois onglets, **Succès**, **Boutique** et **Scores** (le troisième apparaît après le premier lancement du mini-jeu). La pièce est un `.coin` (contour et « A » à deux barres façon ¥ en ambre, rotation continue).
 
 Les produits sont le tableau `PRODUCTS` (`app.js`), avec leur prix et leur genre :
 

@@ -320,7 +320,6 @@ html.is-coarse .ach-item.is-top{border-top:1px solid var(--line-soft)}
 
 .coin{
   display:inline-grid;place-items:center;flex:none;width:24px;height:24px;border-radius:50%;
-  background:conic-gradient(from 30deg,transparent 0 18%,color-mix(in srgb,var(--amber) 32%,transparent) 34%,color-mix(in srgb,var(--cream) 42%,transparent) 50%,color-mix(in srgb,var(--amber) 32%,transparent) 66%,transparent 82%);
 }
 .coin svg{width:100%;height:100%;stroke:var(--amber);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 @keyframes coin-spin{to{transform:rotateY(360deg)}}
