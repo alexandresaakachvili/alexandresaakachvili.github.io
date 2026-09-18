@@ -310,6 +310,92 @@
     })();
   }
 
+  // Calque de particules plein écran (losanges ambre / crème) partagé par le curseur de niveau et le tactile.
+  function makeFx() {
+    var fx = document.createElement("div");
+    fx.className = "fx";
+    document.documentElement.appendChild(fx);
+
+    function spawn(cls, x, y) {
+      var p = document.createElement("i");
+      if (cls) p.className = cls;
+      p.style.left = x + "px";
+      p.style.top = y + "px";
+      fx.appendChild(p);
+      return p;
+    }
+
+    function remove() { this.effect.target.remove(); }
+
+    function burst(x, y, n, spread, size, duration, mix) {
+      for (var i = 0; i < n; i++) {
+        var a = (i / n) * Math.PI * 2 + (Math.random() - .5) * .7;
+        var d = spread * (.5 + Math.random() * .8);
+        var s = size * (.6 + Math.random() * .8);
+        var p = spawn(mix && i % 3 === 1 ? "is-cream" : "", x, y);
+        p.style.width = p.style.height = s.toFixed(1) + "px";
+        p.animate([
+          { transform: "translate(-50%,-50%) rotate(45deg) scale(1)", opacity: 1 },
+          { transform: "translate(calc(-50% + " + (Math.cos(a) * d).toFixed(1) + "px),calc(-50% + " + (Math.sin(a) * d).toFixed(1) + "px)) rotate(" + (45 + (Math.random() - .5) * 240).toFixed(0) + "deg) scale(.15)", opacity: 0 }
+        ], { duration: duration * (.7 + Math.random() * .5), easing: "cubic-bezier(.2,.8,.3,1)", fill: "forwards" }).onfinish = remove;
+      }
+    }
+
+    // Un losange de traînée qui s'éteint sur place.
+    function trailDot(x, y) {
+      var p = spawn(Math.random() < .25 ? "is-cream" : "", x, y);
+      p.style.width = p.style.height = (4 + Math.random() * 4).toFixed(1) + "px";
+      p.animate([
+        { transform: "translate(-50%,-50%) rotate(45deg) scale(1)", opacity: .9 },
+        { transform: "translate(-50%,-50%) rotate(45deg) scale(.1)", opacity: 0 }
+      ], { duration: 380, easing: "cubic-bezier(.2,.6,.3,1)", fill: "forwards" }).onfinish = remove;
+    }
+
+    return { el: fx, spawn: spawn, remove: remove, burst: burst, trailDot: trailDot };
+  }
+
+  // Clics rapprochés (moins de 2 s) : succès 7 / 15 / 22, comptés à la souris comme au doigt.
+  var clickTimes = [];
+  function countClick(now) {
+    clickTimes.push(now);
+    while (clickTimes.length && now - clickTimes[0] > 2000) clickTimes.shift();
+    if (clickTimes.length >= 7) Achievements.unlock("clicks7");
+    if (clickTimes.length >= 15) Achievements.unlock("clicks15");
+    if (clickTimes.length >= 22) Achievements.unlock("clicks22");
+  }
+
+  // Tactile (et ordinateur sans curseur dessiné) : les clics comptent ; au doigt, petit éclat au tap et traînée au glissé.
+  function initTouchFx() {
+    if (Cursor.enabled) return;
+    var FX = coarse && !reduced ? makeFx() : null;
+    var downX = 0, downY = 0, moved = false, down = false, lastX = 0, lastY = 0, lastT = 0, lastTrail = 0;
+
+    document.addEventListener("pointerdown", function (e) {
+      if (document.querySelector(".crash")) return;
+      down = true; moved = false; downX = e.clientX; downY = e.clientY;
+      lastX = e.clientX; lastY = e.clientY; lastT = performance.now();
+    });
+    document.addEventListener("pointermove", function (e) {
+      if (!down) return;
+      if (!moved && Math.hypot(e.clientX - downX, e.clientY - downY) > 10) moved = true;
+      if (!FX || e.pointerType !== "touch") return;
+      var now = performance.now();
+      var speed = Math.hypot(e.clientX - lastX, e.clientY - lastY) / Math.max(1, now - lastT);
+      lastX = e.clientX; lastY = e.clientY; lastT = now;
+      if (speed < .25 || now - lastTrail < 28) return;
+      lastTrail = now;
+      FX.trailDot(e.clientX, e.clientY);
+    }, { passive: true });
+    document.addEventListener("pointerup", function (e) {
+      if (!down) return;
+      down = false;
+      if (moved) return;
+      countClick(performance.now());
+      if (FX && e.pointerType === "touch") FX.burst(e.clientX, e.clientY, 7, 48, 6, 480, true);
+    });
+    document.addEventListener("pointercancel", function () { down = false; });
+  }
+
   function initLevel() {
     if (!Cursor.enabled) return;
     var root = document.documentElement;
@@ -317,9 +403,7 @@
     var level = 0;
     try { level = Math.min(MAX, parseInt(localStorage.getItem("as-level"), 10) || 0); } catch (e) { level = 0; }
 
-    var fx = document.createElement("div");
-    fx.className = "fx";
-    root.appendChild(fx);
+    var FX = makeFx(), fx = FX.el, spawn = FX.spawn, remove = FX.remove, burst = FX.burst;
     var label = document.createElement("span");
     label.className = "cursor-level";
     label.innerHTML = '<span data-level-text></span><span class="cursor-crown"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17h18l-1.6-9.4-4.6 4.2L12 5l-2.8 6.8-4.6-4.2z"/></svg></span>';
@@ -346,40 +430,6 @@
       try { level = Math.min(MAX, parseInt(localStorage.getItem("as-level"), 10) || 0); } catch (err) {  }
       render();
     });
-
-    var clicks = [];
-    function clickBurst(now) {
-      clicks.push(now);
-      while (clicks.length && now - clicks[0] > 2000) clicks.shift();
-      if (clicks.length >= 7) Achievements.unlock("clicks7");
-      if (clicks.length >= 15) Achievements.unlock("clicks15");
-      if (clicks.length >= 22) Achievements.unlock("clicks22");
-    }
-
-    function spawn(cls, x, y) {
-      var p = document.createElement("i");
-      if (cls) p.className = cls;
-      p.style.left = x + "px";
-      p.style.top = y + "px";
-      fx.appendChild(p);
-      return p;
-    }
-
-    function remove() { this.effect.target.remove(); }
-
-    function burst(x, y, n, spread, size, duration, mix) {
-      for (var i = 0; i < n; i++) {
-        var a = (i / n) * Math.PI * 2 + (Math.random() - .5) * .7;
-        var d = spread * (.5 + Math.random() * .8);
-        var s = size * (.6 + Math.random() * .8);
-        var p = spawn(mix && i % 3 === 1 ? "is-cream" : "", x, y);
-        p.style.width = p.style.height = s.toFixed(1) + "px";
-        p.animate([
-          { transform: "translate(-50%,-50%) rotate(45deg) scale(1)", opacity: 1 },
-          { transform: "translate(calc(-50% + " + (Math.cos(a) * d).toFixed(1) + "px),calc(-50% + " + (Math.sin(a) * d).toFixed(1) + "px)) rotate(" + (45 + (Math.random() - .5) * 240).toFixed(0) + "deg) scale(.15)", opacity: 0 }
-        ], { duration: duration * (.7 + Math.random() * .5), easing: "cubic-bezier(.2,.8,.3,1)", fill: "forwards" }).onfinish = remove;
-      }
-    }
 
     function wave(x, y, size, duration, delay) {
       var w = spawn("fx__wave", x, y);
@@ -483,6 +533,7 @@
       shockwave(x, y, r.radius, r.push);
       Fight.shock();
       gain(5, x, y);
+      Achievements.unlock("charge");
     }
 
     var down = null, charge = 0, raf = null, lastSpawn = 0, selecting = false, downX = 0, downY = 0, moved = false;
@@ -535,7 +586,7 @@
       var wasSelecting = selecting;
       reset();
       if (wasSelecting) return;
-      clickBurst(performance.now());
+      countClick(performance.now());
       if (charged) release(e.clientX, e.clientY);
       else gain(1, e.clientX, e.clientY);
     });
@@ -551,12 +602,7 @@
       if (!tierOf(level) || speed < .6 || now - lastTrail < 28) return;
       lastTrail = now;
       var dot = Cursor.dot.getBoundingClientRect();
-      var p = spawn(Math.random() < .25 ? "is-cream" : "", dot.left + dot.width / 2, dot.top + dot.height / 2);
-      p.style.width = p.style.height = (4 + Math.random() * 4).toFixed(1) + "px";
-      p.animate([
-        { transform: "translate(-50%,-50%) rotate(45deg) scale(1)", opacity: .9 },
-        { transform: "translate(-50%,-50%) rotate(45deg) scale(.1)", opacity: 0 }
-      ], { duration: 380, easing: "cubic-bezier(.2,.6,.3,1)", fill: "forwards" }).onfinish = remove;
+      FX.trailDot(dot.left + dot.width / 2, dot.top + dot.height / 2);
     }, { passive: true });
   }
 
@@ -717,25 +763,6 @@
       }, { passive: true });
     }
 
-    var lang = document.querySelector("[data-lang]");
-    var current = lang ? lang.querySelector("[data-lang-current]") : null;
-    if (!lang || !current) return;
-    var open = false;
-    function setOpen(state) {
-      open = state;
-      lang.classList.toggle("is-open", open);
-      current.setAttribute("aria-expanded", open ? "true" : "false");
-    }
-    current.addEventListener("click", function () { setOpen(!open); });
-    lang.querySelectorAll("[data-lang-btn]").forEach(function (b) {
-      b.addEventListener("click", function () { setOpen(false); });
-    });
-    document.addEventListener("click", function (e) {
-      if (open && !lang.contains(e.target)) setOpen(false);
-    });
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && open) setOpen(false);
-    });
   }
 
   function initCarousels() {
@@ -1037,23 +1064,25 @@
     { id: "profil", name: "Coucou", hint: "Visiter le profil" },
     { id: "kokoro", name: "L&rsquo;encre du mouvement<br>Ternie les mots effa&ccedil;ables,<br>Illumine l&rsquo;absence.", hint: "Visiter Kokoro Renzu" },
     { id: "abandon", name: "Trust or Shoot&nbsp;?", hint: "Visiter Abandon West" },
-    { id: "inmachina", name: "Never trust the smiley one&nbsp;🙂", hint: "Visiter In_Machina" },
+    { id: "inmachina", name: "Trust me. Don&rsquo;t trust the smiling one :)", hint: "Visiter In_Machina" },
     { id: "pyramid", name: "Mission accept&eacute;e", hint: "Visiter L&rsquo;Ombre de la Pyramide" },
     { id: "mobile", name: "Skip add in 3&hellip; 2&hellip; 1", hint: "Visiter Pinpin Studio" },
-    { id: "trinytia", name: "Ombre, Shadow ou L&eacute;gende&nbsp;?", hint: "Visiter Tri&rsquo;Nytia" },
+    { id: "trinytia", name: "Gardien, Ombre ou L&eacute;gende&nbsp;?", hint: "Visiter Tri&rsquo;Nytia" },
     { id: "pantheon", name: "World Builder", hint: "Visiter Panth&eacute;on" },
     { id: "all", name: "Un poil compl&eacute;tionniste", hint: "Visiter tous les projets" },
     { id: "doc", name: "Promis, pas de virus", hint: "T&eacute;l&eacute;charger un document" },
     { id: "zoom", name: "On a oubli&eacute; ses lunettes&nbsp;?", hint: "Zoomer sur une image" },
-    { id: "color", name: "Fais comme chez toi, vas-y&nbsp;!", hint: "Changer la couleur du site" },
-    { id: "key", name: "Capitaliste&nbsp;!", hint: "Acheter la cl&eacute;", touch: true },
-    { id: "secret", name: "Tueur d&rsquo;alien", hint: "Trouver le secret", touch: true },
+    { id: "lang", name: "Bilingue", hint: "Changer de langue" },
+    { id: "charge", name: "D&eacute;charge de puissance", hint: "Maintenir le clic jusqu&rsquo;&agrave; lib&eacute;rer une d&eacute;charge qui pousse les cartes", pc: true },
+    { id: "color", name: "Directeur artistique", hint: "Changer la couleur du site" },
+    { id: "key", name: "Et maintenant&nbsp;?", hint: "Acheter la cl&eacute;", touch: true },
+    { id: "secret", name: "Content que &ccedil;a vous ait plu&nbsp;!", hint: "Trouver le secret", touch: true },
     { id: "lvl10", name: "Noob", hint: "Passer niveau 10", pc: true },
     { id: "lvl30", name: "&Eacute;lite", hint: "Passer niveau 30", pc: true },
     { id: "lvl100", name: "Boss", hint: "Passer niveau 100", pc: true },
-    { id: "clicks7", name: "Bient&ocirc;t la crampe&nbsp;?", hint: "Cliquer 7 fois en moins de 2 secondes", pc: true },
-    { id: "clicks15", name: "Cookie Clicker simulator", hint: "Cliquer 15 fois en moins de 2 secondes", pc: true },
-    { id: "clicks22", name: "Deux souris&nbsp;? Tricheur&nbsp;!", hint: "Cliquer 22 fois en moins de 2 secondes", pc: true }
+    { id: "clicks7", name: "Bient&ocirc;t la crampe&nbsp;?", hint: "Cliquer 7 fois en moins de 2 secondes" },
+    { id: "clicks15", name: "Cookie Clicker simulator", hint: "Cliquer 15 fois en moins de 2 secondes" },
+    { id: "clicks22", name: "Deux souris&nbsp;? Tricheur&nbsp;!", hint: "Cliquer 22 fois en moins de 2 secondes" }
   ];
 
   var PAGE_ACHIEVEMENT = {
@@ -1177,14 +1206,14 @@
     { id: "psy", name: "Type psy", desc: "Couleur du site&nbsp;: Violet", price: 2, kind: "theme" },
     { id: "eco", name: "&Eacute;colo", desc: "Couleur du site&nbsp;: Vert", price: 2, kind: "theme" },
     { id: "diamond", name: "Encadr&eacute;", desc: "Le curseur devient carr&eacute;", price: 0, kind: "cursor", pc: true },
-    { id: "tri", name: "Sniper", desc: "Le curseur devient rond", price: 3, kind: "cursor", pc: true },
-    { id: "tag", name: "Taggeur", desc: "Vandaliser la photo de profil", price: 1, kind: "tool" },
+    { id: "tri", name: "Sniper", desc: "Le curseur devient rond", price: 1, kind: "cursor", pc: true },
+    { id: "tag", name: "Taggeur", desc: "Vandaliser la photo de profil", price: 0, kind: "tool" },
     { id: "key", name: "Cl&eacute; de cuivre", desc: "Autant symbole de possibilit&eacute; que de myst&egrave;re", price: 5, kind: "item", pc: true },
     { id: "shipbase", name: "C&rsquo;est dans les vieux vaisseaux qu&rsquo;on fait les meilleurs runs", desc: "Un vieux vaisseau qui sent aussi fort qu&rsquo;il est fiable", price: 0, kind: "ship", gated: true, pc: true },
-    { id: "ship", name: "Pimp my ride", desc: "Un nouveau vaisseau flambant neuf.", price: 3, kind: "ship", gated: true, pc: true },
-    { id: "heart", name: "Free hug", desc: "+1 c&oelig;ur", price: 10, kind: "perk", gated: true, pc: true },
-    { id: "cannon", name: "Mode combat activ&eacute;", desc: "Double les d&eacute;g&acirc;ts du champ de force (clic) et de la d&eacute;charge (maintien)", price: 8, kind: "perk", gated: true, pc: true },
-    { id: "sweep", name: "Nuke", desc: "Appuyer sur Espace oblit&egrave;re tous les ennemis et leurs attaques. Une fois par partie.", price: 6, kind: "perk", gated: true, pc: true }
+    { id: "ship", name: "Pimp my ride", desc: "Un nouveau vaisseau flambant neuf.", price: 1, kind: "ship", gated: true, pc: true },
+    { id: "heart", name: "Free hug", desc: "+1 c&oelig;ur", price: 3, kind: "perk", gated: true, pc: true },
+    { id: "sweep", name: "Nuke", desc: "Appuyer sur Espace oblit&egrave;re tous les ennemis et leurs attaques. Une fois par partie.", price: 6, kind: "perk", gated: true, pc: true },
+    { id: "cannon", name: "Mode combat activ&eacute;", desc: "Double les d&eacute;g&acirc;ts du champ de force (clic) et de la d&eacute;charge (maintien)", price: 9, kind: "perk", gated: true, pc: true }
   ];
 
   var KEY_NAMES = { vanilla: "Cl&eacute; de cuivre", eco: "Cl&eacute; de jade", psy: "Cl&eacute; de cristal" };
@@ -1194,7 +1223,7 @@
   function initAchievements() {
     var root = document.documentElement;
     var KEY = "as-ach";
-    var DEFAULTS = { unlocked: [], visited: [], claimed: [], owned: ["vanilla", "diamond"], theme: "vanilla", cursor: "", ship: "shipbase", shipChosen: false, spent: 0, crown: false, coins: 0, played: false, door: false, shopSeen: false, shopSeenNew: false, noticed: [] };
+    var DEFAULTS = { unlocked: [], visited: [], claimed: [], owned: ["vanilla", "diamond"], theme: "vanilla", cursor: "", ship: "shipbase", shipChosen: false, spent: 0, crown: false, coins: 0, played: false, door: false, shopSeen: false, shopSeenNew: false, noticed: [], tagOn: true };
     var state = JSON.parse(JSON.stringify(DEFAULTS));
     function hydrate() {
       var saved = JSON.parse(localStorage.getItem(KEY) || "null");
@@ -1259,7 +1288,6 @@
         '<button type="button" data-tab="shop"><svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS.coins + '</svg><span data-shop-title></span></button>' +
         '<button type="button" data-tab="scores" hidden><svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS.podium + '</svg><span data-scores-title></span></button>' +
       '</nav>' +
-      '<span class="ach-panel__count" data-ach-count></span>' +
       '<span class="ach-coins">' + COIN + '<b data-coins>0</b></span>' +
       '<button type="button" class="ach-panel__close" data-cursor="close"><svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS.close + '</svg></button>' +
       '</header><ol class="ach-list"></ol><div class="shop" hidden></div><div class="scores" hidden></div>';
@@ -1305,8 +1333,6 @@
       btn.classList.toggle("has-badge", !!waiting);
       btn.classList.toggle("has-news", shopNews());
       panel.querySelector('[data-tab="shop"]').classList.toggle("is-new", shopNews());
-      var n = visible.filter(function (a) { return has(a.id); }).length;
-      panel.querySelector("[data-ach-count]").textContent = n + " / " + visible.length;
       var rows = Math.ceil(visible.length / 2);
       list.style.setProperty("--rows", rows);
       list.innerHTML = visible.map(function (a, i) {
@@ -1367,11 +1393,16 @@
           return banner + '<div class="shop-item is-locked is-pc"><span class="shop-item__text"><b>' + name + '</b><span>' + desc + '</span></span></div>';
         }
         var own = !gated && owned(p.id);
-        var equipped = !gated && ((p.kind === "theme" && state.theme === p.id) || (p.kind === "cursor" && (state.cursor || "diamond") === p.id) || (p.kind === "ship" && (state.ship || "shipbase") === p.id));
+        var equipped = !gated && ((p.kind === "theme" && state.theme === p.id) || (p.kind === "cursor" && (state.cursor || "diamond") === p.id) || (p.kind === "ship" && (state.ship || "shipbase") === p.id) || (p.id === "tag" && own && state.tagOn !== false));
         var can = wallet >= p.price;
         var label, action = "";
         if (gated) { label = I18N.t("shop.gated", "Finir la phase 1 pour débloquer"); }
         else if (!own) { label = I18N.t("shop.buy", "Acheter"); action = can ? "buy" : ""; }
+        else if (p.id === "tag") {
+          // Taggeur se retire et se remet : le bouton reste actif dans les deux sens.
+          label = equipped ? I18N.t("shop.remove", "Retirer") : I18N.t("shop.equip", "Équiper");
+          action = "toggle";
+        }
         else if (p.kind === "theme" || p.kind === "cursor" || p.kind === "ship") {
           label = equipped ? I18N.t("shop.equipped", "Équipé") : I18N.t("shop.equip", "Équiper");
           action = equipped ? "" : "equip";
@@ -1433,12 +1464,19 @@
         if (p.kind === "theme") state.theme = p.id;
         if (p.kind === "cursor") state.cursor = p.id === "diamond" ? "" : p.id;
         if (p.kind === "ship") { state.ship = p.id; state.shipChosen = true; }
-        if (p.id === "tag") enableTag();
+        if (p.id === "tag") { state.tagOn = true; applyTag(); }
         save();
         render();
         bump();
         if (p.id === "key") { blink(); Achievements.unlock("key"); }
         if (p.kind === "theme" && p.id !== "vanilla") Achievements.unlock("color");
+        return;
+      }
+      if (action === "toggle") {
+        state.tagOn = !state.tagOn;
+        applyTag();
+        save();
+        render();
         return;
       }
       if (action === "equip") {
@@ -1491,7 +1529,6 @@
         list.hidden = t !== "ach";
         shop.hidden = t !== "shop";
         scores.hidden = t !== "scores";
-        panel.querySelector("[data-ach-count]").hidden = t !== "ach";
       }
       if (!open || morphing || tab === t) { swap(); if (open) center(); return; }
       var h0 = panel.offsetHeight;
@@ -1511,14 +1548,23 @@
 
     var photo = document.querySelector(".profile__photo img");
 
-    function enableTag() {
-      if (!photo || photo.dataset.tagged) return;
-      photo.dataset.tagged = "1";
-      photo.src = photo.src.replace("portrait.jpg", "portrait-tag.jpg");
-      if (photo.srcset) photo.srcset = photo.srcset.replace("portrait-sm.jpg", "portrait-tag-sm.jpg").replace("portrait.jpg", "portrait-tag.jpg");
+    // Photo taguée si Taggeur est possédé et équipé ; l'original sinon. Réversible depuis la boutique.
+    function applyTag() {
+      if (!photo) return;
+      var on = owned("tag") && state.tagOn !== false;
+      if (!!photo.dataset.tagged === on) return;
+      if (on) {
+        photo.dataset.tagged = "1";
+        photo.src = photo.src.replace("portrait.jpg", "portrait-tag.jpg");
+        if (photo.srcset) photo.srcset = photo.srcset.replace("portrait-sm.jpg", "portrait-tag-sm.jpg").replace("portrait.jpg", "portrait-tag.jpg");
+      } else {
+        delete photo.dataset.tagged;
+        photo.src = photo.src.replace("portrait-tag.jpg", "portrait.jpg");
+        if (photo.srcset) photo.srcset = photo.srcset.replace("portrait-tag-sm.jpg", "portrait-sm.jpg").replace("portrait-tag.jpg", "portrait.jpg");
+      }
     }
 
-    if (owned("tag")) enableTag();
+    applyTag();
 
     var open = false, morphing = false;
 
@@ -2221,7 +2267,7 @@
       g.enemies = g.enemies.filter(function (e) { return e.y < H + 40 && e.x > -60 && e.x < W + 60; });
 
       g.pbullets.forEach(function (p) { p.x += p.vx * dt / 1000; p.y += p.vy * dt / 1000; });
-      g.pbullets = g.pbullets.filter(function (p) {
+      var kept = g.pbullets.filter(function (p) {
         if (p.y < -20 || p.x < -20 || p.x > W + 20) return false;
         if (Math.abs(p.x - b.x) < 66 && Math.abs(p.y - b.y) < 38) { hurtBoss(p.dmg, p.x, p.y); return false; }
         for (var i = 0; i < g.enemies.length; i++) {
@@ -2231,6 +2277,8 @@
         }
         return true;
       });
+      // Si le coup fatal au boss est tombé pendant ce parcours, win() a déjà vidé les balles : ne pas les remettre.
+      if (!g.over) g.pbullets = kept;
 
       g.ebullets.forEach(function (p) { p.x += p.vx * dt / 1000; p.y += p.vy * dt / 1000; });
       g.ebullets = g.ebullets.filter(function (p) {
@@ -2246,11 +2294,12 @@
       if (Math.abs(s.x - b.x) < 61 && Math.abs(s.y - b.y) < 35) hurtShip();
 
       g.drops.forEach(function (d) { d.y += d.vy * dt / 1000; d.life -= dt; });
-      g.drops = g.drops.filter(function (d) {
+      var keptDrops = g.drops.filter(function (d) {
         if (d.life <= 0 || d.y > H + 20) return false;
         if (Math.hypot(d.x - s.x, d.y - s.y) < 26) { pickup(d); return false; }
         return true;
       });
+      if (!g.over) g.drops = keptDrops;  // même garde : une bombe ramassée peut finir le boss
     }
 
     function stepSparks(dt) {
@@ -2350,7 +2399,15 @@
           ctx.restore();
           ctx.shadowBlur = 0;
         }
-        if (s.shield > 0) { ctx.strokeStyle = amber; ctx.lineWidth = 2; ctx.globalAlpha = .5 + Math.sin(g.t / 90) * .3; ctx.beginPath(); ctx.arc(s.x, s.y, 30, 0, 6.28); ctx.stroke(); ctx.globalAlpha = 1; }
+        if (s.shield > 0) {
+          // Bouclier plein tant qu'il reste plus d'une seconde ; ensuite il clignote de plus en plus vite (4 → 20 Hz).
+          var shAlpha = .85;
+          if (s.shield < 1000) {
+            var el = 1000 - s.shield, cycles = 4 * el / 1000 + 8 * el * el / 1e6;
+            shAlpha = Math.floor(cycles * 2) % 2 === 0 ? .85 : .15;
+          }
+          ctx.strokeStyle = amber; ctx.lineWidth = 2; ctx.globalAlpha = shAlpha; ctx.beginPath(); ctx.arc(s.x, s.y, 30, 0, 6.28); ctx.stroke(); ctx.globalAlpha = 1;
+        }
       }
 
       var bx0 = 24, bw0 = W - 48, bh0 = 26, fillW = bw0 * Math.max(0, b.hp / b.max);
@@ -2385,8 +2442,8 @@
         ctx.globalAlpha = s.sweep ? 1 : .3;
         ctx.fillStyle = amber;
         var spaceLabel = I18N.t("fight.space", "[ ESPACE ] :");
-        ctx.fillText(spaceLabel, hudX, H - 218);
-        drawDrop({ kind: "bomb", x: hudX + ctx.measureText(spaceLabel).width + 24, y: H - 218 }, amber, cream, ink2);
+        ctx.fillText(spaceLabel, hudX, H - 226);
+        drawDrop({ kind: "bomb", x: hudX + ctx.measureText(spaceLabel).width + 24, y: H - 226 }, amber, cream, ink2);
         ctx.globalAlpha = 1;
       }
       ctx.textBaseline = "top";
@@ -2479,11 +2536,6 @@
       var R = 72, D = Achievements.owns("cannon") ? 4 : 2;
       g.rings.push({ x: s.x, y: s.y, r: 10, max: R, life: 220 });
       spark(s.x, s.y, 10, color("--cream"), 200);
-      g.ebullets = g.ebullets.filter(function (b) {
-        if (Math.hypot(b.x - s.x, b.y - s.y) > R + b.r) return true;
-        spark(b.x, b.y, 4, color("--amber"), 120);
-        return false;
-      });
       g.enemies.slice().forEach(function (e) {
         if (Math.hypot(e.x - s.x, e.y - s.y) < R + e.r) { e.hp -= D; spark(e.x, e.y, 3, color("--cream"), 90); if (e.hp <= 0) killEnemy(e); }
       });
@@ -2593,7 +2645,6 @@
 
     door.addEventListener("click", function () {
       if (open || morphing) return;
-      blink();
       if (!Achievements.hasKey()) {
         door.classList.remove("is-denied");
         void door.offsetWidth;
@@ -2601,6 +2652,7 @@
         return;
       }
       if (!Achievements.doorOpen()) {
+        blink();
         Achievements.openDoor();
         revealPoster(true);
         return;
@@ -2762,8 +2814,12 @@
 
     init: function () {
       I18N.apply(I18N.detect());
-      document.querySelectorAll("[data-lang-btn]").forEach(function (b) {
-        b.addEventListener("click", function () { I18N.apply(b.dataset.langBtn); });
+      // Un clic n'importe où sur « FR / EN » bascule vers l'autre langue.
+      document.querySelectorAll("[data-lang]").forEach(function (box) {
+        box.addEventListener("click", function () {
+          I18N.apply(I18N.current === "fr" ? "en" : "fr");
+          Achievements.unlock("lang");
+        });
       });
     }
   };
@@ -2775,6 +2831,7 @@
     initCursor();
     initAchievements();
     initLevel();
+    initTouchFx();
     initFight();
     initBrand();
     initPageTransition();
