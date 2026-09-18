@@ -233,6 +233,16 @@ html.is-shaking .site-header{transition:none}
 .ach__badge[hidden]{display:none}
 .ach.is-toast .ach__badge{display:none}
 @keyframes ach-badge{from{scale:0}to{scale:1}}
+/* Tant qu'une pièce attend d'être réclamée : les bords clignotent lentement en ambre, la pastille pulse plus vite. */
+/* Voile sous l'icône (z-index négatif) : au pic, exactement l'aspect du survol — bord ambre plein, fond ink-3. */
+.ach::after{content:"";position:absolute;inset:-1px;z-index:-1;pointer-events:none;border:1px solid var(--amber);border-radius:inherit;background:var(--ink-3);box-shadow:inset 0 0 14px color-mix(in srgb,var(--amber) 28%,transparent);opacity:0;transition:opacity .35s var(--ease)}
+.ach.has-badge:not(.is-toast)::after,.ach.has-news:not(.is-toast)::after{animation:ach-blink 2.6s var(--ease-sine) infinite}
+/* Boutique pas encore vue (ou pas revue depuis que le mini-jeu a révélé ses produits) : point qui pulse sur l'onglet. */
+.ach-tabs button.is-new::after{content:"";width:7px;height:7px;flex:none;border-radius:50%;background:var(--amber);animation:ach-dot 1s var(--ease-sine) infinite alternate}
+@keyframes ach-dot{from{scale:.8;box-shadow:0 0 0 0 transparent}to{scale:1.2;box-shadow:0 0 7px var(--amber)}}
+@keyframes ach-blink{0%,100%{opacity:0}35%,65%{opacity:1}}
+.ach.has-badge .ach__badge{animation:ach-badge .6s var(--ease-snap) both,ach-badge-pulse .4s var(--ease-sine) .6s infinite alternate}
+@keyframes ach-badge-pulse{from{scale:1;box-shadow:0 0 0 0 transparent}to{scale:1.1;box-shadow:0 0 6px color-mix(in srgb,var(--amber) 70%,transparent)}}
 .ach:hover,.ach.is-toast{border-color:var(--amber);background:var(--ink-3)}
 .ach__icon{flex:none;width:70px;height:70px;display:grid;place-items:center}
 .ach__icon svg{width:33px;height:33px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -272,15 +282,26 @@ html.is-shaking .site-header{transition:none}
 .ach-item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;column-gap:.9rem;align-items:start;padding:.55rem 1.2rem;border-top:1px solid var(--line-soft)}
 .ach-item:first-child,.ach-item.is-top{border-top:0}
 .ach-item.is-right{border-left:1px solid var(--line-soft)}
+html.is-coarse .ach-panel ol{grid-template-columns:1fr;grid-auto-flow:row;grid-template-rows:none}
+html.is-coarse .ach-item.is-right{border-left:0}
+html.is-coarse .ach-item.is-top{border-top:1px solid var(--line-soft)}
+.ach-list__pc{padding:.7rem 1.2rem;border-top:1px solid var(--line);background:color-mix(in srgb,var(--amber) 8%,transparent);font-family:var(--font-mono);font-size:var(--step--1);letter-spacing:.1em;text-transform:uppercase;color:var(--amber)}
+.ach-item.is-pc{grid-template-columns:auto minmax(0,1fr)}
 @media (max-width:700px){
   .ach-panel ol{grid-template-columns:1fr;grid-auto-flow:row;grid-template-rows:none}
   .ach-item.is-right{border-left:0}
   .ach-item.is-top{border-top:1px solid var(--line-soft)}
-  .ach-panel__head{flex-wrap:wrap;gap:.6rem .8rem;padding:.8rem}
-  .ach-tabs{order:1;width:100%}
-  .ach-tabs button{font-size:var(--step-0);padding:.35rem .55rem}
-  .ach-panel__count{margin-right:auto}
-  .ach-coins{margin-left:auto}
+  /* Une seule ligne : le compte X / Y disparaît, les onglets se serrent. */
+  .ach-panel__head{gap:.5rem;padding:.6rem .6rem .6rem .7rem}
+  .ach-panel__count{display:none}
+  .ach-tabs{gap:.1rem;min-width:0;overflow-x:auto;scrollbar-width:none}
+  .ach-tabs button{flex:none;gap:.35rem;font-size:var(--step--1);padding:.35rem .45rem}
+  .ach-tabs button svg{width:16px;height:16px}
+  .ach-coins{margin-left:auto;gap:.35rem;font-size:var(--step--1)}
+  .ach-panel__close{width:34px;height:34px}
+}
+@media (max-width:400px){
+  .ach-tabs button svg{display:none}
 }
 .ach-item__check{width:20px;height:20px;align-self:center;display:grid;place-items:center;border:1px solid var(--line);border-radius:var(--radius);transition:border-color .35s var(--ease)}
 .ach-item__check svg{width:13px;height:13px;stroke:var(--amber);fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;opacity:0;scale:.5;transition:opacity .3s var(--ease),scale .4s var(--ease-snap)}
@@ -355,6 +376,7 @@ html.is-shaking .site-header{transition:none}
 .shop-item b{display:block;font-family:var(--font-display);font-weight:700;font-size:var(--step-0);line-height:1.1;letter-spacing:-.01em;text-transform:uppercase;color:var(--cream)}
 .shop-item__text > span{display:block;margin-top:.2rem;font-size:var(--step--1);color:var(--muted)}
 .shop-item.is-locked .shop-item__text{opacity:.55}
+.shop-item__key{display:inline-block;width:1.15em;height:1.15em;margin-left:.15em;vertical-align:-.2em;stroke:var(--amber);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .shop-item__price{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--font-mono);font-size:var(--step-0);color:var(--amber);perspective:200px}
 .shop-item__price .coin{width:18px;height:18px}
 .shop-item__btn{
@@ -434,8 +456,14 @@ html.is-glitching main > *,html.is-glitching .site-header,html.is-glitching .sit
   opacity:0;transition:opacity .25s steps(3);
 }
 .crash.is-on{opacity:1;animation:crash-jitter .5s steps(2) 3}
+/* Le curseur dessiné est masqué sur le faux 404 : on rend la flèche système pour atteindre le bouton. */
+html.is-crashed .crash,html.is-crashed .crash *{cursor:auto !important}
+html.is-crashed .crash .crash__retry{cursor:pointer !important}
+.crash__retry:hover{background:var(--cream);border-color:var(--cream)}
+.card--locked{scroll-margin-top:calc(var(--header-h) + 1.5rem)}
 @keyframes crash-jitter{50%{translate:6px -3px;filter:hue-rotate(40deg)}}
 html.is-coarse .card--locked{display:none}
+html.is-coarse a[data-cursor="secret"]{pointer-events:none}
 html.is-coarse .card:active .card__inner,html.is-coarse .fav:active .fav__inner,html.is-coarse .spec:active .spec__inner{transform:scale(.97)}
 .card--locked.is-denied .card__inner{animation:door-deny .45s var(--ease)}
 @keyframes door-deny{20%{translate:-7px 0}40%{translate:7px 0}60%{translate:-5px 0}80%{translate:5px 0}}

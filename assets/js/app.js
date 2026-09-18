@@ -204,6 +204,9 @@
     lock: '<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
     secret: '<path d="M9.2 9.3a2.9 2.9 0 0 1 5.6.7c0 1.9-2.8 2.3-2.8 4.3"/><path d="M12 17.6v.1"/>',
     coin: '<circle cx="12" cy="12" r="8.5"/><path d="M8.3 16.5 12 7l3.7 9.5"/><path d="M7.6 12.6h8.8"/><path d="M7 15h10"/>',
+    key: '<circle cx="7.5" cy="15.5" r="4"/><path d="M10.4 12.6 20.5 2.5"/><path d="m17 6 3 3"/><path d="m14 9 2.5 2.5"/>',
+    podium: '<path d="M9 20V7.5h6V20"/><path d="M15 20v-8h6v8"/><path d="M3 20v-5h6v5"/><path d="M2 20h20"/>',
+    coins: '<ellipse cx="12" cy="6.5" rx="7" ry="2.6"/><path d="M5 6.5v3.6c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V6.5"/><path d="M5 10.1v3.6c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6v-3.6"/><path d="M5 13.7v3.6c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6v-3.6"/>',
     swear: '<path d="M4 5.2h16a1.8 1.8 0 0 1 1.8 1.8v8.4a1.8 1.8 0 0 1-1.8 1.8H9.6l-4.2 3.6v-3.6H4a1.8 1.8 0 0 1-1.8-1.8V7A1.8 1.8 0 0 1 4 5.2z"/>'
   };
 
@@ -1064,7 +1067,7 @@
     "pantheon.html": "pantheon"
   };
 
-  var Achievements = { unlock: function () {}, render: null, hasKey: function () { return false; }, crown: function () {}, addCoin: function () {}, owns: function () { return false; }, ship: function () { return "shipbase"; }, doorOpen: function () { return false; }, openDoor: function () {}, played: function () {}, openScores: function () {} };
+  var Achievements = { unlock: function () {}, render: null, hasKey: function () { return false; }, crown: function () {}, addCoin: function () {}, owns: function () { return false; }, ship: function () { return "shipbase"; }, doorOpen: function () { return false; }, openDoor: function () {}, played: function () {}, openScores: function () {}, notices: function () {} };
 
   var faviconSource = null;
 
@@ -1176,20 +1179,22 @@
     { id: "diamond", name: "Encadr&eacute;", desc: "Le curseur devient carr&eacute;", price: 0, kind: "cursor", pc: true },
     { id: "tri", name: "Sniper", desc: "Le curseur devient rond", price: 3, kind: "cursor", pc: true },
     { id: "tag", name: "Taggeur", desc: "Vandaliser la photo de profil", price: 1, kind: "tool" },
-    { id: "key", name: "Je te le d&eacute;conseille", desc: "Obtenir la cl&eacute;", price: 5, kind: "item", pc: true },
+    { id: "key", name: "Cl&eacute; de cuivre", desc: "Autant symbole de possibilit&eacute; que de myst&egrave;re", price: 5, kind: "item", pc: true },
     { id: "shipbase", name: "C&rsquo;est dans les vieux vaisseaux qu&rsquo;on fait les meilleurs runs", desc: "Un vieux vaisseau qui sent aussi fort qu&rsquo;il est fiable", price: 0, kind: "ship", gated: true, pc: true },
     { id: "ship", name: "Pimp my ride", desc: "Un nouveau vaisseau flambant neuf.", price: 3, kind: "ship", gated: true, pc: true },
     { id: "heart", name: "Free hug", desc: "+1 c&oelig;ur", price: 10, kind: "perk", gated: true, pc: true },
     { id: "cannon", name: "Mode combat activ&eacute;", desc: "Double les d&eacute;g&acirc;ts du champ de force (clic) et de la d&eacute;charge (maintien)", price: 8, kind: "perk", gated: true, pc: true },
-    { id: "sweep", name: "Nuke", desc: "Appuyer sur Espace oblit&egrave;re tous les ennemis basiques et toutes les attaques adverses.", price: 6, kind: "perk", gated: true, pc: true }
+    { id: "sweep", name: "Nuke", desc: "Appuyer sur Espace oblit&egrave;re tous les ennemis et leurs attaques. Une fois par partie.", price: 6, kind: "perk", gated: true, pc: true }
   ];
+
+  var KEY_NAMES = { vanilla: "Cl&eacute; de cuivre", eco: "Cl&eacute; de jade", psy: "Cl&eacute; de cristal" };
 
   var COIN = '<i class="coin"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7.5 18 12 6l4.5 12"/><path d="M6.8 12.6h10.4"/><path d="M6 15.6h12"/></svg></i>';
 
   function initAchievements() {
     var root = document.documentElement;
     var KEY = "as-ach";
-    var DEFAULTS = { unlocked: [], visited: [], claimed: [], owned: ["vanilla", "diamond"], theme: "vanilla", cursor: "", ship: "shipbase", shipChosen: false, spent: 0, crown: false, coins: 0, played: false, door: false };
+    var DEFAULTS = { unlocked: [], visited: [], claimed: [], owned: ["vanilla", "diamond"], theme: "vanilla", cursor: "", ship: "shipbase", shipChosen: false, spent: 0, crown: false, coins: 0, played: false, door: false, shopSeen: false, shopSeenNew: false, noticed: [] };
     var state = JSON.parse(JSON.stringify(DEFAULTS));
     function hydrate() {
       var saved = JSON.parse(localStorage.getItem(KEY) || "null");
@@ -1206,9 +1211,18 @@
     function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { return; } }
 
     var visible = ACHIEVEMENTS.filter(function (a) { return (!a.pc || Cursor.enabled) && (!a.touch || !coarse); });
+    var pcOnly = coarse ? ACHIEVEMENTS.filter(function (a) { return visible.indexOf(a) < 0; }) : [];
     var products = coarse ? PRODUCTS.filter(function (p) { return !p.pc; }).concat(PRODUCTS.filter(function (p) { return p.pc; })) : PRODUCTS.slice();
     var byId = {};
     ACHIEVEMENTS.forEach(function (a) { byId[a.id] = a; });
+    // Invitations vers la boutique, passées dans la même file que les succès : quand elle s'ouvre (premier succès)
+    // et quand le mini-jeu a révélé le reste des produits. Une seule fois chacune, tant que la boutique n'a pas été vue.
+    var NOTICES = [
+      { id: "shop", notice: true, name: "Boutique d&eacute;bloqu&eacute;e", due: function () { return state.unlocked.length && !state.shopSeen; } },
+      { id: "shopnew", notice: true, name: "Nouveaut&eacute;s en boutique", due: function () { return state.played && !state.shopSeenNew; } }
+    ];
+    NOTICES.forEach(function (n) { byId[n.id] = n; });
+    function shopNews() { return NOTICES.some(function (n) { return n.due(); }); }
     var productById = {};
     PRODUCTS.forEach(function (p) { productById[p.id] = p; });
 
@@ -1242,8 +1256,8 @@
     panel.innerHTML = '<header class="ach-panel__head">' +
       '<nav class="ach-tabs">' +
         '<button type="button" class="is-active" data-tab="ach"><svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS.trophy + '</svg><span data-ach-title></span></button>' +
-        '<button type="button" data-tab="shop"><span data-shop-title></span></button>' +
-        '<button type="button" data-tab="scores" hidden><span data-scores-title></span></button>' +
+        '<button type="button" data-tab="shop"><svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS.coins + '</svg><span data-shop-title></span></button>' +
+        '<button type="button" data-tab="scores" hidden><svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS.podium + '</svg><span data-scores-title></span></button>' +
       '</nav>' +
       '<span class="ach-panel__count" data-ach-count></span>' +
       '<span class="ach-coins">' + COIN + '<b data-coins>0</b></span>' +
@@ -1288,6 +1302,9 @@
       var badge = btn.querySelector(".ach__badge");
       badge.textContent = waiting;
       badge.hidden = !waiting;
+      btn.classList.toggle("has-badge", !!waiting);
+      btn.classList.toggle("has-news", shopNews());
+      panel.querySelector('[data-tab="shop"]').classList.toggle("is-new", shopNews());
       var n = visible.filter(function (a) { return has(a.id); }).length;
       panel.querySelector("[data-ach-count]").textContent = n + " / " + visible.length;
       var rows = Math.ceil(visible.length / 2);
@@ -1300,7 +1317,12 @@
           '<span class="ach-item__check"><svg viewBox="0 0 24 24" aria-hidden="true">' + CHECK + '</svg></span>' +
           '<span><b>' + (ok ? I18N.t("ach.name." + a.id, a.name) : "???") + '</b><span>' + I18N.t("ach.hint." + a.id, a.hint) + '</span></span>' +
           '<span class="ach-item__coin">' + COIN + '</span></li>';
-      }).join("");
+      }).join("") + (pcOnly.length ? '<li class="ach-list__pc">' + I18N.t("shop.pc", "Déblocable sur la version PC du site") + '</li>' + pcOnly.map(function (a) {
+        var ok = has(a.id);
+        return '<li class="ach-item is-pc ' + (ok ? "is-unlocked" : "is-locked") + '" data-id="' + a.id + '">' +
+          '<span class="ach-item__check"><svg viewBox="0 0 24 24" aria-hidden="true">' + CHECK + '</svg></span>' +
+          '<span><b>' + (ok ? I18N.t("ach.name." + a.id, a.name) : "???") + '</b><span>' + I18N.t("ach.hint." + a.id, a.hint) + '</span></span></li>';
+      }).join("") : "");
       renderShop();
       renderScores();
       applyLook();
@@ -1336,8 +1358,10 @@
       var wallet = coins();
       shop.innerHTML = products.map(function (p, i) {
         var gated = !!p.gated && !state.played;
-        var name = gated ? "???" : I18N.t("shop.name." + p.id, p.name);
+        var theme = KEY_NAMES[state.theme] ? state.theme : "vanilla";
+        var name = gated ? "???" : p.id === "key" ? I18N.t("shop.name.key." + theme, KEY_NAMES[theme]) : I18N.t("shop.name." + p.id, p.name);
         var desc = gated ? "???" : I18N.t("shop.desc." + p.id, p.desc);
+        if (p.id === "key" && !gated) name += ' <svg class="shop-item__key" viewBox="0 0 24 24" aria-hidden="true">' + ICONS.key + '</svg>';
         if (coarse && p.pc) {
           var banner = i && products[i - 1].pc ? "" : '<div class="shop__pc">' + I18N.t("shop.pc", "Déblocable sur la version PC du site") + '</div>';
           return banner + '<div class="shop-item is-locked is-pc"><span class="shop-item__text"><b>' + name + '</b><span>' + desc + '</span></span></div>';
@@ -1413,7 +1437,7 @@
         save();
         render();
         bump();
-        if (p.id === "key") Achievements.unlock("key");
+        if (p.id === "key") { blink(); Achievements.unlock("key"); }
         if (p.kind === "theme" && p.id !== "vanilla") Achievements.unlock("color");
         return;
       }
@@ -1454,6 +1478,13 @@
     });
 
     function setTab(t) {
+      if (t === "shop" && shopNews()) {
+        state.shopSeen = true;
+        if (state.played) state.shopSeenNew = true;
+        save();
+        btn.classList.remove("has-news");
+        panel.querySelector('[data-tab="shop"]').classList.remove("is-new");
+      }
       function swap() {
         tab = t;
         panel.querySelectorAll("[data-tab]").forEach(function (b) { b.classList.toggle("is-active", b.dataset.tab === t); });
@@ -1565,6 +1596,7 @@
     var toasts = [];
 
     function rowHtml(a) {
+      if (a.notice) return "<small>" + I18N.t("notice.label", "Nouveau") + "</small><b>" + I18N.t("notice." + a.id, a.name) + "</b>";
       return "<small>" + I18N.t("ach.unlocked", "Succès débloqué") + "</small><b>" + I18N.t("ach.name." + a.id, a.name) + "</b>";
     }
 
@@ -1662,12 +1694,25 @@
 
     Achievements.unlock = function (id) {
       var a = byId[id];
-      if (!a || has(id) || (a.pc && !Cursor.enabled) || (a.touch && coarse)) return;
+      if (!a || a.notice || has(id) || (a.pc && !Cursor.enabled) || (a.touch && coarse)) return;
       state.unlocked.push(id);
       save();
       render();
       toast(a);
+      notices(900);
     };
+
+    // Pousse les invitations dues et pas encore montrées ; `delay` les fait passer après le succès qui vient d'apparaître.
+    function notices(delay) {
+      NOTICES.forEach(function (n, i) {
+        if (!n.due() || state.noticed.indexOf(n.id) >= 0) return;
+        state.noticed.push(n.id);
+        save();
+        setTimeout(function () { toast(n); }, (delay || 0) + i * 250);
+      });
+    }
+    Achievements.notices = function () { notices(0); };
+    notices(0);
 
     var page = (window.location.pathname.split("/").pop() || "index.html").toLowerCase();
     var pageId = PAGE_ACHIEVEMENT[page];
@@ -1791,6 +1836,42 @@
   var BUG_PX = ["X....X", ".X..X.", "XXXXXX", "X.XX.X", "XXXXXX", ".X..X."];
   var HEART_PX = [".XX.XX.", "XXXXXXX", "XXXXXXX", ".XXXXX.", "..XXX..", "...X..."];
 
+  // Glitch plein écran : blocs et bandes par-dessus la page, les morceaux de la page tressautent.
+  // Utilisé par le combat (impact, défaite) et, en court, sur les portes d'entrée du secret.
+  function glitch(ms, then) {
+    var root = document.documentElement;
+    var gl = document.createElement("div");
+    gl.className = "glitch";
+    var cols = ["var(--amber)", "var(--cream)", "var(--ink-3)", "#fff"];
+    var html = "";
+    for (var i = 0; i < 28; i++) {
+      var sz = 10 + Math.random() * 130;
+      html += '<i class="glitch__block" style="left:' + (Math.random() * 100).toFixed(1) + '%;top:' + (Math.random() * 100).toFixed(1) + '%;width:' + sz.toFixed(0) + 'px;height:' + (sz * (.3 + Math.random() * 1.2)).toFixed(0) + 'px;background:' + cols[i % 4] + ';animation-duration:' + (70 + Math.random() * 110).toFixed(0) + 'ms;animation-delay:-' + (Math.random() * 200).toFixed(0) + 'ms;--gx:' + ((Math.random() - .5) * 90).toFixed(0) + 'px"></i>';
+    }
+    for (var k = 0; k < 6; k++) {
+      html += '<i class="glitch__band" style="left:' + (Math.random() * 100).toFixed(1) + '%;width:' + (14 + Math.random() * 110).toFixed(0) + 'px;animation-duration:' + (90 + Math.random() * 140).toFixed(0) + 'ms;--gx:' + ((Math.random() < .5 ? -1 : 1) * (60 + Math.random() * 180)).toFixed(0) + 'px"></i>';
+    }
+    gl.innerHTML = html;
+    root.appendChild(gl);
+    document.querySelectorAll("main > *, .site-header, .site-footer, .fight").forEach(function (el, i) {
+      el.style.setProperty("--gx", ((i % 2 ? -1 : 1) * (8 + Math.random() * 26)).toFixed(0) + "px");
+      el.style.setProperty("--gy", ((i % 3 ? -1 : 1) * (2 + Math.random() * 12)).toFixed(0) + "px");
+      el.style.setProperty("--gc", (20 + Math.random() * 60).toFixed(0) + "%");
+    });
+    root.classList.add("is-glitching");
+    setTimeout(function () {
+      gl.remove();
+      if (!document.querySelector(".glitch")) root.classList.remove("is-glitching");
+      if (then) then();
+    }, ms);
+  }
+
+  // Petit glitch d'un clin d'œil, coupé en mouvement réduit.
+  function blink(then) {
+    if (reduced) { if (then) then(); return; }
+    glitch(180, then);
+  }
+
   function initFight() {
     var door = document.querySelector(".card--locked");
     if (!door) return;
@@ -1900,7 +1981,7 @@
       if (Math.random() > (chance || .14)) return;
       var weights = { bullet: 3, rate: 1, heal: 1, shield: 2, bomb: 2, coin: 3 };
       if (g.ship.bullets >= 5) delete weights.bullet;
-      if (g.ship.rate >= 3) delete weights.rate;
+      if (g.ship.rate >= 4) delete weights.rate;
       if (g.ship.hp >= g.ship.max) delete weights.heal;
       var total = 0, k;
       for (k in weights) total += weights[k];
@@ -1989,7 +2070,7 @@
       if (d.kind === "shield") s.shield = 3000;
       if (d.kind === "bomb") bomb();
       if (d.kind === "bullet") s.bullets = Math.min(5, s.bullets + 1);
-      if (d.kind === "rate") s.rate = Math.min(3, s.rate + 1);
+      if (d.kind === "rate") s.rate = Math.min(4, s.rate + 1);
       spark(d.x, d.y, 12, color("--cream"), 120);
     }
 
@@ -2049,7 +2130,7 @@
       var charging = root.classList.contains("is-charging");
       s.fire -= dt;
       if (!charging && s.fire <= 0) {
-        s.fire = 1000 / (2.5 + s.rate);
+        s.fire = 1000 / (2.5 + s.rate * .75);  // 5 crans : 2,5 à 5,5 coups/s
         if (Achievements.ship() === "ship") spark(s.x, s.y - 14, 2, color("--amber"), 60);
         var n = s.bullets, spread = 14;
         for (var i = 0; i < n; i++) {
@@ -2286,17 +2367,30 @@
       ctx.textBaseline = "top";
       ctx.textAlign = "left";
 
-      for (var h = 0; h < s.max; h++) px(HEART_PX, 24 + h * 26, H - 40, 3, h < s.hp ? amber : "rgba(167,158,144,.25)");
-      for (var rb = 0; rb < 4; rb++) { ctx.fillStyle = rb <= s.rate ? amber : "rgba(167,158,144,.25)"; ctx.fillRect(24 + rb * 9, H - 62 - rb * 4, 6, 6 + rb * 4); }
+      // HUD bas gauche, de bas en haut : cœurs, balles (1 à 5), cadence (1 à 5), nuke.
+      var dim = "rgba(167,158,144,.25)", hudX = 24, pipX = hudX + 40;
+      for (var h = 0; h < s.max; h++) px(HEART_PX, hudX + h * 38, H - 54, 4.5, h < s.hp ? amber : dim);
+      drawDrop({ kind: "bullet", x: hudX + 14, y: H - 86 }, amber, cream, ink2);
+      for (var pb = 0; pb < 5; pb++) { ctx.fillStyle = pb < s.bullets ? amber : dim; ctx.beginPath(); ctx.roundRect(pipX + pb * 13, H - 95, 7, 18, 3.5); ctx.fill(); }
+      drawDrop({ kind: "rate", x: hudX + 14, y: H - 122 }, amber, cream, ink2);
+      for (var rb = 0; rb < 5; rb++) { ctx.fillStyle = rb <= s.rate ? amber : dim; ctx.fillRect(pipX + rb * 13, H - 113 - (6 + rb * 3), 7, 6 + rb * 3); }
+      // Rappel des commandes, au-dessus des jauges : maintien, clic, puis la nuke tout en haut si le perk est acheté.
+      ctx.font = "500 14px " + color("--font-mono"); ctx.textAlign = "left"; ctx.textBaseline = "middle";
+      [["fight.hold", "[ MAINTIEN ] :", "fight.hold.what", "décharge", H - 162], ["fight.click", "[ CLIC ] :", "fight.click.what", "champ de force", H - 190]].forEach(function (row) {
+        var keyLabel = I18N.t(row[0], row[1]);
+        ctx.fillStyle = amber; ctx.fillText(keyLabel, hudX, row[4]);
+        ctx.fillStyle = muted; ctx.fillText(I18N.t(row[2], row[3]), hudX + ctx.measureText(keyLabel).width + 10, row[4]);
+      });
       if (Achievements.owns("sweep")) {
         ctx.globalAlpha = s.sweep ? 1 : .3;
-        ctx.font = "500 11px " + color("--font-mono"); ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillStyle = amber;
-        ctx.fillText(I18N.t("fight.space", "[ ESPACE ] :"), 24, H - 96);
-        drawDrop({ kind: "bomb", x: 116, y: H - 96 }, amber, cream, ink2);
+        ctx.fillStyle = amber;
+        var spaceLabel = I18N.t("fight.space", "[ ESPACE ] :");
+        ctx.fillText(spaceLabel, hudX, H - 218);
+        drawDrop({ kind: "bomb", x: hudX + ctx.measureText(spaceLabel).width + 24, y: H - 218 }, amber, cream, ink2);
         ctx.globalAlpha = 1;
-        ctx.textBaseline = "top";
       }
-      if (s.shield > 0) { ctx.textAlign = "left"; ctx.fillStyle = muted; ctx.fillText("S " + (s.shield / 1000).toFixed(1), 34 + s.max * 26, H - 36); }
+      ctx.textBaseline = "top";
+      if (s.shield > 0) { ctx.font = "500 14px " + color("--font-mono"); ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillStyle = muted; ctx.fillText("S " + (s.shield / 1000).toFixed(1), hudX + s.max * 38 + 6, H - 40); ctx.textBaseline = "top"; }
 
       if (s.hp === 1 && !g.over) {
         var pulse = .08 + (Math.sin(g.t / 260) + 1) * .06;
@@ -2433,33 +2527,6 @@
       soft.style.setProperty("--gi", level.toFixed(2));
     }
 
-    function glitch(ms, then) {
-      var gl = document.createElement("div");
-      gl.className = "glitch";
-      var cols = ["var(--amber)", "var(--cream)", "var(--ink-3)", "#fff"];
-      var html = "";
-      for (var i = 0; i < 28; i++) {
-        var sz = 10 + Math.random() * 130;
-        html += '<i class="glitch__block" style="left:' + (Math.random() * 100).toFixed(1) + '%;top:' + (Math.random() * 100).toFixed(1) + '%;width:' + sz.toFixed(0) + 'px;height:' + (sz * (.3 + Math.random() * 1.2)).toFixed(0) + 'px;background:' + cols[i % 4] + ';animation-duration:' + (70 + Math.random() * 110).toFixed(0) + 'ms;animation-delay:-' + (Math.random() * 200).toFixed(0) + 'ms;--gx:' + ((Math.random() - .5) * 90).toFixed(0) + 'px"></i>';
-      }
-      for (var k = 0; k < 6; k++) {
-        html += '<i class="glitch__band" style="left:' + (Math.random() * 100).toFixed(1) + '%;width:' + (14 + Math.random() * 110).toFixed(0) + 'px;animation-duration:' + (90 + Math.random() * 140).toFixed(0) + 'ms;--gx:' + ((Math.random() < .5 ? -1 : 1) * (60 + Math.random() * 180)).toFixed(0) + 'px"></i>';
-      }
-      gl.innerHTML = html;
-      root.appendChild(gl);
-      document.querySelectorAll("main > *, .site-header, .site-footer, .fight").forEach(function (el, i) {
-        el.style.setProperty("--gx", ((i % 2 ? -1 : 1) * (8 + Math.random() * 26)).toFixed(0) + "px");
-        el.style.setProperty("--gy", ((i % 3 ? -1 : 1) * (2 + Math.random() * 12)).toFixed(0) + "px");
-        el.style.setProperty("--gc", (20 + Math.random() * 60).toFixed(0) + "%");
-      });
-      root.classList.add("is-glitching");
-      setTimeout(function () {
-        gl.remove();
-        if (!document.querySelector(".glitch")) root.classList.remove("is-glitching");
-        if (then) then();
-      }, ms);
-    }
-
     function lose() {
       g.over = true;
       g.msg = { text: I18N.t("fight.lose", "VAISSEAU DÉTRUIT"), life: 1400 };
@@ -2472,8 +2539,14 @@
       cancelAnimationFrame(raf);
       var c = document.createElement("div");
       c.className = "crash";
-      c.innerHTML = '<p class="eyebrow eyebrow--accent">' + I18N.t("crash.eyebrow", "Erreur 404") + '</p><h1>Game<br>Over</h1>';
+      c.innerHTML = '<p class="eyebrow eyebrow--accent">' + I18N.t("crash.eyebrow", "Erreur 404") + '</p><h1>Game<br>Over</h1>' +
+        '<div><button type="button" class="btn btn--solid crash__retry"><span>' + I18N.t("crash.retry", "Relancer") + '</span></button></div>';
       root.appendChild(c);
+      // Recharge la page sur la carte GALAGAX : la partie repart de zéro, le cadenas reste ouvert.
+      c.querySelector(".crash__retry").addEventListener("click", function () {
+        window.location.hash = "galagax";
+        window.location.reload();
+      });
       root.classList.add("is-crashed");
       void c.offsetWidth;
       c.classList.add("is-on");
@@ -2515,10 +2588,12 @@
       panel.style.transform = fromDoor();
       if (lenis) lenis.start();
       root.classList.remove("lenis-stopped");
-      setTimeout(function () { morphing = false; panel.hidden = true; veil.hidden = true; panel.style.transform = ""; g = null; }, 340);
+      setTimeout(function () { morphing = false; panel.hidden = true; veil.hidden = true; panel.style.transform = ""; g = null; Achievements.notices(); }, 340);
     }
 
     door.addEventListener("click", function () {
+      if (open || morphing) return;
+      blink();
       if (!Achievements.hasKey()) {
         door.classList.remove("is-denied");
         void door.offsetWidth;
@@ -2620,6 +2695,7 @@
 
       e.preventDefault();
       if (reduced) { window.location.href = a.href; return; }
+      if (a.dataset.cursor === "secret") { blink(function () { runTransition(a.href); }); return; }
       runTransition(a.href);
     });
 
