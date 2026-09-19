@@ -274,8 +274,8 @@ html.is-shaking .site-header{transition:none}
 .ach-panel[hidden]{display:none}
 .ach-panel.is-resizing ol,.ach-panel.is-resizing .shop{overflow:hidden}
 .ach-panel__head{display:flex;align-items:center;gap:1rem;padding:1rem 1rem 1rem 1.3rem;border-bottom:1px solid var(--line)}
-.ach-panel__close{width:40px;height:40px;flex:none;display:grid;place-items:center;border:1px solid var(--line);border-radius:var(--radius);color:var(--cream);transition:border-color .35s var(--ease),color .35s var(--ease)}
-.ach-panel__close:hover{border-color:var(--amber);color:var(--amber)}
+.ach-panel__close{width:40px;height:40px;flex:none;display:grid;place-items:center;color:var(--cream);transition:color .35s var(--ease)}
+.ach-panel__close:hover{color:var(--amber)}
 .ach-panel__close svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round}
 .ach-panel ol{position:relative;display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:column;grid-template-rows:repeat(var(--rows,10),auto);overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--amber) 55%,transparent) transparent}
 .ach-item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;column-gap:.9rem;align-items:center;padding:.42rem 1.2rem;border-top:1px solid var(--line-soft)}
@@ -333,7 +333,7 @@ html.is-coarse .ach-item.is-top{border-top:1px solid var(--line-soft)}
 }
 .ach-tabs button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .ach-tabs button:hover{color:var(--cream)}
-.ach-tabs button.is-active{color:var(--amber);border-color:var(--line)}
+.ach-tabs button.is-active{color:var(--amber)}
 .ach-coins{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-size:var(--step-0);color:var(--amber);perspective:300px}
 .ach-coins b{font-weight:500;min-width:1.2ch;text-align:right}
 .ach-coins.is-bump{animation:coin-bump .55s var(--ease-snap)}
