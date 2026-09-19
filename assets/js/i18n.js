@@ -305,6 +305,7 @@ window.I18N_EN = {
   "ach.name.lvl30": "Elite",
   "ach.name.clicks7": "Cramp incoming?",
   "ach.name.clicks22": "Two mice? Cheater!",
+  "ach.name.clicks22.touch": "Two fingers? Cheater!",
 
   "shop.title": "Shop",
   "shop.buy": "Buy",

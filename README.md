@@ -357,7 +357,7 @@ Chaque carte de `profil.html` qui existe sur Steam porte `data-href` (la page du
 
 ### Sur mobile
 
-- **Barre** : pas de menu. Les pages autres que la page courante restent dans la barre ; `FR / EN` reste affiché tel quel.
+- **Barre** : pas de menu. Les pages autres que la page courante restent dans la barre ; le sélecteur de langue n'affiche que la langue active (`FR` ou `EN`), un tap bascule vers l'autre.
 - **Cartes** : pas de suivi du doigt ni de gyroscope — la carte s'enfonce légèrement sous le doigt (`html.is-coarse .card:active`, même chose pour les jeux préférés et la fiche technique) et revient d'un ressort.
 - **Particules** : un tap fait éclater quelques losanges, un glissé rapide laisse une traînée (`initTouchFx()`, même calque `.fx` que le curseur PC via `makeFx()`) ; coupé en mouvement réduit. Les taps rapprochés comptent pour les succès de clics.
 - **Images agrandies** : pincer ou taper l'image pour zoomer, glisser pour se déplacer, taper à côté pour fermer. Le bouton **Retour** referme l'image au lieu de quitter la page (une entrée d'historique est ajoutée à l'ouverture). À la souris : molette pour zoomer, clic sur l'image pour zoomer/dézoomer, Échap pour fermer.

@@ -1050,6 +1050,8 @@ a.spec__corner:hover{color:var(--cream);transform:scale(1.12)}
   .nav__links a[aria-current="page"]{display:none}
   .nav,.nav__links{gap:clamp(.8rem,3vw,1.4rem)}
   .nav a{padding-block:.6rem}
+  /* Un seul libellé (langue active) : la barre garde sa place, même avec les trois liens des pages projet. */
+  .lang__menu button:not(.is-active),.lang__menu i{display:none}
 
   .media-grid--2,.media-grid--3,.duo{grid-template-columns:1fr}
 

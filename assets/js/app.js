@@ -376,15 +376,19 @@
       lastX = e.clientX; lastY = e.clientY; lastT = performance.now();
     });
     document.addEventListener("pointermove", function (e) {
-      if (!down) return;
-      if (!moved && Math.hypot(e.clientX - downX, e.clientY - downY) > 10) moved = true;
-      if (!FX || e.pointerType !== "touch") return;
+      if (down && !moved && Math.hypot(e.clientX - downX, e.clientY - downY) > 10) moved = true;
+    }, { passive: true });
+    // La traînée écoute touchmove et non pointermove : dès que le doigt fait défiler la page, le navigateur
+    // envoie pointercancel et coupe les pointermove, alors que touchmove continue pendant tout le défilement.
+    if (FX) document.addEventListener("touchmove", function (e) {
+      var t = e.touches[0];
+      if (!t) return;
       var now = performance.now();
-      var speed = Math.hypot(e.clientX - lastX, e.clientY - lastY) / Math.max(1, now - lastT);
-      lastX = e.clientX; lastY = e.clientY; lastT = now;
+      var speed = Math.hypot(t.clientX - lastX, t.clientY - lastY) / Math.max(1, now - lastT);
+      lastX = t.clientX; lastY = t.clientY; lastT = now;
       if (speed < .25 || now - lastTrail < 28) return;
       lastTrail = now;
-      FX.trailDot(e.clientX, e.clientY);
+      FX.trailDot(t.clientX, t.clientY);
     }, { passive: true });
     document.addEventListener("pointerup", function (e) {
       if (!down) return;
@@ -1082,7 +1086,7 @@
     { id: "lvl100", name: "Boss", hint: "Passer niveau 100", pc: true },
     { id: "clicks7", name: "Bient&ocirc;t la crampe&nbsp;?", hint: "Cliquer 7 fois en moins de 2 secondes" },
     { id: "clicks15", name: "Cookie Clicker simulator", hint: "Cliquer 15 fois en moins de 2 secondes" },
-    { id: "clicks22", name: "Deux souris&nbsp;? Tricheur&nbsp;!", hint: "Cliquer 22 fois en moins de 2 secondes" }
+    { id: "clicks22", name: "Deux souris&nbsp;? Tricheur&nbsp;!", touchName: "Deux doigts&nbsp;? Tricheur&nbsp;!", hint: "Cliquer 22 fois en moins de 2 secondes" }
   ];
 
   var PAGE_ACHIEVEMENT = {
@@ -1251,6 +1255,8 @@
       { id: "shopnew", notice: true, name: "Nouveaut&eacute;s en boutique", due: function () { return state.played && !state.shopSeenNew; } }
     ];
     NOTICES.forEach(function (n) { byId[n.id] = n; });
+    // Nom d'un succès : certains ont une variante tactile (`touchName`, clé `ach.name.<id>.touch`).
+    function achName(a) { return coarse && a.touchName ? I18N.t("ach.name." + a.id + ".touch", a.touchName) : I18N.t("ach.name." + a.id, a.name); }
     function shopNews() { return NOTICES.some(function (n) { return n.due(); }); }
     var productById = {};
     PRODUCTS.forEach(function (p) { productById[p.id] = p; });
@@ -1341,13 +1347,13 @@
         var cls = (ok ? "is-unlocked" : "is-locked") + (claim ? " is-claimable" : "") + (i >= rows ? " is-right" : "") + (i === rows ? " is-top" : "");
         return '<li class="ach-item ' + cls + '" data-id="' + a.id + '"' + (claim ? ' data-cursor="coin" title="' + I18N.t("ach.claim", "Réclamer la pièce") + '"' : "") + '>' +
           '<span class="ach-item__check"><svg viewBox="0 0 24 24" aria-hidden="true">' + CHECK + '</svg></span>' +
-          '<span><b>' + (ok ? I18N.t("ach.name." + a.id, a.name) : "???") + '</b><span>' + I18N.t("ach.hint." + a.id, a.hint) + '</span></span>' +
+          '<span><b>' + (ok ? achName(a) : "???") + '</b><span>' + I18N.t("ach.hint." + a.id, a.hint) + '</span></span>' +
           '<span class="ach-item__coin">' + COIN + '</span></li>';
       }).join("") + (pcOnly.length ? '<li class="ach-list__pc">' + I18N.t("shop.pc", "Déblocable sur la version PC du site") + '</li>' + pcOnly.map(function (a) {
         var ok = has(a.id);
         return '<li class="ach-item is-pc ' + (ok ? "is-unlocked" : "is-locked") + '" data-id="' + a.id + '">' +
           '<span class="ach-item__check"><svg viewBox="0 0 24 24" aria-hidden="true">' + CHECK + '</svg></span>' +
-          '<span><b>' + (ok ? I18N.t("ach.name." + a.id, a.name) : "???") + '</b><span>' + I18N.t("ach.hint." + a.id, a.hint) + '</span></span></li>';
+          '<span><b>' + (ok ? achName(a) : "???") + '</b><span>' + I18N.t("ach.hint." + a.id, a.hint) + '</span></span></li>';
       }).join("") : "");
       renderShop();
       renderScores();
@@ -1643,7 +1649,7 @@
 
     function rowHtml(a) {
       if (a.notice) return "<small>" + I18N.t("notice.label", "Nouveau") + "</small><b>" + I18N.t("notice." + a.id, a.name) + "</b>";
-      return "<small>" + I18N.t("ach.unlocked", "Succès débloqué") + "</small><b>" + I18N.t("ach.name." + a.id, a.name) + "</b>";
+      return "<small>" + I18N.t("ach.unlocked", "Succès débloqué") + "</small><b>" + achName(a) + "</b>";
     }
 
     function clearRows() {
