@@ -109,15 +109,22 @@
       });
     }, { rootMargin: "0px 0px -6% 0px", threshold: 0 });
 
-    items.forEach(function (el) {
-      var r = el.getBoundingClientRect();
-      if (r.top < window.innerHeight && r.bottom > 0) {
+    // Ce qui est déjà à l'écran apparaît sans attendre l'observateur — aussi après un saut d'ancre (retour sur la carte d'un projet), que le navigateur fait parfois après le chargement.
+    function revealVisible() {
+      items.forEach(function (el) {
+        if (el.classList.contains("is-in") || el.dataset.revealPending) return;
+        var r = el.getBoundingClientRect();
+        if (r.top >= window.innerHeight || r.bottom <= 0) return;
+        el.dataset.revealPending = "1";
         var delay = parseFloat(el.dataset.revealDelayLoad || el.dataset.revealDelay || "0");
         setTimeout(function () { el.classList.add("is-in"); }, delay * 1000);
-        return;
-      }
-      io.observe(el);
-    });
+        io.unobserve(el);
+      });
+    }
+    items.forEach(function (el) { io.observe(el); });
+    revealVisible();
+    window.addEventListener("load", revealVisible);
+    window.addEventListener("hashchange", revealVisible);
 
     function finDePage() {
       if (window.innerHeight + window.scrollY < document.documentElement.scrollHeight - 4) return;
@@ -197,9 +204,9 @@
     view: '<path d="M1.7 12S5.7 5.3 12 5.3 22.3 12 22.3 12 18.3 18.7 12 18.7 1.7 12 1.7 12z"/><circle cx="12" cy="12" r="3.3"/>',
     play: '<path class="solid" d="M8.5 5.2v13.6L19.4 12z"/>',
     copy: '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M15 5.5v-1A1.5 1.5 0 0 0 13.5 3H4.5A1.5 1.5 0 0 0 3 4.5v9A1.5 1.5 0 0 0 4.5 15h1"/>',
-    external: '<path d="M8 16 16.5 7.5"/><path d="M9.5 7.5h7v7"/>',
+    external: '<path class="sq" d="M5 19 15 9"/><path class="sq" d="M8 5.5h10.5V16"/>',
     close: '<path d="m6.5 6.5 11 11"/><path d="m17.5 6.5-11 11"/>',
-    top: '<path d="M12 20V5.4"/><path d="m6.6 10.8 5.4-5.4 5.4 5.4"/>',
+    top: '<path class="sq" d="M12 21.5V8.5"/><path class="sq" d="M4.5 12.5 12 5l7.5 7.5"/>',
     trophy: '<path d="M7.5 4h9v3.5a4.5 4.5 0 0 1-9 0z"/><path d="M7.5 6H5a2.5 2.5 0 0 0 2.6 3.4"/><path d="M16.5 6H19a2.5 2.5 0 0 1-2.6 3.4"/><path d="M12 12v3.2"/><path d="M9.2 19.5h5.6"/><path d="M10 15.2h4v4.3h-4z"/>',
     lock: '<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
     secret: '<path d="M9.2 9.3a2.9 2.9 0 0 1 5.6.7c0 1.9-2.8 2.3-2.8 4.3"/><path d="M12 17.6v.1"/>',
@@ -423,10 +430,12 @@
     }
 
     function render() {
-      labelText.textContent = level >= MAX ? "MAX" : "LV " + level;
+      labelText.textContent = level >= MAX ? "MAX" : (I18N.current === "en" ? "LV " : "NV ") + level;
       root.classList.toggle("has-level", level > 0);
       for (var t = 1; t <= 2; t++) root.classList.toggle("cursor-tier-" + t, tierOf(level) === t);
     }
+    Level.render = render;
+    Level.max = function () { gain(MAX, Cursor.x, Cursor.y); };
     render();
     levelAchievements();
     window.addEventListener("pageshow", function (e) {
@@ -1081,9 +1090,9 @@
     { id: "color", name: "Directeur artistique", hint: "Changer la couleur du site" },
     { id: "key", name: "Et maintenant&nbsp;?", hint: "Acheter la cl&eacute;", touch: true },
     { id: "secret", name: "Content que &ccedil;a vous ait plu&nbsp;!", hint: "Trouver le secret", touch: true },
-    { id: "lvl10", name: "Noob", hint: "Passer niveau 10", pc: true },
-    { id: "lvl30", name: "&Eacute;lite", hint: "Passer niveau 30", pc: true },
-    { id: "lvl100", name: "Boss", hint: "Passer niveau 100", pc: true },
+    { id: "lvl10", name: "Noob", hint: "Passer le curseur niveau 10", pc: true },
+    { id: "lvl30", name: "&Eacute;lite", hint: "Passer le curseur niveau 30", pc: true },
+    { id: "lvl100", name: "Boss", hint: "Passer le curseur niveau 100", pc: true },
     { id: "clicks7", name: "Bient&ocirc;t la crampe&nbsp;?", hint: "Cliquer 7 fois en moins de 2 secondes" },
     { id: "clicks15", name: "Cookie Clicker simulator", hint: "Cliquer 15 fois en moins de 2 secondes" },
     { id: "clicks22", name: "Deux souris&nbsp;? Tricheur&nbsp;!", touchName: "Deux doigts&nbsp;? Tricheur&nbsp;!", hint: "Cliquer 22 fois en moins de 2 secondes" }
@@ -1100,7 +1109,8 @@
     "pantheon.html": "pantheon"
   };
 
-  var Achievements = { unlock: function () {}, render: null, hasKey: function () { return false; }, crown: function () {}, addCoin: function () {}, owns: function () { return false; }, ship: function () { return "shipbase"; }, doorOpen: function () { return false; }, openDoor: function () {}, played: function () {}, openScores: function () {}, notices: function () {} };
+  var Level = { render: function () {}, max: function () {} };
+  var Achievements = { unlock: function () {}, konami: function () {}, isKonami: function () { return false; }, render: null, hasKey: function () { return false; }, crown: function () {}, addCoin: function () {}, owns: function () { return false; }, ship: function () { return "shipbase"; }, doorOpen: function () { return false; }, openDoor: function () {}, played: function () {}, openScores: function () {}, notices: function () {} };
 
   var faviconSource = null;
 
@@ -1156,16 +1166,16 @@
       return Scores.list.length < 20 || time < Scores.list[Scores.list.length - 1].time;
     },
 
-    setPending: function (time) {
+    setPending: function (time, konami) {
       if (!Scores.qualifies(time)) return false;
-      Scores.pending = { time: time, date: new Date().toISOString().slice(0, 10) };
+      Scores.pending = { time: time, date: new Date().toISOString().slice(0, 10), konami: !!konami };
       try { localStorage.setItem("as-pending-score", JSON.stringify(Scores.pending)); } catch (e) { return true; }
       return true;
     },
 
     submit: function (name) {
       if (!Scores.pending) return;
-      var entry = { name: (name || "???").slice(0, 16), time: Scores.pending.time, date: Scores.pending.date };
+      var entry = { name: (name || "???").slice(0, 16), time: Scores.pending.time, date: Scores.pending.date, konami: !!Scores.pending.konami };
       Scores.pending = null;
       try { localStorage.removeItem("as-pending-score"); localStorage.setItem("as-name", entry.name); } catch (e) {  }
       Scores.list.push(entry);
@@ -1179,11 +1189,11 @@
 
     fetchRemote: function () {
       if (!window.fetch) return;
-      fetch(SCORES_API.url + "/rest/v1/scores?select=name,time,date&order=time.asc&limit=20", {
+      fetch(SCORES_API.url + "/rest/v1/scores?select=name,time,date,konami&order=time.asc&limit=20", {
         headers: { apikey: SCORES_API.key, Authorization: "Bearer " + SCORES_API.key }
       }).then(function (r) { return r.json(); }).then(function (rows) {
         if (!Array.isArray(rows)) return;
-        Scores.list = rows.map(function (r) { return { name: String(r.name || "???").slice(0, 16), time: Number(r.time) || 0, date: String(r.date || "") }; });
+        Scores.list = rows.map(function (r) { return { name: String(r.name || "???").slice(0, 16), time: Number(r.time) || 0, date: String(r.date || ""), konami: !!r.konami }; });
         Scores.sort();
         Scores.saveLocal();
         if (Scores.onChange) Scores.onChange();
@@ -1212,7 +1222,7 @@
     { id: "diamond", name: "Encadr&eacute;", desc: "Le curseur devient carr&eacute;", price: 0, kind: "cursor", pc: true },
     { id: "tri", name: "Sniper", desc: "Le curseur devient rond", price: 1, kind: "cursor", pc: true },
     { id: "tag", name: "Taggeur", desc: "Vandaliser la photo de profil", price: 0, kind: "tool" },
-    { id: "key", name: "Cl&eacute; de cuivre", desc: "Autant symbole de possibilit&eacute; que de myst&egrave;re", price: 5, kind: "item", pc: true },
+    { id: "key", name: "Cl&eacute; de cuivre", desc: "Promesse d&rsquo;aventure, symbole de myst&egrave;re, assurance de succ&egrave;s", price: 5, kind: "item", pc: true },
     { id: "shipbase", name: "C&rsquo;est dans les vieux vaisseaux qu&rsquo;on fait les meilleurs runs", desc: "Un vieux vaisseau qui sent aussi fort qu&rsquo;il est fiable", price: 0, kind: "ship", gated: true, pc: true },
     { id: "ship", name: "Pimp my ride", desc: "Un nouveau vaisseau flambant neuf.", price: 1, kind: "ship", gated: true, pc: true },
     { id: "heart", name: "Free hug", desc: "+1 c&oelig;ur", price: 3, kind: "perk", gated: true, pc: true },
@@ -1222,12 +1232,14 @@
 
   var KEY_NAMES = { vanilla: "Cl&eacute; de cuivre", eco: "Cl&eacute; de jade", psy: "Cl&eacute; de cristal" };
 
+  var KONAMI_LOGO = '<svg class="scores__konami" viewBox="0 9.7 24 4.4" aria-label="Code Konami"><path d="m14.167 12.562.59-1.298a1.53 1.53 0 0 0 .062-.158h.012c.013.04.037.095.061.158l.575 1.298zm1.887 1.325h1.036l-1.635-3.537a.396.396 0 0 0-.359-.233h-.717c-.041 0-.041.04-.012.055.085.044.146.19.081.325l-1.582 3.39h.702l.39-.87h1.713zm-4.089-3.77v2.152c0 .107.004.174.008.269h-.008a6.068 6.068 0 0 0-.273-.348l-1.618-1.871c-.127-.147-.229-.202-.461-.202H8.79c-.037 0-.041.04-.013.055.123.056.22.123.22.345v3.37h.616v-2.425c0-.13-.004-.23-.008-.34h.008c.114.154.27.356.396.502l1.944 2.263h.322a.305.305 0 0 0 .306-.305v-3.465zm11.733 0h-.856c-.04 0-.045.04-.016.055.126.056.224.123.224.345v3.37H24v-3.465a.3.304 0 0 0-.302-.305m-1.386 3.77-.562-3.442a.401.401 0 0 0-.384-.328h-.53l-.921 2.144a1.866 1.866 0 0 0-.09.23h-.008a1.935 1.935 0 0 0-.081-.218l-.816-1.91a.401.401 0 0 0-.367-.246h-.807c-.04 0-.045.04-.016.055.11.048.192.131.155.34l-.55 3.375h.582l.367-2.382c.017-.118.041-.268.045-.344h.004c.037.1.086.218.139.34l1.015 2.386h.302l1.027-2.429c.057-.142.098-.245.126-.324h.004c.013.095.029.237.053.38l.38 2.373zm-16.205-.25c-.758 0-1.19-.739-1.19-1.59 0-.973.432-1.685 1.19-1.685s1.19.744 1.19 1.59c0 1.001-.432 1.686-1.19 1.686m0-3.66c-1.272 0-2.21.887-2.21 2.022 0 1.14.865 2.022 2.21 2.022 1.272 0 2.206-.883 2.206-2.022 0-1.135-.86-2.021-2.206-2.021M4.33 13.85c-.327-.07-.58-.225-.856-.506-.302-.309-1.387-1.586-1.387-1.586l1.729-1.642h-.934L1.305 11.66c-.07.067-.11.11-.147.154H1.15c.004-.051.004-.107.004-.158v-1.234a.3.304 0 0 0-.302-.305h-.82c-.036 0-.044.04-.012.055.123.056.22.123.22.345v3.37h.914V12.15c0-.047 0-.079-.004-.13h.008c.032.051.09.11.147.182 0 0 .962 1.131 1.064 1.238.407.427.978.578 1.957.483.053-.004.053-.06.004-.072"/></svg>';
+
   var COIN = '<i class="coin"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7.5 18 12 6l4.5 12"/><path d="M6.8 12.6h10.4"/><path d="M6 15.6h12"/></svg></i>';
 
   function initAchievements() {
     var root = document.documentElement;
     var KEY = "as-ach";
-    var DEFAULTS = { unlocked: [], visited: [], claimed: [], owned: ["vanilla", "diamond"], theme: "vanilla", cursor: "", ship: "shipbase", shipChosen: false, spent: 0, crown: false, coins: 0, played: false, door: false, shopSeen: false, shopSeenNew: false, noticed: [], tagOn: true };
+    var DEFAULTS = { unlocked: [], visited: [], claimed: [], owned: ["vanilla", "diamond"], theme: "vanilla", cursor: "", ship: "shipbase", shipChosen: false, spent: 0, crown: false, coins: 0, played: false, door: false, shopSeen: false, shopSeenNew: false, noticed: [], tagOn: true, konami: false };
     var state = JSON.parse(JSON.stringify(DEFAULTS));
     function hydrate() {
       var saved = JSON.parse(localStorage.getItem(KEY) || "null");
@@ -1251,13 +1263,14 @@
     // Invitations vers la boutique, passées dans la même file que les succès : quand elle s'ouvre (premier succès)
     // et quand le mini-jeu a révélé le reste des produits. Une seule fois chacune, tant que la boutique n'a pas été vue.
     var NOTICES = [
-      { id: "shop", notice: true, name: "Boutique d&eacute;bloqu&eacute;e", due: function () { return state.unlocked.length && !state.shopSeen; } },
-      { id: "shopnew", notice: true, name: "Nouveaut&eacute;s en boutique", due: function () { return state.played && !state.shopSeenNew; } }
+      { id: "shop", notice: true, shop: true, name: "Boutique d&eacute;bloqu&eacute;e", due: function () { return state.unlocked.length && !state.shopSeen; } },
+      { id: "shopnew", notice: true, shop: true, name: "Nouveaut&eacute;s en boutique", due: function () { return state.played && !state.shopSeenNew; } },
+      { id: "konami", notice: true, name: "Code Konami&nbsp;: tout est d&eacute;bloqu&eacute;", due: function () { return !!state.konami; } }
     ];
     NOTICES.forEach(function (n) { byId[n.id] = n; });
     // Nom d'un succès : certains ont une variante tactile (`touchName`, clé `ach.name.<id>.touch`).
     function achName(a) { return coarse && a.touchName ? I18N.t("ach.name." + a.id + ".touch", a.touchName) : I18N.t("ach.name." + a.id, a.name); }
-    function shopNews() { return NOTICES.some(function (n) { return n.due(); }); }
+    function shopNews() { return NOTICES.some(function (n) { return n.shop && n.due(); }); }
     var productById = {};
     PRODUCTS.forEach(function (p) { productById[p.id] = p; });
 
@@ -1294,6 +1307,7 @@
         '<button type="button" data-tab="shop"><svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS.coins + '</svg><span data-shop-title></span></button>' +
         '<button type="button" data-tab="scores" hidden><svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS.podium + '</svg><span data-scores-title></span></button>' +
       '</nav>' +
+      '<span class="ach-key" hidden><svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS.key + '</svg></span>' +
       '<span class="ach-coins">' + COIN + '<b data-coins>0</b></span>' +
       '<button type="button" class="ach-panel__close" data-cursor="close"><svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS.close + '</svg></button>' +
       '</header><ol class="ach-list"></ol><div class="shop" hidden></div><div class="scores" hidden></div>';
@@ -1304,6 +1318,7 @@
     var scoresTab = panel.querySelector('[data-tab="scores"]');
     var closeBtn = panel.querySelector(".ach-panel__close");
     var coinsEl = panel.querySelector(".ach-coins");
+    var keyEl = panel.querySelector(".ach-key");
     var tab = "ach";
 
     function applyLook() {
@@ -1323,6 +1338,42 @@
     Achievements.openDoor = function () { state.door = true; save(); };
     Achievements.played = function () { if (state.played) return; state.played = true; if (!owned("shipbase")) state.owned.push("shipbase"); save(); render(); };
     Achievements.addCoin = function () { state.coins = (state.coins || 0) + 1; save(); render(); };
+    Achievements.isKonami = function () { return !!state.konami; };
+    // Code Konami : tout débloquer d'un coup, sans toucher à ce qui est équipé. Une seule fois.
+    Achievements.konami = function () {
+      if (state.konami) return;
+      state.konami = true;
+      ACHIEVEMENTS.forEach(function (a) { if (state.unlocked.indexOf(a.id) < 0) state.unlocked.push(a.id); });
+      Object.keys(PAGE_ACHIEVEMENT).forEach(function (k) { var v = PAGE_ACHIEVEMENT[k]; if (v !== "profil" && state.visited.indexOf(v) < 0) state.visited.push(v); });
+      // Taggeur s'équipe dès qu'il est possédé (`tagOn`), et Pimp my ride s'équipe seul tant qu'aucun vaisseau n'a été choisi (`shipChosen`, voir `hydrate()`) : on fige les deux avant d'ajouter le catalogue.
+      if (!owned("tag")) state.tagOn = false;
+      if (!state.shipChosen) { state.ship = state.ship || "shipbase"; state.shipChosen = true; }
+      PRODUCTS.forEach(function (p) { if (state.owned.indexOf(p.id) < 0) state.owned.push(p.id); });
+      state.coins = (state.coins || 0) + 99;
+      state.played = true;
+      state.crown = true;
+      var wasOpen = !!state.door;
+      state.door = true;
+      save();
+      btn.hidden = false;
+      render();
+      bump();
+      Level.max();
+      blink();
+      if (!wasOpen && Achievements.onDoor) Achievements.onDoor();
+      notices(400);
+    };
+
+    // La pastille compte les pièces à réclamer, plus une pour la boutique tant qu'elle a du nouveau à montrer ; visiter l'onglet suffit à l'éteindre.
+    function renderBadge() {
+      var waiting = visible.filter(function (a) { return has(a.id) && !claimed(a.id); }).length + (shopNews() ? 1 : 0);
+      var badge = btn.querySelector(".ach__badge");
+      badge.textContent = waiting;
+      badge.hidden = !waiting;
+      btn.classList.toggle("has-badge", !!waiting);
+      btn.classList.toggle("has-news", shopNews());
+      panel.querySelector('[data-tab="shop"]').classList.toggle("is-new", shopNews());
+    }
 
     function render() {
       btn.setAttribute("aria-label", I18N.t("ach.title", "Succès"));
@@ -1332,13 +1383,8 @@
       scoresTab.hidden = !state.played;
       closeBtn.setAttribute("aria-label", I18N.t("ui.close", "Fermer"));
       panel.querySelector("[data-coins]").textContent = coins();
-      var waiting = visible.filter(function (a) { return has(a.id) && !claimed(a.id); }).length;
-      var badge = btn.querySelector(".ach__badge");
-      badge.textContent = waiting;
-      badge.hidden = !waiting;
-      btn.classList.toggle("has-badge", !!waiting);
-      btn.classList.toggle("has-news", shopNews());
-      panel.querySelector('[data-tab="shop"]').classList.toggle("is-new", shopNews());
+      keyEl.hidden = !owned("key");
+      renderBadge();
       var rows = Math.ceil(visible.length / 2);
       list.style.setProperty("--rows", rows);
       list.innerHTML = visible.map(function (a, i) {
@@ -1376,7 +1422,7 @@
       html += "<ol>";
       for (var i = 0; i < 20; i++) {
         var e = Scores.list[i];
-        html += '<li class="' + (e ? "" : "is-empty") + '"><b>' + (i + 1) + '</b><span>' + (e ? esc(e.name) : "—") + '</span><i>' + (e ? Scores.label(e.time) : "") + '</i><small>' + (e ? esc(e.date) : "") + '</small></li>';
+        html += '<li class="' + (e ? "" : "is-empty") + '"><b>' + (i + 1) + '</b><span>' + (e ? esc(e.name) : "—") + '</span><i>' + (e && e.konami ? KONAMI_LOGO : "") + (e ? Scores.label(e.time) : "") + '</i></li>';
       }
       html += "</ol>";
       scores.innerHTML = html;
@@ -1393,7 +1439,8 @@
         var theme = KEY_NAMES[state.theme] ? state.theme : "vanilla";
         var name = gated ? "???" : p.id === "key" ? I18N.t("shop.name.key." + theme, KEY_NAMES[theme]) : I18N.t("shop.name." + p.id, p.name);
         var desc = gated ? "???" : I18N.t("shop.desc." + p.id, p.desc);
-        if (p.id === "key" && !gated) name += ' <svg class="shop-item__key" viewBox="0 0 24 24" aria-hidden="true">' + ICONS.key + '</svg>';
+        // L'icône de clé n'est dans le titre que tant qu'elle n'est pas achetée : à l'achat, c'est elle qui part rejoindre la barre.
+        if (p.id === "key" && !gated && !owned("key")) name += ' <svg class="shop-item__key is-bumping" viewBox="0 0 24 24" aria-hidden="true">' + ICONS.key + '</svg>';
         if (coarse && p.pc) {
           var banner = i && products[i - 1].pc ? "" : '<div class="shop__pc">' + I18N.t("shop.pc", "Déblocable sur la version PC du site") + '</div>';
           return banner + '<div class="shop-item is-locked is-pc"><span class="shop-item__text"><b>' + name + '</b><span>' + desc + '</span></span></div>';
@@ -1429,6 +1476,29 @@
       coinsEl.classList.add("is-bump");
     }
 
+    // La clé achetée vole de la boutique jusqu'à la barre, à gauche des pièces, puis y rebondit.
+    function flyKey(from) {
+      if (!from) return;
+      var to = keyEl.getBoundingClientRect();
+      var fly = document.createElement("span");
+      fly.className = "key-fly";
+      fly.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS.key + '</svg>';
+      fly.style.left = (from.left + from.width / 2) + "px";
+      fly.style.top = (from.top + from.height / 2) + "px";
+      keyEl.style.visibility = "hidden";
+      root.appendChild(fly);
+      fly.animate([
+        { transform: "translate(-50%,-50%) scale(1.3)", opacity: 1 },
+        { transform: "translate(calc(-50% + " + (to.left + to.width / 2 - from.left - from.width / 2).toFixed(0) + "px),calc(-50% + " + (to.top + to.height / 2 - from.top - from.height / 2).toFixed(0) + "px)) scale(.9)", opacity: 1 }
+      ], { duration: 620, easing: "cubic-bezier(.3,.7,.2,1)", fill: "forwards" }).onfinish = function () {
+        fly.remove();
+        keyEl.style.visibility = "";
+        keyEl.classList.remove("is-bump");
+        void keyEl.offsetWidth;
+        keyEl.classList.add("is-bump");
+      };
+    }
+
     function claim(li) {
       var id = li.dataset.id;
       if (!has(id) || claimed(id)) return;
@@ -1462,6 +1532,8 @@
       if (!b || b.disabled) return;
       var p = productById[b.dataset.id];
       var action = b.dataset.action;
+      var keyFrom = p && p.id === "key" && action === "buy" ? b.closest(".shop-item").querySelector(".shop-item__key") : null;
+      if (keyFrom) keyFrom = keyFrom.getBoundingClientRect();
       if (!p || !action) return;
       if (action === "buy") {
         if (coins() < p.price || owned(p.id)) return;
@@ -1474,7 +1546,7 @@
         save();
         render();
         bump();
-        if (p.id === "key") { blink(); Achievements.unlock("key"); }
+        if (p.id === "key") { blink(); flyKey(keyFrom); Achievements.unlock("key"); }
         if (p.kind === "theme" && p.id !== "vanilla") Achievements.unlock("color");
         return;
       }
@@ -1526,8 +1598,7 @@
         state.shopSeen = true;
         if (state.played) state.shopSeenNew = true;
         save();
-        btn.classList.remove("has-news");
-        panel.querySelector('[data-tab="shop"]').classList.remove("is-new");
+        renderBadge();
       }
       function swap() {
         tab = t;
@@ -1667,12 +1738,25 @@
       btn.classList.add("is-toast");
       toasts.push({ el: el, id: a.id, left: left || 4200, gone: false });
       fitToast();
+      if (!left) cheer();
     }
+
+    // La boîte met .55 s à s'élargir ; 0,5 s plus tard, le trophée fait son numéro.
+    var icon = btn.querySelector(".ach__icon"), cheerTimer = null;
+    function cheer() {
+      clearTimeout(cheerTimer);
+      cheerTimer = setTimeout(function () {
+        icon.classList.remove("is-cheer");
+        void icon.offsetWidth;
+        icon.classList.add("is-cheer");
+      }, 1050);
+    }
+    icon.addEventListener("animationend", function () { icon.classList.remove("is-cheer"); });
 
     function fitToast() {
       if (!toasts.length) { btn.style.width = ""; return; }
-      var maxW = Math.min(420, window.innerWidth - 32);
-      btn.style.width = Math.min(maxW, 70 + stack.scrollWidth + 22) + "px";
+      var maxW = Math.min(480, window.innerWidth - 32);
+      btn.style.width = Math.min(maxW, 106 + stack.scrollWidth + 22) + "px";
     }
 
     var lastTick = performance.now();
@@ -1725,8 +1809,11 @@
       restoreRows();
     });
 
+    // Rien ne bouge tant que la page arrive : les notifications attendent la fin du préchargeur ou de l'entrée de page.
+    var readyAt = Date.now() + (document.querySelector("[data-preloader]") ? 2200 : 1100);
     function toast(a) {
       if (open) { pending.push(a); return; }
+      if (Date.now() < readyAt) { setTimeout(function () { toast(a); }, readyAt - Date.now()); return; }
       if (btn.hidden) {
         btn.hidden = false;
         btn.classList.add("is-pop");
@@ -1979,10 +2066,11 @@
 
     function fresh() {
       var stars = [];
+      var konami = Achievements.isKonami(), heart = Achievements.owns("heart");
       for (var i = 0; i < 70; i++) stars.push({ x: Math.random() * W, y: Math.random() * H, z: rnd(.3, 1.2) });
       return {
         phase: 1, t: 0, over: false, intro: 4000, introT: 0, stars: stars, shake: 0, freeze: 0, msg: null, sub: null, fireworks: 0, glitchAt: 0,
-        ship: { x: W / 2, y: H - 90, hp: Achievements.owns("heart") ? 3 : 2, max: Achievements.owns("heart") ? 3 : 2, inv: 0, shield: 0, bullets: 1, rate: 0, fire: 0, flash: 0, sweep: Achievements.owns("sweep") ? 1 : 0 },
+        ship: { x: W / 2, y: H - 90, hp: konami ? 5 : heart ? 3 : 2, max: konami ? 5 : heart ? 3 : 2, inv: 0, shield: 0, bullets: konami ? 5 : 1, rate: konami ? 4 : 0, fire: 0, flash: 0, sweep: Achievements.owns("sweep") ? 1 : 0 },
         boss: { x: W / 2, y: 100, hp: BOSS_HP[0], max: BOSS_HP[0], flash: 0, wob: 0, aim: 0, fan: 0, spiral: 0, spiralA: 0, spawn: 0, wave: 0, heavy: 0, shift: 0, seeker: 6000 },
         enemies: [], pbullets: [], ebullets: [], drops: [], sparks: [], rings: [], lastField: 0
       };
@@ -2566,7 +2654,7 @@
       g.boss.y = -400;
       Achievements.crown();
       Achievements.unlock("secret");
-      var qualified = Scores.setPending(ActiveTime.seconds());
+      var qualified = Scores.setPending(ActiveTime.seconds(), Achievements.isKonami());
       setTimeout(function () { closeFight(); if (qualified) setTimeout(Achievements.openScores, 500); }, 6500);
     }
 
@@ -2655,6 +2743,7 @@
         door.classList.remove("is-denied");
         void door.offsetWidth;
         door.classList.add("is-denied");
+        blink();
         return;
       }
       if (!Achievements.doorOpen()) {
@@ -2688,6 +2777,7 @@
       door.classList.add("is-opened");
     }
     if (Achievements.doorOpen()) revealPoster(false);
+    Achievements.onDoor = function () { revealPoster(true); };
     document.addEventListener("keydown", function (e) {
       if (open && g && g.over) { if (e.key === "Escape" || e.key === " ") e.preventDefault(); return; }
       if (e.key === "Escape") closeFight();
@@ -2705,7 +2795,36 @@
     window.addEventListener("resize", function () { if (open && !morphing) { center(); size(); } });
   }
 
+  // Haut, Haut, Bas, Bas, Gauche, Droite, Gauche, Droite — n'importe où sur le site, hors champ de saisie.
+  // Sur une page projet, le titre entier est cliquable : il suit la flèche de retour qu'il contient.
+  function initBackTitle() {
+    document.querySelectorAll(".work-hero__title").forEach(function (title) {
+      var back = title.querySelector(".work-hero__back");
+      if (!back) return;
+      title.setAttribute("data-cursor", "home");
+      title.addEventListener("click", function (e) { if (e.target.closest("a")) return; back.click(); });
+    });
+  }
+
+  function initKonami() {
+    var SEQ = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight"];
+    var at = 0;
+    document.addEventListener("keydown", function (e) {
+      if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+      at = e.key === SEQ[at] ? at + 1 : e.key === SEQ[0] ? 1 : 0;
+      if (at < SEQ.length) return;
+      at = 0;
+      Achievements.konami();
+    });
+  }
+
   function initCardLinks() {
+    // Logo de boutique posé sur une carte-lien de l'accueil : il ouvre la page du jeu à part, sans suivre la carte.
+    document.querySelectorAll("[data-store]").forEach(function (el) {
+      function go(e) { e.preventDefault(); e.stopPropagation(); window.open(el.dataset.store, "_blank", "noopener"); }
+      el.addEventListener("click", go);
+      el.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") go(e); });
+    });
     if (coarse) return;
     document.querySelectorAll("[data-href]").forEach(function (card) {
       card.addEventListener("click", function (e) {
@@ -2815,6 +2934,7 @@
 
       try { localStorage.setItem(I18N.key, lang); } catch (e) {  }
       if (Achievements.render) Achievements.render();
+      Level.render();
       if (hasGSAP && window.ScrollTrigger) window.ScrollTrigger.refresh();
     },
 
@@ -2848,6 +2968,8 @@
     initToTop();
     initLightbox();
     initCardLinks();
+    initKonami();
+    initBackTitle();
     initVideos();
     initTilt();
     initCopy();

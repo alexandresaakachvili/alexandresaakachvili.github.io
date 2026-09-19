@@ -145,11 +145,15 @@ ffmpeg -i entree.gif -frames:v 1 -q:v 78 sortie-poster.webp
 
 `format=yuv420p` aplatit le canal alpha que les GIF déclarent et que ni l'un ni l'autre encodeur ne prend ; `trunc(iw/2)*2` force des dimensions paires, exigées par le 4:2:0.
 
+### Le titre d'une page projet et le retour aux projets
+
+Le `<h1>` de chaque page projet cache une **flèche de retour** (`.work-hero__back`, un `<a>` placé au début du premier `line-mask`, avant le texte — et avant le `<span data-i18n>` quand le titre est traduit, sinon la traduction l'écraserait). Au survol du titre, elle se déplie en largeur depuis la droite ; et tant qu'elle est là, **un clic n'importe où sur le titre** suit le même lien (`initBackTitle()`, qui pose aussi `data-cursor="home"` sur le titre). Elle se déplie (`width` 0 → .72em, `scaleX` ancré à droite) et pousse le titre d'un petit écart ; au doigt, elle est toujours visible. Elle mène à `../index.html#<slug>` : chaque carte de l'accueil porte l'`id` du fichier de sa page (`kokoro-renzu`, `abandon-west`…) et un `scroll-margin-top` pour passer sous la barre. Le **nom dans la barre** (`.brand`) des pages projet pointe sur la même ancre : on revient toujours à la hauteur du projet d'où l'on vient. `initReveals()` re-vérifie ce qui est à l'écran au `load` et au `hashchange`, pour que les cartes visées apparaissent même si le navigateur fait le saut après le chargement.
+
 ### La fiche technique d'une page projet
 
 En haut à droite de chaque page projet, en face de la phrase de présentation, une petite carte donne le rôle, le moteur, l'effectif et la durée : un pictogramme et une valeur par ligne, le moins de texte possible. Elle réagit au survol comme les cartes de l'accueil.
 
-Son **coin bas droit** porte ce qui prolonge le projet : la page Steam ou itch.io, les règles en PDF, ou le badge des Rookie Awards. Un logo, rien d'autre. Sur ordinateur, un clic **n'importe où sur la fiche** ouvre ce lien (`data-href` sur l'`<aside>`) ; sur tactile, seul le logo l'ouvre — la fiche ne s'incline pas, elle s'enfonce sous le doigt.
+Son **coin bas droit** porte ce qui prolonge le projet : la page Steam ou itch.io, les règles en PDF, ou le badge des Rookie Awards. Un logo, rien d'autre. Il est volontairement grand (34 px, badge 52 px) pour que le lien saute aux yeux. Sur ordinateur, un clic **n'importe où sur la fiche** ouvre ce lien (`data-href` sur l'`<aside>`) ; sur tactile, seul le logo l'ouvre — la fiche ne s'incline pas, elle s'enfonce sous le doigt.
 
 ```html
 <aside class="spec" data-tilt="soft" data-reveal data-reveal-delay=".1" aria-label="Fiche technique"
@@ -221,6 +225,15 @@ La flèche n'a ni filet ni fond : elle ne doit pas concurrencer les liens. Elle 
   </button>
 </div>
 ```
+
+### Les flèches
+
+Toutes les flèches du site sont **carrées et épaisses**, comme la police des titres : `stroke-linecap:square`, `stroke-linejoin:miter`, trait plus fort, et un fût qui s'arrête **dans** la tête (sinon son bout carré ressort devant la pointe). Deux mécanismes :
+
+- les flèches qui ont leur propre `<svg>` (retour du titre, haut de page, chevrons du carrousel) le règlent dans leur CSS ;
+- celles qui vivent dans une icône au trait rond (curseur `top` et `external`, boutons « lien externe », pictogramme téléchargements) portent `class="sq"` sur leurs `<path>` — règle globale `svg .sq` en haut de `main.css`, avec un trait renforcé par contexte.
+
+Pour dessiner une nouvelle flèche : tête `M4.5 12.5 12 5l7.5 7.5` (ou tournée), fût qui part de 3,5 unités après le sommet. Le `↑` du HUD du mini-jeu est un glyphe de police, pas concerné.
 
 ### Le curseur personnalisé
 
@@ -306,6 +319,8 @@ Les délais de révélation suivent une échelle courte : `.05` pour la phrase q
 3. Ajoute son visuel de couverture dans `assets/img/` en `.avif` et `.webp`
 4. Renseigne les pictogrammes de moteur, d'effectif et de durée dans le `<span class="card__meta">`
 
+Une carte peut porter un **logo de boutique** à droite (même place que le badge Rookie Awards de Kokoro Renzu, 44–60 px) : un `<span class="card__store" role="link" tabindex="0" data-store="https://store.steampowered.com/…" aria-label="… sur Steam" data-cursor="external">` avec le logo Steam ou itch.io en SVG, placé juste avant `card__name`. Comme la carte est déjà un lien, ce n'est pas un `<a>` : `initCardLinks()` intercepte le clic et ouvre la page dans un nouvel onglet sans suivre la carte. Modèles dans les cartes Abandon West (Steam) et In_Machina (itch.io) de `index.html`.
+
 L'apparition en cascade et les délais se calculent tout seuls : la grille porte `data-stagger` et le JS en déduit le nombre de colonnes.
 
 ### Remplacer le CV
@@ -365,7 +380,7 @@ Chaque carte de `profil.html` qui existe sur Steam porte `data-href` (la page du
 
 ### Le niveau du curseur (ordinateur seulement)
 
-Le curseur dessiné porte un **niveau**, affiché au coin de l'anneau (`LV 7`), mémorisé dans le navigateur (`localStorage`, clé `as-level`) et plafonné à **100 = MAX**.
+Le curseur dessiné porte un **niveau**, affiché au coin de l'anneau (`NV 7` en français, `LV 7` en anglais), mémorisé dans le navigateur (`localStorage`, clé `as-level`) et plafonné à **100 = MAX**.
 
 - **Clic** : +1, éclat de particules, le chiffre rebondit.
 - **Paliers 30 et 100** : triple onde, rafale, petite secousse, et le curseur change d'allure (classes `cursor-tier-1` / `cursor-tier-2` sur `<html>`). À 30 : le point **bat** comme un cœur en lâchant une onde fine à chaque battement, et laisse une **traînée** de losanges quand la souris va vite. À 100 : trait plein qui tourne vite autour du point + **halo doré** pulsé ; le point garde un battement doux et la traînée reste. Au survol d'un lien, l'anneau reprend le style du palier (battement, ou halo + trait tournant). Pendant la charge, le rythme et la rotation s'accélèrent avec `--charge`.
@@ -375,7 +390,7 @@ Tout vit dans `initLevel()` (`app.js`) et le bloc `.cursor-level` / `.fx` du CSS
 
 ### Les succès
 
-Cachés au départ. Au premier succès débloqué, un carré avec un trophée apparaît en bas à droite et y reste sur toutes les pages. Sur ordinateur la liste tient sans défiler (panneau jusqu'à 94 % de la hauteur d'écran). Tant qu'une pièce attend d'être réclamée, le carré porte une pastille avec le nombre (`ach__badge`, classe `has-badge` sur le bouton) : ses bords clignotent lentement (2,6 s, pseudo-élément `::after` sous l'icône qui prend au pic l'aspect du survol : bord ambre plein, fond `--ink-3`) et la pastille pulse vite et court (0,4 s, ×1,1). Deux **invitations vers la boutique** passent dans la même file de notifications, étiquetées « Nouveau » au lieu de « Succès débloqué » : « Boutique débloquée » au premier succès, « Nouveautés en boutique » une fois le mini-jeu lancé (au chargement de page ou à la fermeture de l'arène). Chacune ne sort qu'une fois (`noticed` dans `as-ach`) ; tant que l'onglet Boutique n'a pas été ouvert (`shopSeen`, puis `shopSeenNew` après le mini-jeu), l'onglet porte un point ambre qui pulse (`is-new`) et le bouton clignote comme pour une pièce à réclamer (`has-news`). Tableau `NOTICES` dans `app.js`, clés `notice.*` dans `i18n.js`. Chaque nouveau succès transforme ce carré en notification (trophée + « Succès débloqué » + nom, 4,2 s, décomptées seulement onglet visible et fenêtre au premier plan ; une notification en cours survit au changement de page via `sessionStorage`, clé `as-toast`) puis le referme. Un clic sur le carré l'envoie au centre et ouvre la liste : les succès débloqués sont cochés en ambre avec leur nom, les autres affichent `???` et leur condition grisée. Fermeture : croix, clic à côté, Échap.
+Cachés au départ. Au premier succès débloqué, un carré avec un trophée apparaît en bas à droite (108 px) et y reste sur toutes les pages. Sur ordinateur la liste tient sans défiler (panneau jusqu'à 94 % de la hauteur d'écran). Tant qu'une pièce attend d'être réclamée — ou que la boutique a du nouveau à montrer, ce qui compte pour un — le carré porte une pastille avec le nombre (`ach__badge`, classe `has-badge` sur le bouton) : ses bords clignotent **au rythme de la pastille** (0,4 s en aller-retour, de 0 au plein) : le cadre du bouton passe de `--line` à l'ambre (`ach-frame`) et un voile sous l'icône (`::after`, `ach-blink`) prend au pic l'aspect du survol — bord ambre, fond `--ink-3`, halo ; la pastille pulse en même temps (0,4 s, ×1,1). Deux **invitations vers la boutique** passent dans la même file de notifications, étiquetées « Nouveau » au lieu de « Succès débloqué » : « Boutique débloquée » au premier succès, « Nouveautés en boutique » une fois le mini-jeu lancé (au chargement de page ou à la fermeture de l'arène). Chacune ne sort qu'une fois (`noticed` dans `as-ach`) ; tant que l'onglet Boutique n'a pas été ouvert (`shopSeen`, puis `shopSeenNew` après le mini-jeu), l'onglet porte un point ambre qui pulse au même rythme que la pastille du bouton (`is-new`, 0,4 s en aller-retour) et le bouton clignote comme pour une pièce à réclamer (`has-news`). Tableau `NOTICES` dans `app.js`, clés `notice.*` dans `i18n.js`. Au chargement, les notifications attendent que la page soit posée (2,2 s avec le préchargeur, 1,1 s sinon — `readyAt` dans `toast()`) pour être la seule chose qui bouge. Chaque nouveau succès transforme ce carré en notification (trophée + « Succès débloqué » + nom, 4,2 s ; une fois la boîte déployée et 0,5 s plus tard, le trophée **vibre comme un téléphone** (5 alternances ±14° qui s'amortissent, 0,4 s) pour attirer l'œil — `cheer()` dans `app.js`, classe `is-cheer`, pas pour une notification reprise d'une autre page, décomptées seulement onglet visible et fenêtre au premier plan ; une notification en cours survit au changement de page via `sessionStorage`, clé `as-toast`) puis le referme. Un clic sur le carré l'envoie au centre et ouvre la liste : les succès débloqués sont cochés en ambre avec leur nom, les autres affichent `???` et leur condition grisée. Fermeture : croix, clic à côté, Échap.
 
 Mémorisé dans le navigateur (`localStorage`, clé `as-ach` : succès débloqués + pages projet visitées).
 
@@ -399,7 +414,7 @@ Les succès marqués `pc: true` (niveau, décharge) n'apparaissent pas sur tacti
 
 ### Les pièces et la boutique
 
-Chaque succès débloqué rapporte **une pièce**, mais il faut la **réclamer** : dans la liste, un succès non réclamé montre une pièce qui pulse ; un clic sur la ligne la fait voler jusqu'au compteur en haut à droite du panneau. Le panneau a trois onglets, **Succès**, **Boutique** et **Scores** (le troisième apparaît après le premier lancement du mini-jeu). La pièce est un `.coin` (contour et « A » à deux barres façon ¥ en ambre, rotation continue).
+Chaque succès débloqué rapporte **une pièce**, mais il faut la **réclamer** : dans la liste, un succès non réclamé montre une pièce qui pulse et sa ligne clignote légèrement en ambre au rythme de la pastille (`ach-claim`, fixée au survol) ; un clic sur la ligne la fait voler jusqu'au compteur en haut à droite du panneau. Le panneau a trois onglets, **Succès**, **Boutique** et **Scores** (le troisième apparaît après le premier lancement du mini-jeu). La pièce est un `.coin` (contour et « A » à deux barres façon ¥ en ambre, rotation continue).
 
 Les produits sont le tableau `PRODUCTS` (`app.js`), avec leur prix et leur genre :
 
@@ -411,7 +426,7 @@ Les produits sont le tableau `PRODUCTS` (`app.js`), avec leur prix et leur genre
 | Encadré | possédé et équipé d'office | le curseur d'origine (`diamond` dans le code) — c'est lui qu'on rééquipe pour quitter Sniper |
 | Sniper | 1 | curseur rond : point, carré, ornements et particules en cercles (`html[data-cursor-shape="round"]`) |
 | Taggeur | 0 | la photo du profil est remplacée par sa version taguée (`portrait-tag.jpg` / `portrait-tag-sm.jpg` : moustache et cache-œil). Se retire et se remet à volonté (bouton « Retirer » / « Équiper », `tagOn` dans `as-ach`) |
-| Clé de cuivre / de jade / de cristal | 5 | une clé — le nom suit le thème équipé (`KEY_NAMES` : Vanilla → cuivre, Écolo → jade, Type psy → cristal ; « Copper / Jade / Crystal key » en anglais), le titre se termine par une icône de clé à la taille du texte (`ICONS.key`, `.shop-item__key`), la description dit « Autant symbole de possibilité que de mystère ». L'achat fait glitcher l'écran un instant et débloque le succès « Et maintenant ? » |
+| Clé de cuivre / de jade / de cristal | 5 | une clé — le nom suit le thème équipé (`KEY_NAMES` : Vanilla → cuivre, Écolo → jade, Type psy → cristal ; « Copper / Jade / Crystal key » en anglais), le titre se termine par une icône de clé à la taille du texte (`ICONS.key`, `.shop-item__key`) qui **bat** tant que la clé n'est pas achetée (`is-bumping`) ; à l'achat, cette même icône quitte le titre et vole jusqu'à la barre du panneau, à gauche des pièces (`.ach-key`), où elle reste, la description dit « Promesse d'aventure, symbole de mystère, assurance de succès ». L'achat fait glitcher l'écran un instant et débloque le succès « Et maintenant ? » |
 | C'est dans les vieux vaisseaux qu'on fait les meilleurs runs | offert au premier lancement | le sprite de départ, équipé d'office — ajouté aux possessions par `Achievements.played()` et **masqué** (`???`) tant que le mini-jeu n'a pas été lancé une fois, comme les quatre produits ci-dessous |
 | Pimp my ride | 1 | autre sprite, flamme de réacteur, tirs ambre avec traînée — verrouillé idem |
 | Free hug | 3 | le vaisseau part avec 3 cœurs — **verrouillé** tant que le mini-jeu n'a pas été lancé une fois (`played` dans `as-ach`, posé à l'ouverture de l'arène). Le libellé du verrou dit volontairement « Finir la phase 1 pour débloquer » : c'est un leurre, pour ne pas révéler qu'un mini-jeu existe |
@@ -432,7 +447,7 @@ Ce compteur totalise le temps passé sur le site **onglet visible et fenêtre au
 
 ### Le shoot 'em up
 
-Le clic qui **déverrouille** la carte cadenas (le premier, avec la clé) fait **glitcher l'écran un instant** (`blink()`, 180 ms, `glitch()` en court — coupé en mouvement réduit) — pas les clics refusés ni ceux qui lancent le jeu ; le lien « secrets » du profil fait de même avant de lancer la transition de page. Cliquer la carte **avec la clé** (achat « Clé de cuivre / jade / cristal ») : au premier clic le cadenas **explose** en éclats et laisse place à l'affiche rétro (`assets/img/galagax.jpg`, utilisée comme masque de luminance sur un fond couleur du site : les lignes prennent la couleur du thème), le titre devient « GALAGAX » (toujours glitché) et ce nouvel état est mémorisé (`door` dans `as-ach`). Ce premier clic n'ouvre pas le jeu ; les clics suivants font de la carte une arène de 1240 × 820 (ou 96 % × 92 % de l'écran) sur fond d'espace étoilé (`initFight()`, `app.js`). Sans clé, la carte tremble. Le curseur dessiné est masqué dans l'arène : **le vaisseau suit la souris**.
+Tant que la carte cadenas est fermée, **chaque clic dessus fait glitcher l'écran un instant** (`blink()`, 180 ms, `glitch()` en court — coupé en mouvement réduit) : les clics refusés sans clé comme celui qui la déverrouille — mais pas ceux qui lancent le jeu une fois la carte ouverte ; le lien « secrets » du profil fait de même avant de lancer la transition de page. Cliquer la carte **avec la clé** (achat « Clé de cuivre / jade / cristal ») : au premier clic le cadenas **explose** en éclats et laisse place à l'affiche rétro (`assets/img/galagax.jpg`, utilisée comme masque de luminance sur un fond couleur du site : les lignes prennent la couleur du thème), le titre devient « GALAGAX » (toujours glitché) et ce nouvel état est mémorisé (`door` dans `as-ach`). Ce premier clic n'ouvre pas le jeu ; les clics suivants font de la carte une arène de 1240 × 820 (ou 96 % × 92 % de l'écran) sur fond d'espace étoilé (`initFight()`, `app.js`). Sans clé, la carte tremble en plus du glitch. Le curseur dessiné est masqué dans l'arène : **le vaisseau suit la souris**.
 
 **Tirer** — tir automatique vers le haut (2,5 coups/s, 1 dégât) ; clic = champ de force autour du vaisseau (rayon 72 px, 2 dégâts aux ennemis proches et au boss s'il est dedans, 0,22 s de recharge — ne touche pas aux projectiles) ; maintien = charge (plus de tir pendant) puis explosion dans un rayon de 300 px autour du vaisseau : tue net tous les ennemis (sbires, tourelles, générateurs…) dans la zone et inflige 5 dégâts au boss s'il est dedans — ni l'un ni l'autre ne détruit les projectiles : on les esquive.
 
@@ -448,9 +463,23 @@ Le clic qui **déverrouille** la carte cadenas (le premier, avec la clé) fait *
 
 Les constantes sont groupées au début de `initFight()` (`BOSS_HP`, `TYPES`) et dans `step()`. Pas de croix : Échap abandonne sans conséquence tant que la partie est en cours ; une fois gagnée ou perdue, ni Échap ni rien d'autre ne ferme l'arène (la victoire la referme seule après 6,5 s, la défaite laisse le faux 404). **W** déclenche la victoire — uniquement quand le site est servi depuis `localhost` (`serve.ps1`), pour tester la fin de partie ; en ligne la touche ne fait rien.
 
+### Le code Konami
+
+**Haut, Haut, Bas, Bas, Gauche, Droite, Gauche, Droite** aux flèches, n'importe où sur le site (hors champ de saisie) — `initKonami()` dans `app.js`, qui appelle `Achievements.konami()`. Une seule fois par navigateur (`konami` dans `as-ach`). Effet immédiat, avec un glitch d'écran et une notification « Code Konami : tout est débloqué » :
+
+- tous les succès débloqués (à réclamer) et tous les projets marqués visités ;
+- **+ 99 pièces** ;
+- tout le catalogue possédé, **sans rien équiper** : thème, curseur et vaisseau restent ceux d'avant (`shipChosen` est posé pour que Pimp my ride ne s'équipe pas seul), et Taggeur reste retiré (`tagOn: false`) s'il n'était pas déjà possédé ;
+- le mini-jeu compté comme lancé (`played`) : produits masqués révélés, onglet Scores visible ;
+- le bouton des succès affiché ;
+- curseur au **niveau MAX** avec la couronne (`Level.max()`) ;
+- la carte cadenas **ouverte** : sur l'accueil, le cadenas explose sur-le-champ (`Achievements.onDoor`, posé par `initFight()`), ailleurs elle est ouverte à la prochaine visite.
+
+Dans l'arène, le vaisseau part alors avec **5 cœurs, 5 balles et la cadence maximale** (`fresh()` dans `initFight()`). Une victoire obtenue ainsi est enregistrée avec `konami: true` et affiche le logo KONAMI dans le tableau.
+
 ### Le tableau des scores
 
-Troisième onglet du panneau, **Scores**, visible dès que le mini-jeu a été lancé une fois (comme les produits verrouillés). Il liste les **20 meilleurs temps** pour percer le secret — le temps est le compteur caché au moment de la victoire. Quand tu gagnes avec un temps qui entre dans le top 20, le panneau s'ouvre sur cet onglet avec une ligne « ton temps + ton nom + Enregistrer » ; le nom est mémorisé pour la prochaine fois (`as-name`). Le bouton **« Tout remettre à zéro et relancer le chrono »** efface niveau, succès, achats, compteur et score en attente (mais pas le tableau ni la langue) puis recharge la page : départ propre pour un speedrun.
+Troisième onglet du panneau, **Scores**, visible dès que le mini-jeu a été lancé une fois (comme les produits verrouillés). Il liste les **20 meilleurs temps** pour percer le secret — le temps est le compteur caché au moment de la victoire. Chaque ligne montre le rang, le nom et le temps ; la date est enregistrée mais pas affichée. Un temps obtenu avec le code Konami porte le logo **KONAMI** à gauche du temps (`konami` dans la table, `KONAMI_LOGO` dans `app.js`). Quand tu gagnes avec un temps qui entre dans le top 20, le panneau s'ouvre sur cet onglet avec une ligne « ton temps + ton nom + Enregistrer » ; le nom est mémorisé pour la prochaine fois (`as-name`). Le bouton **« Tout remettre à zéro et relancer le chrono »** efface niveau, succès, achats, compteur et score en attente (mais pas le tableau ni la langue) puis recharge la page : départ propre pour un speedrun.
 
 #### Local ou mondial
 
@@ -458,7 +487,7 @@ Le tableau est **mondial** : il vit dans un projet **Supabase** (gratuit) config
 
 1. Créer un projet sur supabase.com, puis dans *SQL editor* :
    ```sql
-   create table scores (id bigserial primary key, name text not null, time integer not null, date text not null, created_at timestamptz default now());
+   create table scores (id bigserial primary key, name text not null, time integer not null, date text not null, konami boolean not null default false, created_at timestamptz default now());
    alter table scores enable row level security;
    create policy "read" on scores for select using (true);
    create policy "insert" on scores for insert with check (char_length(name) <= 16 and time > 0);
