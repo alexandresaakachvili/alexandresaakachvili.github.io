@@ -11,7 +11,7 @@ Site vitrine statique. **Aucune installation, aucun build** : tu édites un fich
 
 ### L'adresse du site
 
-**https://alexandresaakachvili.github.io/** — le compte GitHub s'appelle `alexandresaakachvili` et le dépôt porte exactement ce nom suivi de `.github.io`, GitHub le sert donc à la racine du domaine. Tous les chemins du site sont relatifs, rien n'est à changer si l'adresse bouge un jour — sauf ceux de `404.html`, qui commencent par `/` : GitHub Pages sert cette page à n'importe quelle adresse manquante, y compris sous `/work/`, et des chemins relatifs y chercheraient `/work/assets/…`.
+**https://alexandresaakachvili.github.io/** — le compte GitHub s'appelle `alexandresaakachvili` et le dépôt porte exactement ce nom suivi de `.github.io`, GitHub le sert donc à la racine du domaine. Les adresses sont **propres, sans `.html`** : `/profil/`, `/contact/`, `/work/kokoro-renzu/`… Chaque page est un dossier avec un `index.html` dedans, c'est ainsi que GitHub Pages sert `/profil/` (et redirige `/profil` vers `/profil/`). **Tous les chemins du site commencent par `/`** (`/assets/…`, `/profil/`, `/#kokoro-renzu`) : ils marchent depuis n'importe quelle profondeur de dossier, et depuis `404.html`, que GitHub Pages sert à n'importe quelle adresse manquante. Conséquence : le site doit être servi à la racine d'un domaine — c'est le cas ici, et `serve.ps1` fait pareil en local. Les anciennes adresses en `.html` (`profil.html`, `work/kokoro-renzu.html`…) sont conservées comme **coquilles de redirection** (`noindex` + `canonical` + renvoi immédiat) le temps que Google oublie ; elles pourront être supprimées plus tard.
 
 ---
 
@@ -19,21 +19,23 @@ Site vitrine statique. **Aucune installation, aucun build** : tu édites un fich
 
 ```
 index.html            Accueil — les 4 catégories de projets, la carte cadenas
-profil.html           Profil + jeux préférés
-contact.html          Contact
+profil/index.html     Profil + jeux préférés            → /profil/
+contact/index.html    Contact                          → /contact/
 404.html              Page d'erreur
+profil.html, contact.html, work/*.html   Coquilles de redirection vers les nouvelles adresses
+sitemap.xml           Plan du site pour Google (une ligne par page)
 robots.txt            Tout est indexable
 .nojekyll             GitHub Pages sert les fichiers tels quels
 serve.ps1             Serveur local (voir « Aperçu en local »)
 resize.ps1            Redimensionne une photo (voir « La photo de profil »)
-work/
-  pyramid-shadow.html
-  kokoro-renzu.html
-  abandon-west.html
-  in-machina.html
-  mobile-games.html
-  tri-nytia.html
-  pantheon.html
+work/                 Une page projet par dossier      → /work/<slug>/
+  pyramid-shadow/index.html
+  kokoro-renzu/index.html
+  abandon-west/index.html
+  in-machina/index.html
+  mobile-games/index.html
+  tri-nytia/index.html
+  pantheon/index.html
 assets/
   css/main.css        Tout le style (variables CSS en haut du fichier)
   js/app.js           Scroll fluide, révélations, curseur, transitions, succès, boutique, shoot 'em up, scores
@@ -93,12 +95,12 @@ Pour ajouter une vidéo :
 1. Récupère son identifiant — les 11 caractères après `youtu.be/` ou `?v=`
 2. Télécharge sa miniature dans `assets/img/video/<identifiant>.jpg` :
    `https://i.ytimg.com/vi/<identifiant>/maxresdefault.jpg`
-3. Colle ce bloc à l'endroit voulu (depuis une page de `work/`) :
+3. Colle ce bloc à l'endroit voulu :
 
 ```html
 <figure class="video-figure" data-reveal>
   <div class="video" data-video="IDENTIFIANT" data-title="Titre du jeu" data-cursor="play">
-    <img class="video__poster" src="../assets/img/video/IDENTIFIANT.jpg" alt="" loading="lazy" decoding="async">
+    <img class="video__poster" src="/assets/img/video/IDENTIFIANT.jpg" alt="" loading="lazy" decoding="async">
   </div>
 </figure>
 ```
@@ -125,9 +127,9 @@ Trois séquences tournent en boucle sans son, comme le faisaient des GIF : le ga
 
 ```html
 <video class="loop" autoplay muted loop playsinline preload="metadata"
-       poster="../assets/img/NOM-poster.webp" aria-label="Titre du jeu">
-  <source src="../assets/img/NOM.webm" type="video/webm">
-  <source src="../assets/img/NOM.mp4" type="video/mp4">
+       poster="/assets/img/NOM-poster.webp" aria-label="Titre du jeu">
+  <source src="/assets/img/NOM.webm" type="video/webm">
+  <source src="/assets/img/NOM.mp4" type="video/mp4">
 </video>
 ```
 
@@ -147,7 +149,7 @@ ffmpeg -i entree.gif -frames:v 1 -q:v 78 sortie-poster.webp
 
 ### Le titre d'une page projet et le retour aux projets
 
-Le `<h1>` de chaque page projet cache une **flèche de retour** (`.work-hero__back`, un `<a>` placé au début du premier `line-mask`, avant le texte — et avant le `<span data-i18n>` quand le titre est traduit, sinon la traduction l'écraserait). Au survol du titre, elle se déplie en largeur depuis la droite ; et tant qu'elle est là, **un clic n'importe où sur le titre** suit le même lien (`initBackTitle()`, qui pose aussi `data-cursor="home"` sur le titre). Elle se déplie (`width` 0 → .72em, `scaleX` ancré à droite) et pousse le titre d'un petit écart ; au doigt, elle est toujours visible. Elle mène à `../index.html#<slug>` : chaque carte de l'accueil porte l'`id` du fichier de sa page (`kokoro-renzu`, `abandon-west`…) et un `scroll-margin-top` pour passer sous la barre. Le **nom dans la barre** (`.brand`) des pages projet pointe sur la même ancre : on revient toujours à la hauteur du projet d'où l'on vient. `initReveals()` re-vérifie ce qui est à l'écran au `load` et au `hashchange`, pour que les cartes visées apparaissent même si le navigateur fait le saut après le chargement.
+Le `<h1>` de chaque page projet cache une **flèche de retour** (`.work-hero__back`, un `<a>` placé au début du premier `line-mask`, avant le texte — et avant le `<span data-i18n>` quand le titre est traduit, sinon la traduction l'écraserait). Au survol du titre, elle se déplie en largeur depuis la droite ; et tant qu'elle est là, **un clic n'importe où sur le titre** suit le même lien (`initBackTitle()`, qui pose aussi `data-cursor="home"` sur le titre). Elle se déplie (`width` 0 → .72em, `scaleX` ancré à droite) et pousse le titre d'un petit écart ; au doigt, elle est toujours visible. Elle mène à `/#<slug>` : chaque carte de l'accueil porte l'`id` du dossier de sa page (`kokoro-renzu`, `abandon-west`…) et un `scroll-margin-top` pour passer sous la barre. Le **nom dans la barre** (`.brand`) des pages projet pointe sur la même ancre : on revient toujours à la hauteur du projet d'où l'on vient. `initReveals()` re-vérifie ce qui est à l'écran au `load` et au `hashchange`, pour que les cartes visées apparaissent même si le navigateur fait le saut après le chargement.
 
 ### La fiche technique d'une page projet
 
@@ -170,10 +172,10 @@ Son **coin bas droit** porte ce qui prolonge le projet : la page Steam ou itch.i
 Le coin bas droit est un `spec__corner`, placé en dernier dans `spec__inner`. Lien (Steam, itch.io, PDF) ou simple badge :
 
 ```html
-<a class="spec__corner" href="../assets/files/regles-xxx.pdf" target="_blank" rel="noopener" aria-label="Règles (PDF)" data-cursor="external">
+<a class="spec__corner" href="/assets/files/regles-xxx.pdf" target="_blank" rel="noopener" aria-label="Règles (PDF)" data-cursor="external">
   <svg …>icône document</svg>          <!-- ou <svg class="spec__corner-logo">logo Steam / itch.io</svg> -->
 </a>
-<span class="spec__corner spec__corner--badge"><img src="../assets/img/badge-rookie-awards.webp" alt="…"></span>
+<span class="spec__corner spec__corner--badge"><img src="/assets/img/badge-rookie-awards.webp" alt="…"></span>
 ```
 
 Les logos Steam et itch.io viennent de Simple Icons ; ils se recopient depuis `work/abandon-west.html` et `work/in-machina.html`.
@@ -314,10 +316,11 @@ Les délais de révélation suivent une échelle courte : `.05` pour la phrase q
 
 ### Ajouter un projet
 
-1. Duplique la page la plus proche dans `work/` et renomme-la
-2. Ajoute une carte dans `index.html`, dans la bonne catégorie (`<section class="cat">`), en copiant un bloc `<a class="card">` existant
-3. Ajoute son visuel de couverture dans `assets/img/` en `.avif` et `.webp`
-4. Renseigne les pictogrammes de moteur, d'effectif et de durée dans le `<span class="card__meta">`
+1. Crée un dossier `work/<slug>/` (le slug devient l'adresse : `/work/<slug>/`) et copie-y le `index.html` du projet le plus proche ; mets à jour son `canonical`, le `href` de la flèche de retour et celui du nom dans la barre (`/#<slug>`)
+2. Ajoute une carte dans `index.html`, dans la bonne catégorie (`<section class="cat">`), en copiant un bloc `<a class="card">` existant : `id="<slug>"` et `href="/work/<slug>/"`
+3. Ajoute la page dans `sitemap.xml` et son slug dans `PAGE_ACHIEVEMENT` (`app.js`) si elle doit débloquer un succès
+4. Ajoute son visuel de couverture dans `assets/img/` en `.avif` et `.webp`
+5. Renseigne les pictogrammes de moteur, d'effectif et de durée dans le `<span class="card__meta">`
 
 Une carte peut porter un **logo de boutique** à droite (même place que le badge Rookie Awards de Kokoro Renzu, 44–60 px) : un `<span class="card__store" role="link" tabindex="0" data-store="https://store.steampowered.com/…" aria-label="… sur Steam" data-cursor="external">` avec le logo Steam ou itch.io en SVG, placé juste avant `card__name`. Comme la carte est déjà un lien, ce n'est pas un `<a>` : `initCardLinks()` intercepte le clic et ouvre la page dans un nouvel onglet sans suivre la carte. Modèles dans les cartes Abandon West (Steam) et In_Machina (itch.io) de `index.html`.
 
@@ -330,7 +333,7 @@ L'apparition en cascade et les délais se calculent tout seuls : la grille porte
 **Aucun lien ne télécharge un fichier.** Les quatorze liens vers un PDF — CV et règles de jeu — l'ouvrent dans un nouvel onglet :
 
 ```html
-<a href="../assets/files/regles-xxx.pdf" target="_blank" rel="noopener" data-cursor="external">…</a>
+<a href="/assets/files/regles-xxx.pdf" target="_blank" rel="noopener" data-cursor="external">…</a>
 ```
 
 L'attribut `download` n'est plus utilisé nulle part, et l'icône `download` du curseur a été retirée avec lui. Si tu veux qu'un lien force le téléchargement, remets `download` à la place de `target`/`rel`, repasse `data-cursor` à `download`, et rétablis son icône dans l'objet `ICONS`, en haut de `assets/js/app.js`.
@@ -398,7 +401,7 @@ La liste est le tableau `ACHIEVEMENTS` (`app.js`, juste avant `initAchievements(
 
 | id | Condition | Où c'est branché |
 |---|---|---|
-| `profil`, `kokoro`, `trinytia`, `inmachina`, `abandon`, `mobile`, `pyramid`, `pantheon` | ouvrir la page | `PAGE_ACHIEVEMENT` (nom de fichier → succès) |
+| `profil`, `kokoro`, `trinytia`, `inmachina`, `abandon`, `mobile`, `pyramid`, `pantheon` | ouvrir la page | `PAGE_ACHIEVEMENT` (dernier segment de l'adresse → succès) |
 | `all` | les 7 pages projet visitées | idem, via `visited` |
 | `doc` | clic sur un lien `.pdf` | écouteur `click` |
 | `zoom` | ouvrir une image en grand | `ouvrir()` du lightbox |
@@ -459,7 +462,7 @@ Tant que la carte cadenas est fermée, **chaque clic dessus fait glitcher l'écr
 
 **Boss** — toujours vulnérable, 3 phases cumulatives (100 / 125 / 150 PV, la barre de vie affiche les points ; « PHASE 2 » et « PHASE 3 » s'affichent 1,6 s au changement). En phase 1, tous les ennemis vont 1,5× plus vite : ① tirs visés, drones, fonceurs, formations, chercheurs ; ② + éventails de 5 balles, suiveurs, tourelles puis générateur, cadence accrue ; à chaque changement de phase le boss garde sa position et devient invulnérable 2 s en clignotant ; ③ + double spirale bullet hell, triple tir visé, mouvement rapide. À partir de la phase 2, un léger glitch permanent (bandes et blocs, `softGlitch`, plus fort en phase 3) ; en phase 3, l'écran est en plus secoué toutes les 4 à 7 s.
 
-**Défaite** : « VAISSEAU DÉTRUIT », glitch 1 s, faux écran 404 persistant avec un bouton **Relancer** (`crash__retry`, EN « Retry ») qui recharge la page sur la carte GALAGAX (`index.html#galagax`, la carte cadenas porte cet `id` et un `scroll-margin-top` pour passer sous la barre) ; le cadenas reste ouvert, la partie repart de zéro. La flèche système est rendue sur cet écran, le curseur dessiné y étant masqué. **Victoire** : explosion, feux d'artifice, « Bravo, vous avez résolu le secret en 9:29 » (minutes:secondes, heures devant si besoin), couronne sur le `LV` du curseur et succès « Content que ça vous ait plu ! ».
+**Défaite** : « VAISSEAU DÉTRUIT », glitch 1 s, faux écran 404 persistant avec un bouton **Relancer** (`crash__retry`, EN « Retry ») qui recharge la page sur la carte GALAGAX (`/#galagax`, la carte cadenas porte cet `id` et un `scroll-margin-top` pour passer sous la barre) ; le cadenas reste ouvert, la partie repart de zéro. La flèche système est rendue sur cet écran, le curseur dessiné y étant masqué. **Victoire** : explosion, feux d'artifice, « Bravo, vous avez résolu le secret en 9:29 » (minutes:secondes, heures devant si besoin), couronne sur le `LV` du curseur et succès « Content que ça vous ait plu ! ».
 
 Les constantes sont groupées au début de `initFight()` (`BOSS_HP`, `TYPES`) et dans `step()`. Pas de croix : Échap abandonne sans conséquence tant que la partie est en cours ; une fois gagnée ou perdue, ni Échap ni rien d'autre ne ferme l'arène (la victoire la referme seule après 6,5 s, la défaite laisse le faux 404). **W** déclenche la victoire — uniquement quand le site est servi depuis `localhost` (`serve.ps1`), pour tester la fin de partie ; en ligne la touche ne fait rien.
 

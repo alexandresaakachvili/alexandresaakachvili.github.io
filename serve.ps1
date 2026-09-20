@@ -86,6 +86,8 @@ try {
             $path = [System.Uri]::UnescapeDataString($path)
             if ($path -eq '/' -or $path.EndsWith('/')) { $path += 'index.html' }
             $relative = $path.TrimStart('/') -replace '/', '\'
+            # Comme GitHub Pages : /profil ou /work/pantheon (sans barre finale) servent le index.html du dossier
+            if (-not [System.IO.Path]::HasExtension($relative) -and (Test-Path -LiteralPath (Join-Path $root $relative) -PathType Container)) { $relative = Join-Path $relative 'index.html' }
 
             $full = Join-Path $root $relative
             $resolvedRoot = [System.IO.Path]::GetFullPath($root)

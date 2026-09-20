@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jeux Mobiles — Alexandre Saakachvili</title>
+<meta name="description" content="Gas Station (5M+ téléchargements), Gangsta Rage, Titan Survivors, Monster Merge Battle : system design, économie et level design sur Unity.">
+<link rel="canonical" href="https://alexandresaakachvili.github.io/work/mobile-games/">
+<link rel="icon" type="image/png" href="/assets/img/favicon.png">
+<link rel="apple-touch-icon" href="/assets/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css">
+<script>try{var d=document.documentElement;if(sessionStorage.getItem("as-seen"))d.className+=" no-preloader";else sessionStorage.setItem("as-seen","1");if(matchMedia("(hover:hover) and (pointer:fine)").matches&&!matchMedia("(prefers-reduced-motion:reduce)").matches)d.className+=" has-custom-cursor";var st=JSON.parse(localStorage.getItem("as-ach")||"{}");if(st.theme&&st.theme!=="vanilla")d.setAttribute("data-theme",st.theme);if(st.cursor==="tri")d.setAttribute("data-cursor-shape","round")}catch(e){}</script>
+</head>
+<body data-en-title="Mobile Games — Alexandre Saakachvili" data-en-desc="Gas Station (5M+ downloads), Gangsta Rage, Titan Survivors, Monster Merge Battle: system design, economy and level design on Unity.">
+<div class="preloader" data-preloader>
+  <div class="preloader__inner">
+    <div class="preloader__name">Alexandre Saakachvili</div>
+    <div class="preloader__count"><span data-preloader-count>0</span> %</div>
+    <div class="preloader__bar"><i data-preloader-bar></i></div>
+  </div>
+</div>
+
+<header class="site-header" data-header>
+  <div class="shell site-header__row">
+    <a class="brand" href="/#mobile-games" data-cursor="home">
+      <span class="brand__name">Alexandre Saakachvili</span>
+      <span class="brand__role">Game Designer</span>
+    </a>
+    <nav class="nav" aria-label="Navigation principale">
+      <div class="nav__links">
+        <a href="/" data-i18n="nav.work">Projets</a>
+        <a href="/profil/" data-i18n="nav.about">Profil</a>
+        <a href="/contact/" data-i18n="nav.contact">Contact</a>
+      </div>
+      <div class="lang" data-lang data-cursor="swear" role="button" aria-label="Changer de langue">
+        <div class="lang__menu">
+          <button type="button" data-lang-btn="fr" data-cursor="swear" class="is-active">FR</button><i>/</i><button type="button" data-lang-btn="en" data-cursor="swear">EN</button>
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="work-hero shell">
+    <div class="work-hero__row">
+      <div class="work-hero__main">
+        <h1 class="work-hero__title" data-reveal>
+          <span class="line-mask"><span><a class="work-hero__back" href="/#mobile-games" aria-label="Retour aux projets" data-cursor="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.5 12H8.5"/><path d="M12.5 4.5 5 12l7.5 7.5"/></svg></a><span data-i18n="mob.h1">Jeux Mobiles</span></span></span>
+        </h1>
+        <p class="lede" data-reveal data-reveal-delay=".05" data-i18n="mob.lede">Jeux mobiles hybrid-casual et mid-core pour VOODOO et HOMA (idle arcade, survivors, auto battler).</p>
+      </div>
+
+      <aside class="spec" data-tilt="soft" data-reveal data-reveal-delay=".1" aria-label="Fiche technique">
+        <span class="spec__inner">
+          <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7.5" width="18" height="12" rx="2"/><path d="M8.7 7.5V5.8A1.8 1.8 0 0 1 10.5 4h3a1.8 1.8 0 0 1 1.8 1.8v1.7"/></svg> <span data-i18n="mob.role">System Design, Economy Design, Level Design, Programmation</span></span>
+          <span class="meta-chip"><svg class="meta-chip__logo" viewBox="0 0 24 24" role="img" aria-label="Unity"><path d="m12.9288 4.2939 3.7997 2.1929c.1366.077.1415.2905 0 .3675l-4.515 2.6076a.4192.4192 0 0 1-.4246 0L7.274 6.8543c-.139-.0745-.1415-.293 0-.3675l3.7972-2.193V0L1.3758 5.5977V16.793l3.7177-2.1456v-4.3858c-.0025-.1565.1813-.2682.318-.1838l4.5148 2.6076a.4252.4252 0 0 1 .2136.3676v5.2127c.0025.1565-.1813.2682-.3179.1838l-3.7996-2.1929-3.7178 2.1457L12 24l9.6954-5.5977-3.7178-2.1457-3.7996 2.1929c-.1341.082-.3229-.0248-.3179-.1838V13.053c0-.1565.087-.2956.2136-.3676l4.5149-2.6076c.134-.082.3228.0224.3179.1838v4.3858l3.7177 2.1456V5.5977L12.9288 0Z"/></svg> Unity</span>
+          <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="sq" d="M12 3.5v8"/><path class="sq" d="m7.2 10.4 4.8 4.8 4.8-4.8"/><path d="M4 20.5h16"/></svg> 5 M+</span>
+          <span class="meta-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20.5V6.2l8-2.7v17"/><path d="M12 20.5h8V9.6l-8-2.7"/><path d="M7.4 9.4v.1"/><path d="M7.4 13.2v.1"/><path d="M15.8 12.6v.1"/><path d="M15.8 16.2v.1"/></svg> VOODOO, HOMA</span>
+        </span>
+      </aside>
+    </div>
+  </section>
+
+  <section class="shell block">
+
+    <article class="game" data-reveal>
+      <div class="game__body">
+        <div class="game__title">
+          <h2>Gas Station</h2>
+          <span class="game__badge">5 M+ <span data-i18n="mob.dl">téléchargements</span></span>
+        </div>
+        <div class="prose stack">
+          <p class="body-lg" data-i18n="mob.gas.p1">Gas Station : Junkyaed Tycoon mélange <strong>arcade-idle</strong> et <strong>Tycoon</strong>.</p>
+          <p class="body-lg" data-i18n="mob.gas.p2">Propriétaire d&rsquo;une petite station-service dans le Nevada, le joueur devra <strong>construire de nouvelles structures</strong> (car wash, garage, gare routière...) et étendre son empire dans tous les États-Unis d&rsquo;Amérique. Vous devrez donc nettoyer les lieux en <strong>cassant des objets</strong> pour <strong>collecter des ressources</strong> et gagner de l&rsquo;espace.</p>
+          <p class="body-lg" data-i18n="mob.gas.p3"><strong>+5M de téléchargements</strong>, en collaboration avec <strong>HOMA</strong>, j&rsquo;ai travailler sur le <strong>System Design</strong>, l&rsquo;<strong>économie</strong> et le <strong>Level Design</strong>.</p>
+          <div class="game__cta">
+            <a class="btn" data-tilt="soft" href="https://apps.apple.com/fr/app/gas-station-simulator-tycoon/id6737841009" target="_blank" rel="noopener" data-cursor="external"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="sq" d="M5 19 15 9"/><path class="sq" d="M8 5.5h10.5V16"/></svg><span>App Store</span></a>
+          </div>
+        </div>
+        <figure class="video-figure">
+          <div class="video video--portrait" data-video="1O8M_00afmg" data-title="Gas Station" data-cursor="play">
+            <img class="video__poster" src="/assets/img/video/1O8M_00afmg.jpg" alt="" loading="lazy" decoding="async">
+          </div>
+        </figure>
+      </div>
+    </article>
+
+    <article class="game" data-reveal>
+      <div class="game__body">
+        <div class="game__title">
+          <h2>Gangsta Rage</h2>
+          <span class="game__badge">500 K+ <span data-i18n="mob.dl">téléchargements</span></span>
+        </div>
+        <div class="prose stack">
+          <p class="body-lg" data-i18n="mob.rage.p1">Gangsta Rage est une <strong>réinterprétation urbaine</strong> de <strong>XP Hero</strong>.</p>
+          <p class="body-lg" data-i18n="mob.rage.p2">Pour conquérir tous les districts et <strong>contrôler le territoire de toutes les mafias</strong>, le joueur va devoir <strong>faire tomber leurs chefs</strong>. Il pourra compter sur son <strong>crew</strong>, ses <strong>statistiques</strong> et ses <strong>armes</strong> qu&rsquo;il améliorera avec l&rsquo;argent volé aux membres des gangs rivaux.</p>
+          <p class="body-lg" data-i18n="mob.rage.p3">Construit sur <strong>Unity</strong> en <strong>2 mois</strong> avec 1 programmeurs et 2 artistes, j&rsquo;étais en charge du <strong>System Design</strong>, de l&rsquo;<strong>économie</strong>, du <strong>Level Design</strong> et de l&rsquo;<strong>intégration moteur</strong>.</p>
+          <div class="game__cta">
+            <a class="btn" data-tilt="soft" href="https://apps.apple.com/fr/app/gangsta-rage/id6746482327" target="_blank" rel="noopener" data-cursor="external"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="sq" d="M5 19 15 9"/><path class="sq" d="M8 5.5h10.5V16"/></svg><span>App Store</span></a>
+          </div>
+        </div>
+        <figure class="video-figure">
+          <div class="video video--portrait" data-video="USfPP7ubTSY" data-title="Gangsta Rage" data-cursor="play">
+            <img class="video__poster" src="/assets/img/video/USfPP7ubTSY.jpg" alt="" loading="lazy" decoding="async">
+          </div>
+        </figure>
+      </div>
+    </article>
+
+    <article class="game" data-reveal>
+      <div class="game__body">
+        <div class="game__title">
+          <h2>Titan Survivors</h2>
+          <span class="game__badge" data-i18n="mob.proto">Prototype</span>
+        </div>
+        <div class="prose stack">
+          <p class="body-lg" data-i18n="mob.titan.p1">Titan survivors est un <strong>survivors-like</strong> avec des méchas, des aliens et beaucoup d&rsquo;explosions. La particularité est que le joueur doit se former une <strong>squad de 3 personnages</strong> au cours de la partie. Chaque personnage ayant son propre style de combat et donc certains <strong>builds</strong> et <strong>combos</strong> spécifiques.</p>
+          <p class="body-lg" data-i18n="mob.titan.p2">Prototypé sur <strong>Unity</strong> en <strong>2 mois</strong> avec 2 programmeurs et 2 artistes, j&rsquo;étais en charge du <strong>Combat Design</strong>, de l&rsquo;<strong>économie</strong>, du <strong>Level Design</strong> et de l&rsquo;<strong>intégration moteur</strong>.</p>
+        </div>
+        <figure class="video-figure">
+          <div class="video video--portrait" data-video="gH_cmc3nnWQ" data-title="Titan Survivors" data-cursor="play">
+            <img class="video__poster" src="/assets/img/video/gH_cmc3nnWQ.jpg" alt="" loading="lazy" decoding="async">
+          </div>
+        </figure>
+      </div>
+    </article>
+
+    <article class="game" data-reveal>
+      <div class="game__body">
+        <div class="game__title">
+          <h2>Monster Merge</h2>
+          <span class="game__badge" data-i18n="mob.proto">Prototype</span>
+        </div>
+        <div class="prose stack">
+          <p class="body-lg" data-i18n="mob.merge.p1">Monster Merge Battle associe <strong>merge</strong> game et <strong>slot machine</strong>.</p>
+          <p class="body-lg" data-i18n="mob.merge.p2">Entre <strong>jackpot</strong>, <strong>super merge</strong> et <strong>fusion d&rsquo;unité en héros</strong>, le joueur a toujours de quoi faire. Dans un second temps, l&rsquo;expérience devient plus <strong>stratégique</strong>, notamment grâce au <strong>placement grid based des unités</strong>, au <strong>deckbuilding</strong> et aux choix de <strong>bonus post-combat</strong>.</p>
+          <p class="body-lg" data-i18n="mob.merge.p3">Prototypé sur <strong>Unity</strong> en <strong>2 mois</strong> avec 2 programmeurs et 2 artistes, j&rsquo;étais en charge du <strong>System Design</strong>, de l&rsquo;<strong>économie</strong>, du <strong>Level Design</strong> (wave based) et de l&rsquo;<strong>intégration moteur</strong>.</p>
+        </div>
+        <figure class="video-figure">
+          <div class="video video--portrait" data-video="BGequ4s-Ud8" data-title="Monster Merge Battle" data-cursor="play">
+            <img class="video__poster" src="/assets/img/video/BGequ4s-Ud8.jpg" alt="" loading="lazy" decoding="async">
+          </div>
+        </figure>
+      </div>
+    </article>
+
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="shell footer-row" data-reveal>
+    <div class="footer-links">
+    <button type="button" data-copy="a.saakachvili@gmail.com" data-cursor="copy" aria-label="Copier l&rsquo;adresse mail">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
+      <span>a.saakachvili@gmail.com</span>
+    </button>
+    <button type="button" data-copy="06 24 56 43 31" data-cursor="copy" aria-label="Copier le numéro de téléphone">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.6 3h3.3l1.7 4.2-2.5 1.7a13.5 13.5 0 0 0 6.2 6.2l1.7-2.5 4.2 1.7v3.3a2.1 2.1 0 0 1-2.1 2.1A16.1 16.1 0 0 1 3.5 5.1 2.1 2.1 0 0 1 5.6 3z"/></svg>
+      <span>06 24 56 43 31</span>
+    </button>
+    <a href="https://www.linkedin.com/in/a-saakachvili" target="_blank" rel="noopener" data-cursor="external">LinkedIn</a>
+    <a href="/assets/files/cv-alexandre-saakachvili.pdf" target="_blank" rel="noopener" data-cursor="external">CV</a>
+    </div>
+    <button type="button" class="to-top" data-to-top data-cursor="top">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.5V8.5"/><path d="M4.5 12.5 12 5l7.5 7.5"/></svg>
+      <span class="sr-only" data-i18n="ui.top">Haut de page</span>
+    </button>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="/assets/js/i18n.js"></script>
+<script src="/assets/js/app.js"></script>
+</body>
+</html>

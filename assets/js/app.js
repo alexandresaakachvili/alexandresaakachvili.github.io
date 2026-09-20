@@ -1098,15 +1098,16 @@
     { id: "clicks22", name: "Deux souris&nbsp;? Tricheur&nbsp;!", touchName: "Deux doigts&nbsp;? Tricheur&nbsp;!", hint: "Cliquer 22 fois en moins de 2 secondes" }
   ];
 
+  // Dernier segment de l'adresse (`/work/kokoro-renzu/` → `kokoro-renzu`, `/profil/` → `profil`), avec ou sans `.html` ni barre finale.
   var PAGE_ACHIEVEMENT = {
-    "profil.html": "profil",
-    "kokoro-renzu.html": "kokoro",
-    "tri-nytia.html": "trinytia",
-    "in-machina.html": "inmachina",
-    "abandon-west.html": "abandon",
-    "mobile-games.html": "mobile",
-    "pyramid-shadow.html": "pyramid",
-    "pantheon.html": "pantheon"
+    "profil": "profil",
+    "kokoro-renzu": "kokoro",
+    "tri-nytia": "trinytia",
+    "in-machina": "inmachina",
+    "abandon-west": "abandon",
+    "mobile-games": "mobile",
+    "pyramid-shadow": "pyramid",
+    "pantheon": "pantheon"
   };
 
   var Level = { render: function () {}, max: function () {} };
@@ -1858,7 +1859,7 @@
     Achievements.notices = function () { notices(0); };
     notices(0);
 
-    var page = (window.location.pathname.split("/").pop() || "index.html").toLowerCase();
+    var page = (window.location.pathname.replace(/\/(index\.html)?$/, "").split("/").pop() || "index").replace(/\.html$/, "").toLowerCase();
     var pageId = PAGE_ACHIEVEMENT[page];
     if (pageId) {
       if (pageId !== "profil" && state.visited.indexOf(pageId) < 0) { state.visited.push(pageId); save(); }
