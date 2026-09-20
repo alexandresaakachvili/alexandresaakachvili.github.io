@@ -377,7 +377,7 @@ html.is-coarse .ach-item.is-top{border-top:1px solid var(--line-soft)}
 .scores li span{font-family:var(--font-display);font-weight:700;text-transform:uppercase;letter-spacing:-.01em;color:var(--cream);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .scores li i{display:inline-flex;align-items:center;gap:.55em;font-family:var(--font-mono);font-style:normal;color:var(--cream);letter-spacing:.04em}
 /* Score obtenu avec le code Konami : le logo précède le temps. */
-.scores__konami{width:3.8em;height:.7em;flex:none;fill:var(--amber)}
+.scores__konami{width:1.7em;height:1.7em;flex:none;object-fit:contain;margin-block:-.35em}
 .scores li.is-empty span,.scores li.is-empty b{color:var(--muted);opacity:.5}
 @media (max-width:700px){
   .scores ol{grid-template-columns:1fr;grid-auto-flow:row;grid-template-rows:none}

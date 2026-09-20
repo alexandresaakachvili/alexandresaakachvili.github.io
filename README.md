@@ -475,11 +475,11 @@ Les constantes sont groupées au début de `initFight()` (`BOSS_HP`, `TYPES`) et
 - curseur au **niveau MAX** avec la couronne (`Level.max()`) ;
 - la carte cadenas **ouverte** : sur l'accueil, le cadenas explose sur-le-champ (`Achievements.onDoor`, posé par `initFight()`), ailleurs elle est ouverte à la prochaine visite.
 
-Dans l'arène, le vaisseau part alors avec **5 cœurs, 5 balles et la cadence maximale** (`fresh()` dans `initFight()`). Une victoire obtenue ainsi est enregistrée avec `konami: true` et affiche le logo KONAMI dans le tableau.
+Dans l'arène, le vaisseau part alors avec **5 cœurs, 5 balles et la cadence maximale** (`fresh()` dans `initFight()`). Une victoire obtenue ainsi est enregistrée avec `konami: true` et affiche l'emblème Konami dans le tableau.
 
 ### Le tableau des scores
 
-Troisième onglet du panneau, **Scores**, visible dès que le mini-jeu a été lancé une fois (comme les produits verrouillés). Il liste les **20 meilleurs temps** pour percer le secret — le temps est le compteur caché au moment de la victoire. Chaque ligne montre le rang, le nom et le temps ; la date est enregistrée mais pas affichée. Un temps obtenu avec le code Konami porte le logo **KONAMI** à gauche du temps (`konami` dans la table, `KONAMI_LOGO` dans `app.js`). Quand tu gagnes avec un temps qui entre dans le top 20, le panneau s'ouvre sur cet onglet avec une ligne « ton temps + ton nom + Enregistrer » ; le nom est mémorisé pour la prochaine fois (`as-name`). Le bouton **« Tout remettre à zéro et relancer le chrono »** efface niveau, succès, achats, compteur et score en attente (mais pas le tableau ni la langue) puis recharge la page : départ propre pour un speedrun.
+Troisième onglet du panneau, **Scores**, visible dès que le mini-jeu a été lancé une fois (comme les produits verrouillés). Il liste les **20 meilleurs temps** pour percer le secret — le temps est le compteur caché au moment de la victoire. Chaque ligne montre le rang, le nom et le temps ; la date est enregistrée mais pas affichée. Un temps obtenu avec le code Konami porte l'emblème Konami (`assets/img/konami.png`, couleurs d'origine) à gauche du temps (`konami` dans la table, `KONAMI_LOGO` dans `app.js`). Quand tu gagnes avec un temps qui entre dans le top 20, le panneau s'ouvre sur cet onglet avec une ligne « ton temps + ton nom + Enregistrer » ; le nom est mémorisé pour la prochaine fois (`as-name`). Le bouton **« Tout remettre à zéro et relancer le chrono »** efface niveau, succès, achats, compteur et score en attente (mais pas le tableau ni la langue) puis recharge la page : départ propre pour un speedrun.
 
 #### Local ou mondial
 
