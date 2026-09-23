@@ -1762,7 +1762,7 @@
     function fitToast() {
       if (!toasts.length) { btn.style.width = ""; return; }
       var maxW = Math.min(480, window.innerWidth - 32);
-      btn.style.width = Math.min(maxW, 106 + stack.scrollWidth + 22) + "px";
+      btn.style.width = Math.min(maxW, btn.querySelector(".ach__icon").offsetWidth + stack.scrollWidth + 22) + "px";
     }
 
     var lastTick = performance.now();

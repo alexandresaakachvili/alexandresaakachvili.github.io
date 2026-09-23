@@ -301,6 +301,15 @@ html.is-coarse .ach-item.is-top{border-top:1px solid var(--line-soft)}
 .ach-list__pc{padding:.7rem 1.2rem;border-top:1px solid var(--line);background:color-mix(in srgb,var(--amber) 8%,transparent);font-family:var(--font-mono);font-size:var(--step--1);letter-spacing:.1em;text-transform:uppercase;color:var(--amber)}
 .ach-item.is-pc{grid-template-columns:auto minmax(0,1fr)}
 @media (max-width:700px){
+  /* Sur mobile, le bouton succès garde son ancien gabarit de 72 px. */
+  .ach{width:72px;height:72px}
+  .ach__badge{top:5px;right:5px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;font-size:.6rem;line-height:18px}
+  .ach__icon{width:70px;height:70px}
+  .ach__icon svg{width:33px;height:33px}
+  .ach__toast small{font-size:.6rem}
+  .ach__toast b{font-size:.9rem}
+  .ach.is-toast{min-height:72px}
+  .ach.is-toast .ach__toast{max-width:min(328px,calc(100vw - 2rem - 92px))}
   .ach-panel ol{grid-template-columns:1fr;grid-auto-flow:row;grid-template-rows:none}
   .ach-item.is-right{border-left:0}
   .ach-item.is-top{border-top:1px solid var(--line-soft)}
@@ -808,19 +817,19 @@ body.is-leaving{
 .spec .meta-chip{gap:.6rem;align-items:flex-start;line-height:1.35}
 .spec .meta-chip svg{margin-top:.1em}
 
-.spec__inner:has(.spec__corner) .meta-chip:last-of-type{padding-right:2.8rem}
+.spec__inner:has(.spec__corner) .meta-chip:last-of-type{padding-right:3.6rem}
 .spec__corner{
   position:absolute;right:clamp(.7rem,1vw,.9rem);bottom:clamp(.7rem,1vw,.9rem);
-  display:grid;place-items:center;width:34px;height:34px;
+  display:grid;place-items:center;width:46px;height:46px;
   color:var(--muted);transition:color .35s var(--ease),transform .5s var(--ease-snap);
 }
-.spec__corner svg{width:30px;height:30px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.spec__corner svg{width:42px;height:42px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .spec__corner svg.spec__corner-logo{fill:currentColor;stroke:none}
 .spec.is-hovered .spec__corner{color:var(--amber)}
 a.spec__corner:hover{color:var(--cream);transform:scale(1.12)}
-.spec__corner--badge{width:52px;height:52px;right:.5rem;bottom:.5rem}
+.spec__corner--badge{width:68px;height:68px;right:.5rem;bottom:.5rem}
 .spec__corner--badge img{width:100%;height:100%;object-fit:contain}
-.spec__inner:has(.spec__corner--badge) .meta-chip:last-of-type{padding-right:3.8rem}
+.spec__inner:has(.spec__corner--badge) .meta-chip:last-of-type{padding-right:4.8rem}
 
 .block{padding-block:clamp(2.6rem,7vh,6rem)}
 
