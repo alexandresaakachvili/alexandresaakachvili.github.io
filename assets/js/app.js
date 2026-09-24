@@ -1079,13 +1079,13 @@
     { id: "abandon", name: "Trust or Shoot&nbsp;?", hint: "Visiter Abandon West" },
     { id: "inmachina", name: "Trust me. Don&rsquo;t trust the smiling one :)", hint: "Visiter In_Machina" },
     { id: "pyramid", name: "Mission accept&eacute;e", hint: "Visiter L&rsquo;Ombre de la Pyramide" },
-    { id: "mobile", name: "Skip add in 3&hellip; 2&hellip; 1", hint: "Visiter Pinpin Studio" },
+    { id: "mobile", name: "Skip ad in 3&hellip; 2&hellip; 1", hint: "Visiter Pinpin Studio" },
     { id: "trinytia", name: "Gardien, Ombre ou L&eacute;gende&nbsp;?", hint: "Visiter Tri&rsquo;Nytia" },
     { id: "pantheon", name: "World Builder", hint: "Visiter Panth&eacute;on" },
     { id: "all", name: "Un poil compl&eacute;tionniste", hint: "Visiter tous les projets" },
     { id: "doc", name: "Promis, pas de virus", hint: "T&eacute;l&eacute;charger un document" },
     { id: "zoom", name: "On a oubli&eacute; ses lunettes&nbsp;?", hint: "Zoomer sur une image" },
-    { id: "lang", name: "Bilingue", hint: "Changer de langue" },
+    { id: "lang", name: "Прости", hint: "Changer de langue" },
     { id: "charge", name: "D&eacute;charge de puissance", hint: "Maintenir le clic jusqu&rsquo;&agrave; lib&eacute;rer une d&eacute;charge qui pousse les cartes", pc: true },
     { id: "color", name: "Directeur artistique", hint: "Changer la couleur du site" },
     { id: "key", name: "Et maintenant&nbsp;?", hint: "Acheter la cl&eacute;", touch: true },
@@ -2931,6 +2931,11 @@
         if (!body.dataset.frDesc) body.dataset.frDesc = desc.getAttribute("content") || "";
         desc.setAttribute("content", (toEN && body.dataset.enDesc) ? body.dataset.enDesc : body.dataset.frDesc);
       }
+
+      // Le CV existe en deux PDF : cv-alexandre-saakachvili.pdf (FR) et cv-alexandre-saakachvili-en.pdf (EN).
+      document.querySelectorAll('a[href*="/cv-alexandre-saakachvili"]').forEach(function (a) {
+        a.setAttribute("href", a.getAttribute("href").replace(/cv-alexandre-saakachvili(-en)?\.pdf/, toEN ? "cv-alexandre-saakachvili-en.pdf" : "cv-alexandre-saakachvili.pdf"));
+      });
 
       document.querySelectorAll("[data-lang-label]").forEach(function (el) { el.textContent = lang.toUpperCase(); });
 

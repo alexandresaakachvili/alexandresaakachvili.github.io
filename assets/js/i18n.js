@@ -298,7 +298,6 @@ window.I18N_EN = {
   "ach.name.all": "Completionist, aren&rsquo;t you?",
   "ach.name.doc": "No virus, promise",
   "ach.name.zoom": "Forgot your glasses?",
-  "ach.name.lang": "Bilingual",
   "ach.name.charge": "Power discharge",
   "ach.name.color": "Art director",
   "ach.name.key": "What now?",

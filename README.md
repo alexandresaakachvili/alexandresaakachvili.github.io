@@ -328,7 +328,7 @@ L'apparition en cascade et les délais se calculent tout seuls : la grille porte
 
 ### Remplacer le CV
 
-Écrase `assets/files/cv-alexandre-saakachvili.pdf` en gardant le même nom : tous les liens continuent de fonctionner.
+Le CV existe en deux versions : `assets/files/cv-alexandre-saakachvili.pdf` (français) et `assets/files/cv-alexandre-saakachvili-en.pdf` (anglais). Écrase-les en gardant ces noms : tous les liens continuent de fonctionner. Le HTML pointe toujours vers la version française ; en anglais, `I18N.apply` (dans `app.js`) bascule les liens vers la version `-en`.
 
 **Aucun lien ne télécharge un fichier.** Les quatorze liens vers un PDF — CV et règles de jeu — l'ouvrent dans un nouvel onglet :
 
