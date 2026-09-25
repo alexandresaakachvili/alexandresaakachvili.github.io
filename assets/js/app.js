@@ -378,7 +378,7 @@
     var downX = 0, downY = 0, moved = false, down = false, lastX = 0, lastY = 0, lastT = 0, lastTrail = 0;
 
     document.addEventListener("pointerdown", function (e) {
-      if (document.querySelector(".crash")) return;
+      if (document.querySelector(".crash") || Fight.busy()) return;
       down = true; moved = false; downX = e.clientX; downY = e.clientY;
       lastX = e.clientX; lastY = e.clientY; lastT = performance.now();
     });
@@ -581,7 +581,7 @@
     }
 
     document.addEventListener("pointerdown", function (e) {
-      if (e.button !== 0 || e.pointerType === "touch" || document.querySelector(".crash")) return;
+      if (e.button !== 0 || e.pointerType === "touch" || document.querySelector(".crash") || Fight.busy()) return;
       down = performance.now();
       downX = e.clientX; downY = e.clientY; moved = false;
       selecting = false;
@@ -1942,7 +1942,7 @@
     });
   }
 
-  var Fight = { shock: function () {} };
+  var Fight = { shock: function () {}, busy: function () { return false; } };
 
   var SHIP_PX = [
     "....X....",
@@ -1966,19 +1966,55 @@
     "..X...X..",
     "...X.X..."
   ];
+  // Pixel de base du jeu : 4 px (vaisseau, cœurs, ennemis). Certains sprites ont leur propre échelle (voir draw) pour garder
+  // la carrure voulue : boss ×3, spawner ×1,3, seeker ×1,25, dasher et drones de formation ×0,75.
+  var PIX = 4;
+
   var BOSS_PX = [
-    "......XXX......",
-    "....XXXXXXX....",
-    "..XXX.XXX.XXX..",
-    ".XXXXXXXXXXXXX.",
-    "XXX.XXXXXXX.XXX",
-    "XX.XX.XXX.XX.XX",
-    "X..XX.....XX..X",
-    "....XX...XX....",
-    "...XX.....XX..."
+    "......X...X......",
+    "......XXXXX......",
+    "....XXXXXXXXX....",
+    "...X..XXXXX..X...",
+    "..XX...XXX...XX..",
+    "XXXX...X.X...XXXX",
+    "...XXXXX.XXXXX...",
+    "...X.XXXXXXX.X...",
+    "..X..X.X.X.X..X..",
+    "..X...........X..",
+    "...X.........X..."
   ];
-  var DRONE_PX = ["..XX..", ".XXXX.", "XX.XXX", "XXXXXX", ".X..X.", "X....X"];
-  var BUG_PX = ["X....X", ".X..X.", "XXXXXX", "X.XX.X", "XXXXXX", ".X..X."];
+
+  // Ennemis : deux frames chacun, qui alternent (voir ENEMY_FRAME).
+  var DRONE_PX = [
+    ["..X.....X..", "X..X...X..X", "X.XXXXXXX.X", "XXX.XXX.XXX", "XXXXXXXXXXX", ".XXXXXXXXX.", "..X.....X..", ".X.......X."],
+    ["..X.....X..", "...X...X...", "..XXXXXXX..", ".XX.XXX.XX.", "XXXXXXXXXXX", "X.XXXXXXX.X", "X.X.....X.X", "...XX.XX..."]
+  ];
+  var BUG_PX = [
+    ["X.XXX.X", ".XXXXX.", ".X.X.X.", "XX.X.XX", "XXXXXXX", ".X.X.X.", "..X.X.."],
+    ["X.XXX.X", ".XXXXX.", ".X.X.X.", "XX.X.XX", "XXXXXXX", ".X.X.X.", "X.....X"]
+  ];
+  // D'après le 2e alien du GIF, tête en bas et étiré : les pattes traînent derrière, le crâne s'effile en pointe vers le joueur.
+  var DASHER_PX = [
+    ["X.X..X.X", ".X.XX.X.", "..X..X..", "XXXXXXXX", "XX.XX.XX", "XXXXXXXX", ".XXXXXX.", ".XXXXXX.", "..XXXX..", "..XXXX..", "...XX...", "...XX..."],
+    [".X....X.", "X......X", ".X.XX.X.", "XXXXXXXX", "XX.XX.XX", "XXXXXXXX", ".XXXXXX.", ".XXXXXX.", "..XXXX..", "..XXXX..", "...XX...", "...XX..."]
+  ];
+  var FOLLOWER_PX = [
+    [".X.......X.", "..X.....X..", "...XX.XX...", ".XX..X..XX.", "XXXXXXXXXXX", ".X..XXX..X.", "..X..X..X..", "...X...X..."],
+    ["...X...X...", "..X.....X..", "...XX.XX...", ".XX..X..XX.", "XXXXXXXXXXX", ".X..XXX..X.", "X....X....X", ".X.......X."]
+  ];
+  var SEEKER_PX = [
+    ["X...X..X...X", ".X.X....X.X.", "..X......X..", ".XXXXXXXXXX.", "XX...XX...XX", ".XXXXXXXXXX.", "..XXX..XXX..", "XX...XX...XX"],
+    ["..X......X..", ".X.X....X.X.", "..X......X..", ".XXXXXXXXXX.", "XX...XX...XX", ".XXXXXXXXXX.", "..XX....XX..", ".X.XXXXXX.X."]
+  ];
+  var TURRET_PX = [
+    ["........XXXX........", "....XX.XXXXXX.XX....", "...XXXX..XX..XXXX...", "..XXX.XXXXXXXX.XXX..", "XXX.XXX.XXXX.XXX.XXX", "XX...XX.XXXX.XX...XX", "....XXXX.XX.XXXX....", "..XXXX........XXXX.."],
+    ["XXX.....XXXX.....XXX", "XX..XX.XXXXXX.XX..XX", ".X.XXXX..XX..XXXX.X.", ".XXXX.XXXXXXXX.XXXX.", "..XXXXX.XXXX.XXXXX..", "....XXX.XXXX.XXX....", "..XXXXXX.XX.XXXXXX..", "XXXX.....XX.....XXXX"]
+  ];
+  var SPAWNER_PX = [
+    [".X...XX...X.", "X..XXXXXX..X", "X.XX.XX.XX.X", "XXX..XX..XXX", "X.XX.XX.XX.X", "...XXXXXX...", ".XX......XX.", ".X........X."],
+    ["X....XX....X", "X..XXXXXX..X", "X.XX.XX.XX.X", "XXX.XXXX.XXX", "X.XX.XX.XX.X", "...XXXXXX...", "..XX....XX..", "....X..X...."]
+  ];
+  var ENEMY_FRAME = 560;  // ms par frame d'animation
   var HEART_PX = [".XX.XX.", "XXXXXXX", "XXXXXXX", ".XXXXX.", "..XXX..", "...X..."];
 
   // Glitch plein écran : blocs et bandes par-dessus la page, les morceaux de la page tressautent.
@@ -2076,18 +2112,35 @@
       for (var i = 0; i < 70; i++) stars.push({ x: Math.random() * W, y: Math.random() * H, z: rnd(.3, 1.2) });
       return {
         phase: 1, t: 0, over: false, intro: 4000, introT: 0, stars: stars, shake: 0, freeze: 0, msg: null, sub: null, fireworks: 0, glitchAt: 0,
-        ship: { x: W / 2, y: H - 90, hp: konami ? 5 : heart ? 3 : 2, max: konami ? 5 : heart ? 3 : 2, inv: 0, shield: 0, bullets: konami ? 5 : 1, rate: konami ? 4 : 0, fire: 0, flash: 0, sweep: Achievements.owns("sweep") ? 1 : 0 },
-        boss: { x: W / 2, y: 100, hp: BOSS_HP[0], max: BOSS_HP[0], flash: 0, wob: 0, aim: 0, fan: 0, spiral: 0, spiralA: 0, spawn: 0, wave: 0, heavy: 0, shift: 0, seeker: 6000 },
-        enemies: [], pbullets: [], ebullets: [], drops: [], sparks: [], rings: [], lastField: 0
+        ship: { x: W / 2, y: H - 90, hp: konami ? 5 : heart ? 3 : 2, max: konami ? 5 : heart ? 3 : 2, inv: 0, shield: 0, bullets: konami ? 5 : 1, rate: konami ? 4 : 0, fire: 0, flash: 0, sweep: Achievements.owns("sweep") ? 1 : 0, lean: 0, conv: 0 },
+        boss: { x: W / 2, y: 100, hp: BOSS_HP[0], max: BOSS_HP[0], flash: 0, wob: 0, aim: 0, fan: 0, spiral: 0, spiralA: 0, spawn: 0, wave: 0, heavy: 0, shift: 0, seeker: 6000, lag: BOSS_HP[0], lagHold: 0 },
+        enemies: [], pbullets: [], ebullets: [], drops: [], sparks: [], rings: [], motes: [], lastField: 0, charged: false, aura: null, onThaw: null, dying: 0, boomT: 0
       };
     }
 
-    function px(map, x, y, s, fill) {
-      ctx.fillStyle = fill;
-      for (var r = 0; r < map.length; r++) for (var c = 0; c < map[r].length; c++) {
-        if (map[r].charAt(c) === "X") ctx.fillRect(x + c * s, y + r * s, s, s);
+    // Chaque sprite est rendu une fois (1 px par pixel d'art, une couleur) puis agrandi sans lissage :
+    // aplat net, aucune couture entre les pixels, quelle que soit la position ou la densité d'écran.
+    var spriteCache = {};
+    function sprite(map, fill) {
+      var key = fill + "|" + map.join("/");
+      if (spriteCache[key]) return spriteCache[key];
+      var c = document.createElement("canvas");
+      c.width = map[0].length; c.height = map.length;
+      var sc = c.getContext("2d");
+      sc.fillStyle = fill;
+      for (var r = 0; r < map.length; r++) for (var k = 0; k < map[r].length; k++) {
+        if (map[r].charAt(k) === "X") sc.fillRect(k, r, 1, 1);
       }
+      return (spriteCache[key] = c);
     }
+
+    function px(map, x, y, s, fill) {
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(sprite(map, fill), x, y, map[0].length * s, map.length * s);
+    }
+
+    // Sprite centré sur (x, y), pixel de s px.
+    function pxAt(map, x, y, s, fill) { px(map, x - map[0].length * s / 2, y - map.length * s / 2, s, fill); }
 
     function spark(x, y, n, col, speed) {
       for (var i = 0; i < n; i++) {
@@ -2097,12 +2150,12 @@
     }
 
     var TYPES = {
-      drone: { hp: 1, r: 12, score: 1 },
-      dasher: { hp: 1, r: 11, score: 1 },
-      follower: { hp: 1, r: 11, score: 1 },
-      spawner: { hp: 15, r: 32, score: 4 },
-      turret: { hp: 5, r: 18, score: 4 },
-      seeker: { hp: 10, r: 16, score: 3 }
+      drone: { hp: 1, r: 13, score: 1 },
+      dasher: { hp: 1, r: 12, score: 1 },
+      follower: { hp: 1, r: 17, score: 1 },
+      spawner: { hp: 15, r: 29, score: 4 },
+      turret: { hp: 15, r: 26, score: 4 },
+      seeker: { hp: 10, r: 24, score: 3 }
     };
 
     function addEnemy(type, x, y, extra) {
@@ -2113,8 +2166,8 @@
     }
 
     function formation() {
-      var n = 7, gap = 46, x0 = W / 2 - (n - 1) * gap / 2;
-      for (var row = 0; row < 2; row++) for (var i = 0; i < n; i++) addEnemy("drone", x0 + i * gap, -20 - row * 36 - Math.abs(i - (n - 1) / 2) * 12, { form: true, fx: x0 + i * gap, hp: 1 });
+      var n = 7, gap = 42, x0 = W / 2 - (n - 1) * gap / 2;
+      for (var row = 0; row < 2; row++) for (var i = 0; i < n; i++) addEnemy("drone", x0 + i * gap, -20 - row * 32 - Math.abs(i - (n - 1) / 2) * 10, { form: true, fx: x0 + i * gap, hp: 1, r: 13 });
     }
 
     function shootEnemy(x, y, ang, speed, r) {
@@ -2123,12 +2176,15 @@
 
     function aimAt(x, y) { return Math.atan2(g.ship.y - y, g.ship.x - x); }
 
-    function dropBonus(x, y, chance) {
+    // Jamais un bonus inutile : pas de soin à PV pleins, pas de balle ou de cadence au maximum.
+    // Le loot garanti des gros ennemis (sure) n'est jamais une pièce.
+    function dropBonus(x, y, chance, sure) {
       if (Math.random() > (chance || .14)) return;
       var weights = { bullet: 3, rate: 1, heal: 1, shield: 2, bomb: 2, coin: 3 };
       if (g.ship.bullets >= 5) delete weights.bullet;
       if (g.ship.rate >= 4) delete weights.rate;
       if (g.ship.hp >= g.ship.max) delete weights.heal;
+      if (sure) delete weights.coin;
       var total = 0, k;
       for (k in weights) total += weights[k];
       var roll = Math.random() * total, kind = "coin";
@@ -2138,7 +2194,7 @@
 
     function hurtShip() {
       var s = g.ship;
-      if (s.inv > 0 || s.shield > 0 || g.over) return;
+      if (s.inv > 0 || s.shield > 0 || g.over || g.dying > 0) return;
       s.hp -= 1;
       s.inv = 1200;
       s.flash = 400;
@@ -2151,25 +2207,60 @@
       if (s.hp <= 0) lose();
     }
 
+    // Flash du boss touché : blanc → ambre → blanc, 30 ms chacun. Un flash va au bout avant d'être relancé, sinon le tir continu le bloquerait sur le blanc.
+    var BOSS_FLASH = 90;
+
     function hurtBoss(n, x, y) {
       var b = g.boss;
-      if (g.over) return;
+      if (g.over || g.dying > 0) return;
       if (b.shift > 0) { spark(x || b.x, y || b.y, 4, color("--muted"), 90); return; }
       b.hp -= n;
-      b.flash = 140;
+      if (b.flash <= 0) b.flash = BOSS_FLASH;
+      b.lagHold = 380;
       spark(x || b.x, y || b.y, 4 + n * 2, color("--cream"), 150);
       if (b.hp > 0) return;
       if (g.phase < 3) {
         g.phase += 1;
-        b.hp = b.max = BOSS_HP[g.phase - 1];
+        b.hp = b.max = b.lag = BOSS_HP[g.phase - 1];
         b.shift = 2000;
+        b.flash = BOSS_FLASH;
         g.ebullets = [];
         g.msg = { text: "PHASE " + g.phase, life: 1600 };
         spark(b.x, b.y, 50, color("--amber"), 280);
-        g.shake = 12;
+        // Changement de phase : l'image se fige en tremblant, puis un glitch la relâche.
+        g.shake = 22;
+        g.freeze = 220;
+        g.onThaw = function () { if (open) glitch(260); };
         return;
       }
-      win();
+      die();
+    }
+
+    // Mort du boss : 1,1 s au quart de la vitesse, explosions en chaîne sur sa carcasse, puis la victoire (win).
+    // Plus aucune balle ennemie, et le vaisseau ne peut plus être touché pendant la scène.
+    var DEATH = 1100, SLOWMO = .25;
+    function die() {
+      if (g.over || g.dying > 0) return;
+      g.dying = DEATH;
+      g.boomT = 0;
+      g.boss.hp = 0;
+      g.ebullets = [];
+      g.shake = 14;
+      g.freeze = 90;
+    }
+
+    function dyingTick(dt) {
+      var b = g.boss;
+      g.dying -= dt;
+      g.boomT -= dt;
+      if (g.boomT <= 0) {
+        g.boomT = 70 + Math.random() * 60;
+        var ex = b.x + rnd(-95, 95), ey = b.y + rnd(-60, 60);
+        spark(ex, ey, 22, Math.random() < .5 ? color("--amber") : color("--cream"), 240);
+        g.rings.push({ x: ex, y: ey, r: 6, max: rnd(30, 60), life: 260, col: color("--amber") });
+        g.shake = Math.max(g.shake, 9);
+      }
+      if (g.dying <= 0) { g.dying = 0; win(); }
     }
 
     function killEnemy(e) {
@@ -2179,30 +2270,46 @@
       if (e.type === "seeker") {
         spark(e.x, e.y, 40, color("--cream"), 260);
         g.rings.push({ x: e.x, y: e.y, r: 10, max: 110, life: 320 });
-        g.shake = Math.max(g.shake, 6);
+        g.shake = Math.max(g.shake, 9);
+        g.freeze = Math.max(g.freeze, 60);  // hit-stop
         if (Math.hypot(g.ship.x - e.x, g.ship.y - e.y) < 110) hurtShip();
         g.enemies.slice().forEach(function (o) { if (o !== e && Math.hypot(o.x - e.x, o.y - e.y) < 110 + o.r) { spark(o.x, o.y, 6, color("--cream"), 120); killEnemy(o); } });
-        dropBonus(e.x, e.y, 1);
+        dropBonus(e.x, e.y, 1, true);
         return;
       }
-      dropBonus(e.x, e.y, e.type === "dasher" ? .28 : .14);
+      var big = TYPES[e.type].hp > 1;  // gros ennemis : toujours un objet
+      dropBonus(e.x, e.y, big ? 1 : e.type === "dasher" ? .28 : .14, big);
     }
 
 
+    // Rayon du cercle de décharge prête : il s'ouvre en 240 ms avec un léger dépassement, puis respire (±9 %).
+    var AURA_R = 34;
+    function auraRadius(a) {
+      var u = Math.min(1, a.t / 240), c = 1.7;
+      var k = 1 + (c + 1) * Math.pow(u - 1, 3) + c * Math.pow(u - 1, 2);
+      return AURA_R * k * (1 + Math.sin(a.t / 57) * .09);
+    }
+
+    // Pendant la cinématique d'intro, les clics ne déclenchent rien sur la page (éclats, charge, niveau du curseur).
+    Fight.busy = function () { return open && !!g && g.intro > 0; };
+
     Fight.shock = function () {
-      if (!open || !g || g.over) return;
+      if (!open || !g || g.over || g.intro > 0) return;
       var s = g.ship, R = 300, D = Achievements.owns("cannon") ? 10 : 5;
+      // Le cercle de charge explose : l'onde de choc part de sa taille actuelle, en ambre.
+      if (g.aura) { g.rings.push({ x: s.x, y: s.y, r: auraRadius(g.aura), max: R * 1.1, life: 360, col: color("--amber"), w: 4 }); g.aura = null; }
       g.rings.push({ x: s.x, y: s.y, r: 20, max: R, life: 320 });
       spark(s.x, s.y, 30, color("--cream"), 300);
       g.shake = 10;
       g.enemies.slice().forEach(function (e) {
         if (Math.hypot(e.x - s.x, e.y - s.y) < R + e.r) { spark(e.x, e.y, 6, color("--cream"), 120); killEnemy(e); }
       });
-      if (Math.hypot(g.boss.x - s.x, g.boss.y - s.y) < R + 60) hurtBoss(D);
+      if (Math.hypot(g.boss.x - s.x, g.boss.y - s.y) < R + 90) hurtBoss(D);
     };
 
     function bomb() {
       g.shake = 16;
+      g.freeze = Math.max(g.freeze, 80);  // hit-stop
       g.enemies.slice().forEach(function (e) { spark(e.x, e.y, 10, color("--amber"), 160); });
       g.enemies = [];
       g.ebullets = [];
@@ -2262,18 +2369,38 @@
           s.yaw = Math.PI + Math.PI * ev;
         }
         s.x = W / 2;
-        b.y = -120 + 220 * Math.max(0, Math.min(1, (g.introT - 3000) / 1000));
+        b.y = -120 + 250 * Math.max(0, Math.min(1, (g.introT - 3000) / 1000));
         b.x = W / 2;
         if (g.intro <= 0) { s.scale = 1; s.yaw = 0; g.msg = { text: "GO", life: 600 }; }
         return;
       }
+      var px0 = s.x;
       s.x += (tx - s.x) * Math.min(1, dt / 60);
       s.y += (ty - s.y) * Math.min(1, dt / 60);
+      // Vitesse horizontale (px/s) : le vaisseau se penche du côté où il file.
+      var vx = dt > 0 ? (s.x - px0) * 1000 / dt : 0;
+      s.lean += (Math.max(-1, Math.min(1, vx / 1100)) * 1.05 - s.lean) * Math.min(1, dt / 90);
       s.inv = Math.max(0, s.inv - dt);
       s.shield = Math.max(0, s.shield - dt);
       s.flash = Math.max(0, s.flash - dt);
 
       var charging = root.classList.contains("is-charging");
+      // Décharge prête : un cercle ambre s'ouvre autour du vaisseau et respire jusqu'au relâchement (Fight.shock le fait exploser).
+      var charged = root.classList.contains("is-charged");
+      if (charged && !g.charged) { g.aura = { t: 0 }; g.shake = Math.max(g.shake, 5); }
+      if (!charged) g.aura = null;
+      if (g.aura) g.aura.t += dt;
+      g.charged = charged;
+      // Montée de la charge : des particules convergent vers le vaisseau, de plus en plus serrées ; plus rien une fois prête.
+      if (charging && !charged) {
+        s.conv -= dt;
+        if (s.conv <= 0) {
+          var lvl = parseFloat(root.style.getPropertyValue("--charge")) || 0;
+          s.conv = 55 - 35 * lvl;
+          var d0 = rnd(48, 78);
+          g.motes.push({ a: Math.random() * Math.PI * 2, d: d0, d0: d0, life: 300, max: 300, cream: Math.random() < .3 });
+        }
+      } else s.conv = 0;
       s.fire -= dt;
       if (!charging && s.fire <= 0) {
         s.fire = 1000 / (2.5 + s.rate * .75);  // 5 crans : 2,5 à 5,5 coups/s
@@ -2289,21 +2416,27 @@
       b.flash = Math.max(0, b.flash - dt);
       b.osc = (b.osc || 0) + dt / (g.phase === 3 ? 900 : 1400);
       b.x = W / 2 + Math.sin(b.osc) * (W * .28);
-      b.y = 100 + Math.sin(b.wob / 2100) * 14;
+      b.y = 130 + Math.sin(b.wob / 2100) * 14;
+      // Barre de vie amortie : le segment blanc attend un instant après le dernier coup, puis rattrape la vraie valeur.
+      if (b.lag > b.hp) {
+        b.lagHold -= dt;
+        if (b.lagHold <= 0) b.lag = Math.max(b.hp, b.lag - Math.max((b.lag - b.hp) * dt / 220, dt * .01));
+      } else b.lag = b.hp;
       if (b.shift > 0) { b.shift -= dt; }
+      else if (g.dying > 0) { /* le boss agonise : plus d'attaques */ }
       else {
         b.aim -= dt;
         if (b.aim <= 0) {
           b.aim = g.phase === 1 ? 1400 : g.phase === 2 ? 1100 : 900;
-          shootEnemy(b.x, b.y + 30, aimAt(b.x, b.y), 260, 6);
-          if (g.phase === 3) { shootEnemy(b.x - 30, b.y + 30, aimAt(b.x - 30, b.y) - .18, 260, 5); shootEnemy(b.x + 30, b.y + 30, aimAt(b.x + 30, b.y) + .18, 260, 5); }
+          shootEnemy(b.x, b.y + 50, aimAt(b.x, b.y), 260, 6);
+          if (g.phase === 3) { shootEnemy(b.x - 30, b.y + 50, aimAt(b.x - 30, b.y) - .18, 260, 5); shootEnemy(b.x + 30, b.y + 50, aimAt(b.x + 30, b.y) + .18, 260, 5); }
         }
         if (g.phase >= 2) {
           b.fan -= dt;
           if (b.fan <= 0) {
             b.fan = g.phase === 2 ? 2200 : 1700;
             var base = aimAt(b.x, b.y);
-            for (var f = -2; f <= 2; f++) shootEnemy(b.x, b.y + 30, base + f * .22, 210, 5);
+            for (var f = -2; f <= 2; f++) shootEnemy(b.x, b.y + 50, base + f * .22, 210, 5);
           }
         }
         if (g.phase === 3) {
@@ -2319,9 +2452,9 @@
         if (b.spawn <= 0) {
           b.spawn = g.phase === 1 ? 1000 : g.phase === 2 ? 1200 : 950;
           var roll = Math.random();
-          if (g.phase >= 2 && roll < .3) addEnemy("follower", b.x + rnd(-40, 40), b.y + 30);
+          if (g.phase >= 2 && roll < .3) addEnemy("follower", b.x + rnd(-40, 40), b.y + 50);
           else if (roll < .55) addEnemy("dasher", rnd(30, W - 30), -20, { vx: rnd(-160, 160), vy: rnd(300, 420) });
-          else addEnemy("drone", b.x + rnd(-60, 60), b.y + 30);
+          else addEnemy("drone", b.x + rnd(-60, 60), b.y + 50);
         }
         b.wave -= dt;
         if (b.wave <= 0) { b.wave = g.phase === 1 ? 8000 : 9000; formation(); }
@@ -2334,7 +2467,7 @@
           b.heavy = g.phase === 1 ? 9300 : g.phase === 2 ? 9000 : 7000;
           var hasSpawner = g.enemies.some(function (e) { return e.type === "spawner"; });
           var turrets = g.enemies.filter(function (e) { return e.type === "turret"; }).length;
-          if (g.phase >= 2 && turrets < 2) addEnemy("turret", turrets ? W - 60 : 60, -30, { ty: 60 });
+          if (g.phase >= 2 && turrets < 2) addEnemy("turret", turrets ? W - 60 : 60, -30, { ty: 230 });
           else if (g.phase >= 2 && !hasSpawner) addEnemy("spawner", rnd(80, W - 80), -30, { ty: rnd(150, 210) });
         }
       }
@@ -2369,7 +2502,7 @@
       g.pbullets.forEach(function (p) { p.x += p.vx * dt / 1000; p.y += p.vy * dt / 1000; });
       var kept = g.pbullets.filter(function (p) {
         if (p.y < -20 || p.x < -20 || p.x > W + 20) return false;
-        if (Math.abs(p.x - b.x) < 66 && Math.abs(p.y - b.y) < 38) { hurtBoss(p.dmg, p.x, p.y); return false; }
+        if (Math.abs(p.x - b.x) < 98 && Math.abs(p.y - b.y) < 60) { hurtBoss(p.dmg, p.x, p.y); return false; }
         for (var i = 0; i < g.enemies.length; i++) {
           var e = g.enemies[i];
           var hit = Math.hypot(p.x - e.x, p.y - e.y) < e.r + p.r;
@@ -2391,9 +2524,14 @@
         var touch = Math.hypot(e.x - s.x, e.y - s.y) < e.r + 1;
         if (touch) hurtShip();
       });
-      if (Math.abs(s.x - b.x) < 61 && Math.abs(s.y - b.y) < 35) hurtShip();
+      if (Math.abs(s.x - b.x) < 94 && Math.abs(s.y - b.y) < 56) hurtShip();
 
-      g.drops.forEach(function (d) { d.y += d.vy * dt / 1000; d.life -= dt; });
+      g.drops.forEach(function (d) {
+        d.y += d.vy * dt / 1000; d.life -= dt;
+        // Aimant léger : à moins de 55 px, bonus et pièces glissent vers le vaisseau, plus vite en approchant.
+        var mx = s.x - d.x, my = s.y - d.y, md = Math.hypot(mx, my);
+        if (md < 55 && md > 1) { var pull = 170 * (1 - md / 55) * dt / 1000; d.x += mx / md * pull; d.y += my / md * pull; }
+      });
       var keptDrops = g.drops.filter(function (d) {
         if (d.life <= 0 || d.y > H + 20) return false;
         if (Math.hypot(d.x - s.x, d.y - s.y) < 26) { pickup(d); return false; }
@@ -2402,8 +2540,24 @@
       if (!g.over) g.drops = keptDrops;  // même garde : une bombe ramassée peut finir le boss
     }
 
+    // Dessin en pixels du vaisseau incliné (repère centré sur le vaisseau). Roulis sur le même axe que l'intro :
+    // la largeur se resserre en cosinus, et la perspective grossit le côté vers lequel il file, rétrécit l'autre.
+    function pxRoll(map, x, y, sz, fill, lean) {
+      var cx = Math.cos(lean), persp = Math.sin(lean) * .32, img = sprite(map, fill), h = map.length;
+      ctx.imageSmoothingEnabled = false;
+      // Colonne par colonne (tranches du sprite pré-rendu), chacune étirée selon son côté ; léger chevauchement contre les coutures.
+      for (var c = 0; c < map[0].length; c++) {
+        var lx = x + c * sz;
+        var k = 1 + persp * (lx + sz / 2) / 18;  // -18..18 → côté opposé plus petit, côté du virage plus grand
+        ctx.drawImage(img, c, 0, 1, h, lx * cx, y * k, sz * cx + .5, h * sz * k);
+      }
+    }
+
     function stepSparks(dt) {
-      g.rings.forEach(function (r) { r.life -= dt; r.r += (r.max - r.r) * Math.min(1, dt / 60); });
+      // Les particules de charge accélèrent en approchant du vaisseau (distance en 1 − p²).
+      g.motes.forEach(function (m) { m.life -= dt; var p = 1 - Math.max(0, m.life) / m.max; m.d = m.d0 * (1 - p * p); });
+      g.motes = g.motes.filter(function (m) { return m.life > 0; });
+      g.rings.forEach(function (r) { r.life -= dt; r.r += (r.max - r.r) * Math.min(1, dt / 60); if (r.follow) { r.x = g.ship.x; r.y = g.ship.y; } });
       g.rings = g.rings.filter(function (r) { return r.life > 0; });
       g.sparks = g.sparks.filter(function (sp) {
         sp.life -= dt;
@@ -2461,18 +2615,19 @@
       g.stars.forEach(function (st) { ctx.globalAlpha = .25 + st.z * .5; ctx.fillStyle = cream; ctx.fillRect(st.x, st.y, st.z > .9 ? 2 : 1, st.z > .9 ? 2 : 1); });
       ctx.globalAlpha = 1;
 
-      var bs = 10, bw = 15 * bs, bh = 9 * bs;
-      if (b.flash > 0) { ctx.shadowColor = cream; ctx.shadowBlur = 20; }
-      if (!(b.shift > 0 && Math.floor(g.t / 90) % 2 === 0)) px(BOSS_PX, b.x - bw / 2, b.y - bh / 2, bs, b.flash > 0 ? "#fff" : cream);
+      var bs = PIX * 3, bw = BOSS_PX[0].length * bs, bh = BOSS_PX.length * bs;
+      var bf = b.flash / BOSS_FLASH, bossFill = b.flash > 0 ? (bf > 2 / 3 || bf <= 1 / 3 ? "#fff" : amber) : cream;
+      if (g.dying > 0) bossFill = Math.floor(g.dying / 60) % 2 ? "#fff" : amber;
+      if (b.flash > 0) { ctx.shadowColor = bossFill; ctx.shadowBlur = 20; }
+      if (!(b.shift > 0 && Math.floor(g.t / 90) % 2 === 0)) px(BOSS_PX, b.x - bw / 2, b.y - bh / 2, bs, bossFill);
       ctx.shadowBlur = 0;
 
       g.enemies.forEach(function (e) {
-        if (e.type === "drone") px(e.form ? DRONE_PX : BUG_PX, e.x - 12, e.y - 12, 4, cream);
-        else if (e.type === "dasher") { ctx.fillStyle = cream; ctx.beginPath(); ctx.moveTo(e.x, e.y + 14); ctx.lineTo(e.x - 9, e.y - 10); ctx.lineTo(e.x + 9, e.y - 10); ctx.closePath(); ctx.fill(); }
-        else if (e.type === "follower") { ctx.fillStyle = cream; ctx.beginPath(); ctx.moveTo(e.x, e.y - 12); ctx.lineTo(e.x + 12, e.y); ctx.lineTo(e.x, e.y + 12); ctx.lineTo(e.x - 12, e.y); ctx.closePath(); ctx.fill(); }
-        else if (e.type === "seeker") { ctx.strokeStyle = cream; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(e.x, e.y, 14, 0, 6.28); ctx.stroke(); ctx.fillStyle = cream; ctx.globalAlpha = .5 + Math.sin(g.t / 140) * .4; ctx.beginPath(); ctx.arc(e.x, e.y, 6, 0, 6.28); ctx.fill(); ctx.globalAlpha = 1; var sa2 = aimAt(e.x, e.y); ctx.beginPath(); ctx.moveTo(e.x + Math.cos(sa2) * 14, e.y + Math.sin(sa2) * 14); ctx.lineTo(e.x + Math.cos(sa2) * 22, e.y + Math.sin(sa2) * 22); ctx.stroke(); }
-        else if (e.type === "spawner") { ctx.strokeStyle = cream; ctx.lineWidth = 3; ctx.beginPath(); for (var k = 0; k < 6; k++) { var a = k * Math.PI / 3 + g.t / 900; var vx = e.x + Math.cos(a) * 32, vy = e.y + Math.sin(a) * 32; if (k) ctx.lineTo(vx, vy); else ctx.moveTo(vx, vy); } ctx.closePath(); ctx.stroke(); ctx.fillStyle = cream; ctx.fillRect(e.x - 8, e.y - 8, 16, 16); }
-        else if (e.type === "turret") { ctx.fillStyle = muted; ctx.fillRect(e.x - 18, e.y - 10, 36, 20); ctx.strokeStyle = cream; ctx.lineWidth = 5; var ta = aimAt(e.x, e.y); ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(e.x + Math.cos(ta) * 22, e.y + Math.sin(ta) * 22); ctx.stroke(); }
+        // Frame d'animation : la formation bat la mesure ensemble, les autres sont décalés chacun par leur graine.
+        var fr = Math.floor((g.t + (e.form ? 0 : e.seed * 300)) / ENEMY_FRAME) % 2;
+        var art = e.type === "drone" ? (e.form ? DRONE_PX : BUG_PX) : e.type === "dasher" ? DASHER_PX : e.type === "follower" ? FOLLOWER_PX
+          : e.type === "seeker" ? SEEKER_PX : e.type === "spawner" ? SPAWNER_PX : TURRET_PX;
+        pxAt(art[fr], e.x, e.y, e.type === "seeker" ? PIX * 1.25 : e.form ? PIX * .75 : e.type === "dasher" ? PIX * .75 : e.type === "spawner" ? PIX * 1.3 : PIX, cream);
         if (TYPES[e.type].hp > 1) { ctx.fillStyle = "rgba(167,158,144,.4)"; ctx.fillRect(e.x - 16, e.y - e.r - 8, 32, 3); ctx.fillStyle = cream; ctx.fillRect(e.x - 16, e.y - e.r - 8, 32 * e.hp / TYPES[e.type].hp, 3); }
       });
 
@@ -2483,8 +2638,26 @@
       });
       g.ebullets.forEach(function (p) { ctx.fillStyle = amber; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.28); ctx.fill(); ctx.fillStyle = cream; ctx.beginPath(); ctx.arc(p.x, p.y, p.r * .4, 0, 6.28); ctx.fill(); });
 
-      g.rings.forEach(function (r) { ctx.strokeStyle = cream; ctx.lineWidth = 2; ctx.globalAlpha = Math.max(0, r.life / 220); ctx.beginPath(); ctx.arc(r.x, r.y, r.r, 0, 6.28); ctx.stroke(); ctx.globalAlpha = 1; });
-      g.drops.forEach(function (d) { drawDrop(d, amber, cream, ink2); });
+      g.rings.forEach(function (r) { ctx.strokeStyle = r.col || cream; ctx.lineWidth = r.w || 2; ctx.globalAlpha = Math.max(0, Math.min(1, r.life / 220)); ctx.beginPath(); ctx.arc(r.x, r.y, r.r, 0, 6.28); ctx.stroke(); ctx.globalAlpha = 1; });
+      // Objet sur le point de disparaître : clignote lentement ses 3 dernières secondes, vite la dernière.
+      g.drops.forEach(function (d) {
+        if (d.life < 3000 && Math.floor(d.life / (d.life < 1000 ? 125 : 200)) % 2) return;
+        drawDrop(d, amber, cream, ink2);
+      });
+
+      if (g.aura && !g.over) {
+        var ar = auraRadius(g.aura);
+        ctx.fillStyle = tint(.08); ctx.beginPath(); ctx.arc(s.x, s.y, ar, 0, 6.28); ctx.fill();
+        ctx.strokeStyle = amber; ctx.lineWidth = 2.5; ctx.globalAlpha = .9; ctx.stroke(); ctx.globalAlpha = 1;
+      }
+
+      g.motes.forEach(function (m) {
+        var mx = s.x + Math.cos(m.a) * m.d, my = s.y + Math.sin(m.a) * m.d, ms = 5;
+        ctx.globalAlpha = Math.min(1, (1 - m.life / m.max) * 3);
+        ctx.fillStyle = m.cream ? cream : amber;
+        ctx.save(); ctx.translate(mx, my); ctx.rotate(Math.PI / 4); ctx.fillRect(-ms / 2, -ms / 2, ms, ms); ctx.restore();
+      });
+      ctx.globalAlpha = 1;
 
       if (!g.over) {
         var blink = s.inv > 0 && Math.floor(g.t / 80) % 2 === 0;
@@ -2492,10 +2665,10 @@
           if (root.classList.contains("is-charging")) { ctx.shadowColor = amber; ctx.shadowBlur = 24; }
           var fancy = Achievements.ship() === "ship";
           ctx.save();
-          if (s.scale && (s.scale !== 1 || s.yaw)) { var yawX = Math.cos(s.yaw || 0); ctx.translate(s.x, s.y); ctx.scale(s.scale * (Math.abs(yawX) < .12 ? (yawX < 0 ? -.12 : .12) : yawX), s.scale); ctx.translate(-s.x, -s.y); }
-          if (fancy) { ctx.fillStyle = amber; ctx.globalAlpha = .6 + Math.random() * .4; ctx.fillRect(s.x - 5, s.y + 18, 4, 6 + Math.random() * 10); ctx.fillRect(s.x + 1, s.y + 18, 4, 6 + Math.random() * 10); ctx.globalAlpha = 1; }
-          px(fancy ? SHIP2_PX : SHIP_PX, s.x - 18, s.y - 18, 4, s.flash > 0 ? amber : (fancy ? amber : cream));
-          if (fancy) px(["...X...", "..X.X..", ".X...X.", "..X.X..", "...X..."], s.x - 14, s.y - 10, 4, cream);
+          ctx.translate(s.x, s.y);
+          if (s.scale && (s.scale !== 1 || s.yaw)) { var yawX = Math.cos(s.yaw || 0); ctx.scale(s.scale * (Math.abs(yawX) < .12 ? (yawX < 0 ? -.12 : .12) : yawX), s.scale); }
+          pxRoll(fancy ? SHIP2_PX : SHIP_PX, -18, -18, 4, s.flash > 0 ? amber : (fancy ? amber : cream), s.lean);
+          if (fancy) pxRoll(["...X...", "..X.X..", ".X...X.", "..X.X..", "...X..."], -14, -10, 4, cream, s.lean);
           ctx.restore();
           ctx.shadowBlur = 0;
         }
@@ -2513,6 +2686,8 @@
       var bx0 = 24, bw0 = W - 48, bh0 = 26, fillW = bw0 * Math.max(0, b.hp / b.max);
       ctx.fillStyle = "rgba(167,158,144,.22)";
       ctx.fillRect(bx0, 20, bw0, bh0);
+      var lagW = bw0 * Math.max(0, Math.min(b.max, b.lag) / b.max);
+      if (lagW > fillW) { ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.fillRect(bx0 + fillW, 20, lagW - fillW, bh0); }
       ctx.fillStyle = amber;
       ctx.fillRect(bx0, 20, fillW, bh0);
       ctx.font = "700 16px " + color("--font-mono");
@@ -2526,7 +2701,7 @@
 
       // HUD bas gauche, de bas en haut : cœurs, balles (1 à 5), cadence (1 à 5), nuke.
       var dim = "rgba(167,158,144,.25)", hudX = 24, pipX = hudX + 40;
-      for (var h = 0; h < s.max; h++) px(HEART_PX, hudX + h * 38, H - 54, 4.5, h < s.hp ? amber : dim);
+      for (var h = 0; h < s.max; h++) px(HEART_PX, hudX + h * 38, H - 54, PIX, h < s.hp ? amber : dim);
       drawDrop({ kind: "bullet", x: hudX + 14, y: H - 86 }, amber, cream, ink2);
       for (var pb = 0; pb < 5; pb++) { ctx.fillStyle = pb < s.bullets ? amber : dim; ctx.beginPath(); ctx.roundRect(pipX + pb * 13, H - 95, 7, 18, 3.5); ctx.fill(); }
       drawDrop({ kind: "rate", x: hudX + 14, y: H - 122 }, amber, cream, ink2);
@@ -2604,8 +2779,13 @@
       if (!open) return;
       var dt = Math.min(50, now - (last || now));
       last = now;
-      if (g.freeze > 0) g.freeze -= dt;
-      else step(dt);
+      if (g.freeze > 0) {
+        g.freeze -= dt;
+        if (g.freeze <= 0 && g.onThaw) { var thaw = g.onThaw; g.onThaw = null; thaw(); }
+      } else if (g.dying > 0) {
+        step(dt * SLOWMO);
+        dyingTick(dt);  // en temps réel : les explosions gardent leur cadence pendant le ralenti
+      } else step(dt);
       draw();
       raf = requestAnimationFrame(loop);
     }
@@ -2631,15 +2811,16 @@
 
     function field() {
       var s = g.ship;
-      if (g.t - g.lastField < 220) return;
+      if (g.intro > 0 || g.t - g.lastField < 220) return;
       g.lastField = g.t;
       var R = 72, D = Achievements.owns("cannon") ? 4 : 2;
       g.rings.push({ x: s.x, y: s.y, r: 10, max: R, life: 220 });
       spark(s.x, s.y, 10, color("--cream"), 200);
+      g.shake = Math.max(g.shake, 7);
       g.enemies.slice().forEach(function (e) {
         if (Math.hypot(e.x - s.x, e.y - s.y) < R + e.r) { e.hp -= D; spark(e.x, e.y, 3, color("--cream"), 90); if (e.hp <= 0) killEnemy(e); }
       });
-      if (Math.abs(g.boss.x - s.x) < R + 66 && Math.abs(g.boss.y - s.y) < R + 38) hurtBoss(D);
+      if (Math.abs(g.boss.x - s.x) < R + 98 && Math.abs(g.boss.y - s.y) < R + 60) hurtBoss(D);
     }
 
     function win() {
@@ -2787,15 +2968,14 @@
     document.addEventListener("keydown", function (e) {
       if (open && g && g.over) { if (e.key === "Escape" || e.key === " ") e.preventDefault(); return; }
       if (e.key === "Escape") closeFight();
-      if ((e.key === "w" || e.key === "W") && open && g && !g.over && /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)) win();
       if (e.key === " " && open && g && !g.over && g.intro <= 0 && g.ship.sweep) {
         e.preventDefault();
         g.ship.sweep = 0;
         g.shake = 14;
+        g.freeze = Math.max(g.freeze, 90);  // hit-stop
         g.enemies.slice().forEach(function (en) { spark(en.x, en.y, 10, color("--amber"), 160); });
         g.enemies = [];
         g.ebullets = [];
-        g.msg = { text: I18N.t("fight.sweep", "NUKE"), life: 700 };
       }
     });
     window.addEventListener("resize", function () { if (open && !morphing) { center(); size(); } });

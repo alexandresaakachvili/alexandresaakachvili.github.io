@@ -336,7 +336,6 @@ window.I18N_EN = {
   "shop.desc.sweep": "Press Space to obliterate every enemy and their attacks. Once per run.",
   "shop.gated": "End phase 1 to unlock",
   "shop.pc": "Unlockable on the desktop version of the site",
-  "fight.sweep": "NUKE",
   "fight.win": "VICTORY",
   "fight.lose": "SHIP DESTROYED",
   "fight.space": "[ SPACE ] :",
