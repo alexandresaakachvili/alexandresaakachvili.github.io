@@ -38,7 +38,8 @@
 
 *,*::before,*::after{box-sizing:border-box}
 *{margin:0;padding:0}
-html{-webkit-text-size-adjust:100%;background:#000}
+/* scrollbar-gutter : la place de la barre de défilement reste réservée quand une popup bloque le scroll (overflow:hidden), sinon la page se décale. */
+html{-webkit-text-size-adjust:100%;background:#000;scrollbar-gutter:stable}
 body{
   background:var(--bg);
   color:var(--fg);
@@ -56,6 +57,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 ul,ol{list-style:none}
 ::selection{background:var(--amber);color:var(--ink)}
 :focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+/* Retour depuis un projet (/#kokoro-renzu…) : le navigateur focus la carte ciblée, sans contour. */
+.card:target{outline:none}
 
 html.lenis,html.lenis body{height:auto}
 
@@ -101,8 +104,14 @@ p + p{margin-top:1em}
 
 strong{font-weight:600;color:var(--fg)}
 
-[data-reveal]{opacity:0;transform:translateY(24px)}
-[data-reveal].is-in{opacity:1;transform:none;transition:opacity .8s var(--ease),transform .9s var(--ease)}
+/* Apparition : le texte monte, les médias (cartes, images, vidéos…) basculent vers l'avant en 3D.
+   En animation (et non en transition) pour que le transform ne reste pas posé sur l'élément une fois arrivé. */
+[data-reveal]{opacity:0}
+[data-reveal].is-in{opacity:1;animation:reveal-up .9s var(--ease) backwards}
+[data-reveal].is-in:is(figure,.figure,.video-figure,.fav,.card,.item,.contact-tile,.profile__photo,.spec,.carousel,.media-grid,.game,.split,.tech--media){transform-origin:50% 0;animation:reveal-tilt 1.1s var(--ease) backwards}
+.work-hero__title[data-reveal]{opacity:1;animation:none}
+@keyframes reveal-up{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes reveal-tilt{from{opacity:0;transform:perspective(1200px) translateY(70px) rotateX(-24deg) scale(.94)}to{opacity:1;transform:none}}
 .line-mask{display:block;overflow:hidden;padding-block:.1em;margin-block:-.1em}
 .line-mask > span{display:block;transform:translateY(115%);transition:transform 1s var(--ease)}
 .is-in .line-mask > span,.line-mask.is-in > span{transform:none}
@@ -705,7 +714,7 @@ body.is-leaving{
 .card__timer{font-family:var(--font-mono);letter-spacing:.12em;font-weight:400}
 .card--locked .card__name{font-variant-ligatures:none}
 
-.cards:has(.card.is-hovered) .card:not(.is-hovered) .card__inner{transform:scale(.975);opacity:.55}
+.cards:has(.card.is-hovered) .card:not(.is-hovered) .card__inner{transform:scale(.975);opacity:.775}
 .cards .card__inner{transition:transform .5s var(--ease-snap),opacity .45s var(--ease),border-color .45s var(--ease),background .45s var(--ease)}
 
 .card__meta{display:flex;flex-wrap:wrap;align-items:center;gap:clamp(.7rem,1.4vw,1.4rem);margin-top:.5rem}
@@ -804,6 +813,17 @@ body.is-leaving{
 .work-hero__title:hover .work-hero__back,.work-hero__back:focus-visible,html.is-coarse .work-hero__back{width:.8em;margin-right:.22em}
 .work-hero__title:hover .work-hero__back svg,.work-hero__back:focus-visible svg,html.is-coarse .work-hero__back svg{transform:scaleX(1)}
 .work-hero__back:hover{color:var(--cream)}
+/* La flèche décale tout le titre : lignes suivantes, retours à la ligne et sous-titre suivent la même largeur (.8em + .22em). */
+@property --back{syntax:"<length>";inherits:true;initial-value:0px}
+/* La transition est posée sur les lignes : celle du titre est écrasée par [data-reveal].is-in. */
+.work-hero__title{--back:0px}
+.work-hero__title:has(.work-hero__back):hover,.work-hero__title:has(.work-hero__back:focus-visible),html.is-coarse .work-hero__title:has(.work-hero__back){--back:1.02em}
+.work-hero__title:has(.work-hero__back) .line-mask > span,.work-hero__title:has(.work-hero__back) .work-hero__sub{
+  padding-left:var(--back);
+  transition:transform 1s var(--ease),padding-left .5s var(--ease-snap),text-indent .5s var(--ease-snap);
+}
+.work-hero__title .line-mask > span:has(> .work-hero__back){text-indent:calc(var(--back) * -1)}
+.work-hero__back{text-indent:0}
 
 .spec{perspective:900px;width:clamp(200px,20vw,260px)}
 .spec__inner{
@@ -887,7 +907,7 @@ a.spec__corner:hover{color:var(--cream);transform:scale(1.12)}
              background .45s var(--ease),opacity .45s var(--ease);
 }
 
-.items:has(.item.is-hovered) .item:not(.is-hovered){transform:scale(.965);opacity:.55}
+.items:has(.item.is-hovered) .item:not(.is-hovered){transform:scale(.965);opacity:.775}
 .item.is-hovered{
   z-index:5;border-color:var(--amber);background:var(--ink-3);
   will-change:transform;
@@ -967,7 +987,7 @@ a.spec__corner:hover{color:var(--cream);transform:scale(1.12)}
 .fav__media{position:relative;overflow:hidden;aspect-ratio:16/10;flex:none;background:var(--ink-2)}
 .fav__media img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease)}
 .fav.is-hovered .fav__media img{transform:scale(1.07)}
-.favs:has(.fav.is-hovered) .fav:not(.is-hovered) .fav__inner{transform:scale(.94);opacity:.5}
+.favs:has(.fav.is-hovered) .fav:not(.is-hovered) .fav__inner{transform:scale(.94);opacity:.75}
 .favs .fav__inner{transition:transform .55s var(--ease-snap),opacity .4s var(--ease),border-color .45s var(--ease),background .45s var(--ease),box-shadow .45s var(--ease)}
 .fav__text{position:relative;display:flex;flex-direction:column;gap:.2rem;flex:1;padding:clamp(.72rem,1.1vw,1.05rem)}
 
@@ -1052,7 +1072,7 @@ a.spec__corner:hover{color:var(--cream);transform:scale(1.12)}
              opacity .4s var(--ease),background .45s,box-shadow .45s var(--ease);
 }
 
-.contact-grid:has(.contact-tile.is-hovered) .contact-tile:not(.is-hovered){transform:scale(.965);opacity:.55}
+.contact-grid:has(.contact-tile.is-hovered) .contact-tile:not(.is-hovered){transform:scale(.965);opacity:.775}
 .contact-tile.is-hovered{
   z-index:5;will-change:transform;border-color:color-mix(in srgb,var(--amber) 55%,transparent);
   transform:translateY(-6px);background:var(--ink-3);

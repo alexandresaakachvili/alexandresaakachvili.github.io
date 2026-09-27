@@ -724,7 +724,10 @@
 
     Hover.on(function (el) {
       var card = el && el.closest ? el.closest("[data-tilt]") : null;
-      if (card === hovered) return;
+      if (card === hovered) {
+        if (card && card.__tiltApply) card.__tiltApply(Cursor.x, Cursor.y);
+        return;
+      }
       if (hovered) {
         hovered.classList.remove("is-hovered");
         if (hovered.__tiltReset) hovered.__tiltReset();
@@ -764,12 +767,15 @@
     });
   }
 
+  // Un changement de langue fait bouger la mise en page, donc le scroll : le header l'ignore un instant.
+  var headerHoldUntil = 0;
   function initHeader() {
     var header = document.querySelector("[data-header]");
     if (header) {
       var last = 0;
       window.addEventListener("scroll", function () {
         var y = window.scrollY;
+        if (performance.now() < headerHoldUntil) { last = y; return; }
         if (y > last && y > 240) header.classList.add("is-hidden");
         else header.classList.remove("is-hidden");
         last = y;
@@ -3072,6 +3078,47 @@
     });
   }
 
+  // Changement de langue : les textes visibles se décodent lettre par lettre, façon « Ne pas ouvrir ».
+  var scrambleGen = 0;
+  // Tout le texte visible à l'écran est touché, traduit ou non (noms de projets compris).
+  function scrambleIn() {
+    if (reduced) return;
+    var GLYPHS = "▓▒░█#%&@$*<>/\|=+~^";
+    var vh = window.innerHeight, jobs = [];
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        if (!n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+        var p = n.parentElement;
+        if (!p || p.closest("script,style,noscript,textarea,[data-glitch]")) return NodeFilter.FILTER_REJECT;
+        var r = p.getBoundingClientRect();
+        return (r.width && r.bottom >= 0 && r.top <= vh) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      }
+    }), n;
+    while ((n = walker.nextNode())) {
+      var text = n.nodeValue, th = [];
+      for (var i = 0; i < text.length; i++) th.push((i / text.length) * .55 + Math.random() * .4);
+      jobs.push({ node: n, text: text, th: th, last: text });
+    }
+    if (!jobs.length) return;
+    var gen = ++scrambleGen, start = performance.now(), dur = 375;
+    var t = setInterval(function () {
+      var p = gen === scrambleGen ? (performance.now() - start) / dur : 1;
+      jobs.forEach(function (j) {
+        // Si un autre script a réécrit ce texte entre-temps, on le laisse tranquille.
+        if (j.node.nodeValue !== j.last) return;
+        if (p >= 1) { j.node.nodeValue = j.text; return; }
+        var out = "";
+        for (var i = 0; i < j.text.length; i++) {
+          var c = j.text.charAt(i);
+          out += (p >= j.th[i] || /\s/.test(c)) ? c
+            : Math.random() < .5 ? GLYPHS.charAt(Math.floor(Math.random() * GLYPHS.length)) : String.fromCharCode(65 + Math.floor(Math.random() * 26));
+        }
+        j.node.nodeValue = j.last = out;
+      });
+      if (p >= 1) clearInterval(t);
+    }, 45);
+  }
+
   var I18N = {
     key: "as-lang",
     current: "fr",
@@ -3134,7 +3181,9 @@
       // Un clic n'importe où sur « FR / EN » bascule vers l'autre langue.
       document.querySelectorAll("[data-lang]").forEach(function (box) {
         box.addEventListener("click", function () {
+          headerHoldUntil = performance.now() + 800;
           I18N.apply(I18N.current === "fr" ? "en" : "fr");
+          scrambleIn();
           Achievements.unlock("lang");
         });
       });
