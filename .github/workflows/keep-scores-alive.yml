@@ -1,0 +1,59 @@
+name: Keep scores alive
+
+# Supabase met en pause les projets gratuits après 7 jours sans activité.
+# Deux fois par semaine, ce workflow :
+#   1. lit le tableau des scores (compte comme activité côté Supabase) ;
+#   2. en garde une copie dans backup/scores.json, commitée si elle a changé ;
+#   3. se réactive lui-même, sinon GitHub coupe les workflows planifiés
+#      après 60 jours sans activité sur le dépôt.
+# Si la lecture échoue (projet en pause, clé changée), GitHub envoie un mail.
+on:
+  schedule:
+    - cron: "17 6 * * 1,4"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lire le tableau des scores
+        env:
+          # Même URL et même clé publique que SCORES_API dans assets/js/app.js
+          SCORES_URL: https://aryluvedemvtmonqlcxk.supabase.co
+          SCORES_KEY: sb_publishable_BiNTdYccGldXJ19ZU8Kw0A_x7E5Kn1K
+        run: |
+          curl --fail --silent --show-error --max-time 30 --retry 3 --retry-delay 20 \
+            -H "apikey: $SCORES_KEY" -H "Authorization: Bearer $SCORES_KEY" \
+            "$SCORES_URL/rest/v1/scores?select=name,time,date,konami&order=time.asc,id.asc" \
+            -o "$RUNNER_TEMP/scores.json"
+          jq -e 'type == "array"' "$RUNNER_TEMP/scores.json" > /dev/null
+
+      - name: Sauvegarder les scores dans le dépôt
+        run: |
+          # Un tableau vide n'écrase jamais une sauvegarde existante
+          if [ "$(jq length "$RUNNER_TEMP/scores.json")" -eq 0 ]; then
+            echo "Tableau vide, sauvegarde inchangée."
+            exit 0
+          fi
+          mkdir -p backup
+          jq . "$RUNNER_TEMP/scores.json" > backup/scores.json
+          git add backup/scores.json
+          if git diff --cached --quiet; then
+            echo "Aucun nouveau score."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Sauvegarde des scores"
+          git push
+
+      - name: Garder ce workflow actif
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/keep-scores-alive.yml/enable"
