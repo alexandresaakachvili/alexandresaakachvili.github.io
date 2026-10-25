@@ -2,11 +2,13 @@ name: Keep scores alive
 
 # Supabase met en pause les projets gratuits après 7 jours sans activité.
 # Deux fois par semaine, ce workflow :
-#   1. lit le tableau des scores (compte comme activité côté Supabase) ;
-#   2. en garde une copie dans backup/scores.json, commitée si elle a changé ;
-#   3. se réactive lui-même, sinon GitHub coupe les workflows planifiés
+#   1. écrit dans la base via la fonction keepalive() (supabase/keepalive.sql) :
+#      les lectures seules ne suffisaient pas à Supabase ;
+#   2. lit le tableau des scores ;
+#   3. en garde une copie dans backup/scores.json, commitée si elle a changé ;
+#   4. se réactive lui-même, sinon GitHub coupe les workflows planifiés
 #      après 60 jours sans activité sur le dépôt.
-# Si la lecture échoue (projet en pause, clé changée), GitHub envoie un mail.
+# Si un appel échoue (projet en pause, clé changée), GitHub envoie un mail.
 on:
   schedule:
     - cron: "17 6 * * 1,4"
@@ -19,14 +21,23 @@ permissions:
 jobs:
   ping:
     runs-on: ubuntu-latest
+    env:
+      # Même URL et même clé publique que SCORES_API dans assets/js/app.js
+      SCORES_URL: https://aryluvedemvtmonqlcxk.supabase.co
+      SCORES_KEY: sb_publishable_BiNTdYccGldXJ19ZU8Kw0A_x7E5Kn1K
     steps:
       - uses: actions/checkout@v5
 
+      - name: Écrire dans la base
+        # Fonction créée par supabase/keepalive.sql
+        run: |
+          curl --fail --silent --show-error --max-time 30 --retry 3 --retry-delay 20 \
+            -X POST -H "apikey: $SCORES_KEY" -H "Authorization: Bearer $SCORES_KEY" \
+            -H "Content-Type: application/json" -d '{}' \
+            "$SCORES_URL/rest/v1/rpc/keepalive"
+          echo
+
       - name: Lire le tableau des scores
-        env:
-          # Même URL et même clé publique que SCORES_API dans assets/js/app.js
-          SCORES_URL: https://aryluvedemvtmonqlcxk.supabase.co
-          SCORES_KEY: sb_publishable_BiNTdYccGldXJ19ZU8Kw0A_x7E5Kn1K
         run: |
           curl --fail --silent --show-error --max-time 30 --retry 3 --retry-delay 20 \
             -H "apikey: $SCORES_KEY" -H "Authorization: Bearer $SCORES_KEY" \
